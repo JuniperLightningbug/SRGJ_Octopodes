@@ -1,0 +1,13 @@
+{
+  "name": "com.martinmicklethwaite.mm_library",
+  "version": "1.0.1",
+  "displayName": "MM's Unity Library",
+  "description": "Collection of Unity utilities & assets shared across projects",
+  "unity": "6000.0",
+  "dependencies": {},
+  "author": {
+    "name": "Martin Micklethwaite",
+    "url": "https://www.martinmicklethwaite.com"
+  },
+  "_fingerprint": "f1f28f30a2d5a51efedbf099c888cf05e87d4b09"
+}
