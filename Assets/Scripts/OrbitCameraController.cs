@@ -15,7 +15,6 @@ public class OrbitCameraController : MonoBehaviour
 	
 	void Update()
 	{
-
 		if( Mouse.current.rightButton.isPressed )
 		{
 			Vector2 mouseDelta = Mouse.current.delta.ReadValue();

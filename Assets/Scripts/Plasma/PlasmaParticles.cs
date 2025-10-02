@@ -18,6 +18,9 @@ public class PlasmaParticles : StandaloneSingletonBase<PlasmaParticles>
 	
 	// Unity constraint - max batch size
 	private const int _kBatchSize = 1023;
+	
+	// Don't cull the particle mesh batches (we could recalculate bounds, but it seems unnecessary)
+	private float _kBoundingBoxExtentsMultiplier = 99999.0f;
 
 	[Header( "Visuals" )]
 	[SerializeField] private float _particleSize = 0.3f;
@@ -35,6 +38,16 @@ public class PlasmaParticles : StandaloneSingletonBase<PlasmaParticles>
 	[SerializeField] private int _maxCount = _kBatchSize;
 	[ShowNonSerializedField] private int _currentCount = 0;
 	
+	// A constant proportional to the field strength (we're not using real units, so just use this as a scale factor)
+	[SerializeField] private float _k = 1.0f;
+	
+	[Header("Atmosphere Influence")]
+	[SerializeField, MinMaxSlider(0.0f, 1.0f)]
+	private Vector2 _atmosphereRadius = Vector2.zero;
+	// Multiplier per second: min at earth radius, max at atmosphere radius
+	[SerializeField, MinMaxSlider( 0.0f, 10.0f )]
+	private Vector2 _atmosphereDragPerSec = Vector2.one;
+	
 	// Runtime
 	private Mesh _particleMesh;
 	private MaterialPropertyBlock _cachedMatPropBlockObj;
@@ -42,6 +55,7 @@ public class PlasmaParticles : StandaloneSingletonBase<PlasmaParticles>
 	private Vector4[] _coloursRenderQueue;
 	private float[] _sizeMultipliersRenderQueue;
 	private Matrix4x4[] _matricesRenderQueue; // Always identity - but required
+	private Transform _cameraTransform;
 	
 	// Burst
 	private NativeArray<Vector3> _positions;
@@ -50,27 +64,16 @@ public class PlasmaParticles : StandaloneSingletonBase<PlasmaParticles>
 	private NativeArray<float> _sizeMultipliers;
 	private NativeArray<Vector4> _colours;
 	
-	private Transform _cameraTransform;
-	
 	// TODO: Hard-coded for now
 	private Vector3 _mCentreVec = Vector3.zero;
 	private Vector3 _mDir = Vector3.up;
 	private float _mMag = 1.0f;
-	private float kBoundingBoxExtentsMultiplier = 99999.0f;
 	
-	[SerializeField, MinMaxSlider(0.0f, 1.0f)]
-	private Vector2 _atmosphereRadius = Vector2.zero;
-	
-	// Multiplier per second: min at earth radius, max at atmosphere radius
-	[SerializeField, MinMaxSlider( 0.0f, 10.0f )]
-	private Vector2 _atmosphereDragPerSec = Vector2.one;
-	
-	[SerializeField] private float _k = 1.0f;
 
 	protected override void Initialise()
 	{
 		// Make a quad mesh that doesn't cull
-		_particleMesh = Instantiate(PrimitiveQuadBuilder.BuildQuad( _particleSize, kBoundingBoxExtentsMultiplier ));
+		_particleMesh = Instantiate(PrimitiveQuadBuilder.BuildQuad( _particleSize, _kBoundingBoxExtentsMultiplier ));
 		
 		_positions = new NativeArray<Vector3>(_maxCount, Allocator.Persistent);
 		_velocities = new NativeArray<Vector3>(_maxCount, Allocator.Persistent);
