@@ -14,7 +14,7 @@ public class SatelliteOrbit : MonoBehaviour
 	 *
 	 * -> Root (with attached script): world space, moves to planet position but does not rotate
 	 * |-> _orbitalTransformRoot: Rotates to the correct direction
-	 * |--> orbital visualisation (component or child transform if necessary for visuals scale or rotation offset)
+	 * |--> _orbitalVisualsToScaleRoot (component or child transform if necessary for visuals scale or rotation offset)
 	 * |--> _satelliteRootTransform: root of all spawned satellites (rotates in local space over time)
 	 * |---> [n] spawned satellites
 	 *
@@ -22,32 +22,52 @@ public class SatelliteOrbit : MonoBehaviour
 	 */
 	
 	// Rotate the orbital circle to the input direction
-	[SerializeField] protected Transform _orbitalTransformRoot;
+	[SerializeField] private Transform _orbitalTransformRoot;
+	
+	// Transform to apply a _scale_ to in order to create the desired radius (e.g. a circle from a line renderer)
+	[SerializeField] private Transform _orbitalVisualsToScaleRoot;
 	
 	// Transform parenting all the satellites. Since we're rotating them at the same rate, we can do it once.
 	// But we don't necessarily want to rotate the whole object (e.g. the line renderer, other visuals)
-	[SerializeField] protected Transform _satelliteRootTransform;
+	[SerializeField] private Transform _satelliteTransformRoot;
 
-	[ReadOnly, SerializeField] protected List<Transform> _satelliteTransforms;
+	[SerializeField] private Object _satellitePrefab;
+
+	[ReadOnly, SerializeField] private List<Transform> _satelliteTransforms;
+
+	[SerializeField, Tooltip("Set by instantiating manager")] private float _radius = 1.0f;
+	[SerializeField, Tooltip("Set by instantiating manager (Rotations Per Second)")] private float _orbitSpeed = 1.0f;
 
 	private Vector3 _directionReference0 = Vector3.right;
 	private Vector3 _directionReference1 = Vector3.forward;
 	private Vector3 _cachedTransformUp = Vector3.up;
 
-	public void Initialise( Vector3 centre, Quaternion rotation, float radius, bool bApplyRadiusFromSurface, Vector3 startReferencePosition )
+	public void Initialise( Vector3 centre, Quaternion rotation, float radius, bool bApplyRadiusFromSurface, float orbitSpeed, Vector3 startReferencePosition )
 	{
 		transform.position = centre;
 		transform.rotation = rotation;
+		transform.localScale = Vector3.one;
 		_cachedTransformUp = transform.up;
 
-		float scale = bApplyRadiusFromSurface ? startReferencePosition.magnitude + radius : radius;
-		transform.localScale *= scale;
+		_radius = bApplyRadiusFromSurface ? startReferencePosition.magnitude + radius : radius;
+		if( _orbitalVisualsToScaleRoot )
+		{
+			_orbitalVisualsToScaleRoot.localScale = Vector3.one * _radius;
+		}
+		_orbitSpeed = orbitSpeed;
 
 		Vector3 startDirection = transform.InverseTransformPoint( startReferencePosition ).normalized;
 		_directionReference0 = startDirection;
 		_directionReference1 = startDirection;
 		
 		UpdateOrbitRotationToReferencePositions();
+	}
+
+	void Update()
+	{
+		// Rotate satellites
+		float frameRotationDegrees = _orbitSpeed * Time.deltaTime * 360.0f;
+		_satelliteTransformRoot.Rotate( new Vector3( 0.0f, -frameRotationDegrees, 0.0f ), Space.Self );
 	}
 
 	public void UpdateSecondReferencePosition( Vector3 pos1 )
@@ -80,8 +100,33 @@ public class SatelliteOrbit : MonoBehaviour
 		       MM.MathsUtils.Approximately( Mathf.Abs( a.z ), Mathf.Abs( b.z ), epsilon );
 	}
 
-	public bool AddSatellite()
+	public bool LaunchSatellite()
 	{
+		if( _satellitePrefab )
+		{
+			// For now, just use the first direction reference point for the initial position
+			// TODO: We'll need to think of something better for this - and we will need to handle rotations.
+			// TODO: We should apply a local offset and then a local y rotation instead.
+			Transform satelliteRoot = _satelliteTransformRoot ? _satelliteTransformRoot : transform;
+			GameObject newSatelliteObj = Instantiate( _satellitePrefab, satelliteRoot ) as GameObject;
+			if( newSatelliteObj )
+			{
+				newSatelliteObj.transform.localPosition = satelliteRoot.InverseTransformDirection( _directionReference0 ) * _radius;
+				
+				// TODO TEMP: COLOUR MAT
+				MeshRenderer newMeshRenderer = newSatelliteObj.GetComponent<MeshRenderer>();
+				if( newMeshRenderer )
+				{
+					newMeshRenderer.material.SetColor( "_BaseColor", Random.ColorHSV(0.0f, 1.0f, 0.3f, 0.8f, 0.5f, 0.8f, 1.0f, 1.0f ) );
+				}
+				
+				// TODO fix
+				HexgridMaterialTracker.Instance.TrackTransform( newSatelliteObj.transform );
+				
+				return true;
+			}
+		}
+
 		return false;
 	}
 }

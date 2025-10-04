@@ -12,27 +12,22 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 		get { return false; }
 	}
 
+	[Header("Project data")]
 	[SerializeField] private Object _orbitPrefab;
 
-	// TODO will we ever have more than 1?
+	[Header("Scene data")]
 	[SerializeField] private Transform _orbitCentreTransform;
 	[SerializeField] private Collider _orbitClickableCollider;
 	[SerializeField] private Camera _camera;
-	[SerializeField] private bool _bMeasureOrbitRadiusFromPlanetSurface = false;
 	
+	[Header("Behaviour")]
+	[SerializeField] private bool _bMeasureOrbitRadiusFromPlanetSurface = false;
 	[SerializeField] private float _orbitRadius = 1.0f;
-	private float OrbitScale
-	{
-		get
-		{
-			return (_bMeasureOrbitRadiusFromPlanetSurface && _orbitClickableCollider) ?
-				_orbitClickableCollider.transform.lossyScale.x * 0.5f + _orbitRadius :
-				_orbitRadius;
-		}
-	}
+	[SerializeField, Tooltip("Rotations Per Second")] private float _orbitSpeed = 1.0f;
 
 	private List<SatelliteOrbit> _orbits = new List<SatelliteOrbit>();
 	private SatelliteOrbit _newOrbit;
+	private SatelliteOrbit _lastOrbit;
 
 	protected override void Initialise()
 	{
@@ -73,6 +68,11 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 		{
 			TryReleaseOrbit();
 		}
+
+		if( Keyboard.current.spaceKey.wasPressedThisFrame )
+		{
+			TryLaunchSatellites( 1 ); // TODO: This is temporary - needs a design decision
+		}
 	}
 
 	private void TryCreateOrbit()
@@ -104,6 +104,7 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 					_orbitCentreTransform.rotation,
 					_orbitRadius,
 					_bMeasureOrbitRadiusFromPlanetSurface,
+					_orbitSpeed,
 					referencePosition
 					);
 			}
@@ -129,7 +130,19 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 			TryUpdateOrbitDirection();
 
 			_orbits.Add( _newOrbit );
+			_lastOrbit = _newOrbit;
 			_newOrbit = null;
+		}
+	}
+
+	private void TryLaunchSatellites( int num )
+	{
+		if( _lastOrbit )
+		{
+			for( int i = 0; i < num; ++i )
+			{
+				_lastOrbit.LaunchSatellite();
+			}
 		}
 	}
 

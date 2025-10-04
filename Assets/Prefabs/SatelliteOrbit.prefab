@@ -201,7 +201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blendMode: 1
   scaleMode: 0
-  color: {r: 0.5924529, g: 0.5924529, b: 0.5924529, a: 0.47058824}
+  color: {r: 0.690566, g: 0.690566, b: 0.690566, a: 0.72156864}
   detailLevel: 2
   culling: 0
   boundsPadding: 0
@@ -226,7 +226,7 @@ MonoBehaviour:
   angRadiansEnd: 2.3561945
   radius: 1
   radiusSpace: 0
-  thickness: 0.05
+  thickness: 0.03
   thicknessSpace: 0
   arcEndCaps: 0
   matchDashSpacingToSize: 1
@@ -371,8 +371,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _orbitalTransformRoot: {fileID: 8886015278592442234}
-  _satelliteRootTransform: {fileID: 7780902978943342853}
+  _orbitalVisualsToScaleRoot: {fileID: 876301957430773996}
+  _satelliteTransformRoot: {fileID: 7780902978943342853}
+  _satellitePrefab: {fileID: 3446865649245523367, guid: cda283cb3075ee747951f3f8172a9b89, type: 3}
   _satelliteTransforms: []
+  _radius: 1
+  _orbitSpeed: 0.3
 --- !u!1 &8504576942324197469
 GameObject:
   m_ObjectHideFlags: 0
