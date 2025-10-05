@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HexgridMat 1
+  m_Name: HexgridTestMat 1
   m_Shader: {fileID: -6465566751694194690, guid: 639ccb95d2c0a574c924d7b27e081793, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
