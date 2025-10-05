@@ -3,7 +3,7 @@ using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SO_PlanetData", menuName = "Scriptable Objects/SO_PlanetData")]
+[CreateAssetMenu(fileName = "PlanetData", menuName = "Scriptable Objects/PlanetData")]
 public class SO_PlanetData : ScriptableObject
 {
 	public enum ESensorType
@@ -22,10 +22,13 @@ public class SO_PlanetData : ScriptableObject
 	public string _key;
 	public string _displayName;
 
+	[System.Serializable]
 	public struct PlanetLayerTuple
 	{
 		public ESensorType _sensorType;
-		public SO_PlanetLayerMeshes.EHexgridMeshKey _mesh;
+		public Mesh _mesh;
+		public Material _material;
+		// TODO textures?
 	}
 	
 	public List<PlanetLayerTuple> _planetLayers = new List<PlanetLayerTuple>();
@@ -42,10 +45,13 @@ public class SO_PlanetData : ScriptableObject
 			int maxLayerCount = (i == (int)ESensorType.INVALID || i == (int)ESensorType.COUNT) ? 0 : 1;
 			for( int j = 0; j < _planetLayers.Count; ++j )
 			{
-				foundLayerCount++;
-				if( foundLayerCount > maxLayerCount )
+				if( _planetLayers[j]._sensorType == (ESensorType)i )
 				{
-					duplicateEntryIdxs.Add( j );
+					foundLayerCount++;
+					if( foundLayerCount > maxLayerCount || _planetLayers[j]._mesh == null )
+					{
+						duplicateEntryIdxs.Add( j );
+					}
 				}
 			}
 		}

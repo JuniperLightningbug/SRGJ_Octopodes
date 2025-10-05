@@ -549,6 +549,7 @@ GameObject:
   - component: {fileID: 5875063706523584498}
   - component: {fileID: 7361046476286314583}
   - component: {fileID: 4738709903307127965}
+  - component: {fileID: 7361046476286314584}
   m_Layer: 0
   m_Name: planet_earth
   m_TagString: Untagged
@@ -564,6 +565,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6540277778478046536}
   m_Mesh: {fileID: -575865206004738883, guid: a65026d4b86261148a9f35473340648d, type: 3}
+--- !u!114 &7361046476286314584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6540277778478046536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a297f0235e8caf347b4ac6e6c0d77263, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _planetData: {fileID: 11400000, guid: 35cb5bff130bd6a42b94e2659c4ddd49, type: 2}
+  _auroraMeshFilter: {fileID: 8298887388151357373}
+  _magnetoMeshFilter: {fileID: 0}
+  _massSpecMeshFilter: {fileID: 0}
+  _plasmaMeshFilter: {fileID: 0}
+  _planetMeshRenderer: {fileID: 0}
+  _layerMeshesCache: {fileID: 11400000, guid: e69d7ba4b0e10b84da778463f6e4e936, type: 2}
+  _planetLayerInstances: []
 --- !u!33 &8298887388151357373
 MeshFilter:
   m_ObjectHideFlags: 0

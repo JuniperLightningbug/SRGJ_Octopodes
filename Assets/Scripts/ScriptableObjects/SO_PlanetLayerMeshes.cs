@@ -10,97 +10,31 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "PlanetLayerMeshes", menuName = "Scriptable Objects/PlanetLayerMeshes")]
 public class SO_PlanetLayerMeshes : ScriptableObject
 {
-
-	public enum EHexgridMeshKey
-	{
-		INVALID = -1,
-		
-		// NOTE: THESE WILL BE PLANET-SPECIFIC! they're just to create a lookup table
-		Aurora,
-		Magneto,
-		MassSpec,
-		Plasma,
-		// Add others here
-		
-		COUNT
-	}
-	
 	[System.Serializable]
 	public class HexgridMeshDataTuple
 	{
 		// Keys
-		[SerializeField] public EHexgridMeshKey _key;
-		[SerializeField] public Mesh _meshAsset;
+		[SerializeField] public Mesh _mesh;
 
 		// Values
-		[SerializeField, ReadOnly, AllowNesting] public HexgridMeshData _meshData;
+		[SerializeField, ReadOnly, AllowNesting] public HexgridMeshData _hexgridMeshData;
 
 		public void RefreshMeshData( bool bForce = false )
 		{
-			if( _meshData == null || bForce )
+			if( _hexgridMeshData == null || bForce )
 			{
-				_meshData = new HexgridMeshData();
+				_hexgridMeshData = new HexgridMeshData();
 			}
-			_meshData.InitialiseFromMesh( _meshAsset );
+			_hexgridMeshData.InitialiseFromMesh( _mesh );
 		}
 	}
 	
 	// Edit-time info (serialisable list with manually enforced uniqueness of 'HexgridLayerData._key' key)
 	[SerializeField]
-	public HexgridMeshDataTuple[] _hexgridLayerList = new HexgridMeshDataTuple[(int)EHexgridMeshKey.COUNT];
+	public HexgridMeshDataTuple[] _hexgridLayerList = Array.Empty<HexgridMeshDataTuple>();
 	
 	// Runtime info (lazily init this on poll)
-	private Dictionary<EHexgridMeshKey, HexgridMeshData> _hexgridMeshDataByKey = new Dictionary<EHexgridMeshKey, HexgridMeshData>();
-	private Dictionary<Mesh, HexgridMeshData> _hexgridMeshDataBySharedMesh = new Dictionary<Mesh, HexgridMeshData>();
-
-	[Button( "Refresh Hexgrid Layers" )]
-	public void Editor_RefreshHexgridLayers()
-	{
-#if UNITY_EDITOR
-
-		/*
-		 * Cross-reference with '_EHexgridMeshKey' to:
-		 * - Clear duplicate elements (or just warn?)
-		 * - Add missing layer keys
-		 * - Refresh mesh data if necessary
-		 */
-		Undo.RecordObject( this, "Refreshed hexgrid layer list" );
-
-		HexgridMeshDataTuple[] newLayers = new HexgridMeshDataTuple[(int)EHexgridMeshKey.COUNT];
-		
-		for( int layerKey = 0; layerKey < (int)EHexgridMeshKey.COUNT; ++layerKey )
-		{
-			bool bCopiedExisting = false;
-			for( int i = 0; i < _hexgridLayerList.Length; ++i )
-			{
-				if( _hexgridLayerList[i] != null && _hexgridLayerList[i]._key == (EHexgridMeshKey)layerKey )
-				{
-					// If this layer exists already, copy it from the previous list
-					newLayers[layerKey] = _hexgridLayerList[i];
-					bCopiedExisting = true;
-					break; // Only keep the first one to avoid duplicates
-				}
-			}
-
-			if( !bCopiedExisting )
-			{
-				newLayers[layerKey] = new HexgridMeshDataTuple
-				{
-					_key = (EHexgridMeshKey)layerKey
-				};
-			}
-		}
-		
-		_hexgridLayerList = newLayers;
-		TryRecompileHexgridMeshes( false, true );
-
-		if( !ValidateData() )
-		{
-			Debug.LogWarning( "Validation failed" );
-		}
-		
-#endif
-	}
+	private Dictionary<string, HexgridMeshData> _hexgridMeshDataBySharedMeshName;
 
 	[Button( "Recompile hexgrid meshes" )]
 	public void Editor_RecompileHexgridMeshes()
@@ -124,78 +58,56 @@ public class SO_PlanetLayerMeshes : ScriptableObject
 	{
 		for( int i = 0; i < _hexgridLayerList.Length; ++i )
 		{
-			if( _hexgridLayerList[i]._meshData != null )
+			if( _hexgridLayerList[i]._hexgridMeshData != null )
 			{
 				_hexgridLayerList[i].RefreshMeshData( bForce );
+				
+				// TEMP TODO
+				Debug.LogWarningFormat( "{0} : {1}", _hexgridLayerList[i]._mesh.GetInstanceID().ToString(),
+					_hexgridLayerList[i]._mesh.name );
 			}
 
 			if( bWarnIfMissing )
 			{
-				if( !_hexgridLayerList[i]._meshAsset )
+				if( !_hexgridLayerList[i]._mesh )
 				{
-					Debug.LogWarningFormat( "Hexgrid data [{0}] has not been assigned a mesh",
-						_hexgridLayerList[i]._key.ToString() );
+					Debug.LogWarningFormat( "Hexgrid data at [{0}] has not been assigned a mesh", i );
 				}
-				else if( _hexgridLayerList[i]._meshData == null || !_hexgridLayerList[i]._meshData._bInitialised )
+				else if( _hexgridLayerList[i]._hexgridMeshData == null || !_hexgridLayerList[i]._hexgridMeshData._bInitialised )
 				{
 					Debug.LogWarningFormat( "Hexgrid data [{0}] has not successfully compiled the hexgrid mesh",
-						_hexgridLayerList[i]._key.ToString() );
+						_hexgridLayerList[i]._mesh.name );
 				}
 			}
 		}
 	}
-
-	public bool ValidateData()
+	
+	public bool TryGetMeshData( Mesh inSharedMesh, out HexgridMeshData outLayerData )
 	{
-		bool bValid = _hexgridLayerList.Length == (int)EHexgridMeshKey.COUNT;
-
-		if( !bValid )
-		{
-			return false;
-		}
-		
-		for( int i = 0; i < _hexgridLayerList.Length; ++i )
-		{
-			bValid &= _hexgridLayerList[i]._meshAsset &&
-			          _hexgridLayerList[i]._meshData != null &&
-			          _hexgridLayerList[i]._meshData._bInitialised &&
-			          _hexgridLayerList[i]._meshData._mesh == _hexgridLayerList[i]._meshAsset;
-		}
-		
-		return bValid;
-	}
-
-	public bool TryGetMeshDataFromKey( EHexgridMeshKey inKey, out HexgridMeshData outLayerData )
-	{
-		LazyInitRuntimeMeshData();
-		return _hexgridMeshDataByKey.TryGetValue( inKey, out outLayerData );
+		return TryGetMeshData( inSharedMesh.name, out outLayerData );
 	}
 	
-	public bool TryGetMeshDataFromKey( Mesh inSharedMesh, out HexgridMeshData outLayerData )
+	public bool TryGetMeshData( string inSharedMeshName, out HexgridMeshData outLayerData )
 	{
 		LazyInitRuntimeMeshData();
-		return _hexgridMeshDataBySharedMesh.TryGetValue( inSharedMesh, out outLayerData );
+		return _hexgridMeshDataBySharedMeshName.TryGetValue( inSharedMeshName, out outLayerData );
 	}
 
 	public void LazyInitRuntimeMeshData()
 	{
-		if( _hexgridMeshDataByKey == null || _hexgridMeshDataBySharedMesh == null )
+		if( _hexgridMeshDataBySharedMeshName == null )
 		{
 			// De-serialize to a dictionary (for the game jam, let's do it as a lazy init at runtime)
 			Debug.LogFormat( "Initialising {0} runtime mesh dictionary entries", _hexgridLayerList.Length );
-			_hexgridMeshDataByKey = new Dictionary<EHexgridMeshKey, HexgridMeshData>();
-			_hexgridMeshDataBySharedMesh = new Dictionary<Mesh, HexgridMeshData>();
+			_hexgridMeshDataBySharedMeshName = new Dictionary<string, HexgridMeshData>();
 			for( int i = 0; i < _hexgridLayerList.Length; ++i )
 			{
-				if( !(_hexgridMeshDataByKey.TryAdd(
-					      _hexgridLayerList[i]._key,
-					      _hexgridLayerList[i]._meshData ) &&
-				      _hexgridMeshDataBySharedMesh.TryAdd(
-					      _hexgridLayerList[i]._meshAsset,
-					      _hexgridLayerList[i]._meshData )) )
+				if( !_hexgridMeshDataBySharedMeshName.TryAdd(
+					      _hexgridLayerList[i]._mesh.name,
+					      _hexgridLayerList[i]._hexgridMeshData ) )
 				{
 					Debug.LogErrorFormat( "Can't deserialise hexgrid layer mesh data for: {0}",
-						_hexgridLayerList[i]._key.ToString() );
+						_hexgridLayerList[i]._mesh.name );
 				}
 			}
 		}

@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: HexgridLayers
   m_EditorClassIdentifier: 
   _hexgridLayerList:
-  - _type: 0
-    _meshAsset: {fileID: 1908012735059086017, guid: 0e5f8739be5e6f840969af2b018c5148, type: 3}
-    _meshData:
+  - _mesh: {fileID: 1908012735059086017, guid: 0e5f8739be5e6f840969af2b018c5148, type: 3}
+    _hexgridMeshData:
       _mesh: {fileID: 1908012735059086017, guid: 0e5f8739be5e6f840969af2b018c5148, type: 3}
       _bInitialised: 1
       _vertices:
@@ -4186,9 +4185,8 @@ MonoBehaviour:
       _bakeOutput: "Hexgrid face data for [aurora]:\nMesh: 1782 vertices, 1782 normals,
         3564 triangles.\nResult: 1782 vertices mapped (1782 reverse-mapped) to 297
         distinct faces.\nErrors: 0\n\t"
-  - _type: 1
-    _meshAsset: {fileID: 5330818721451473509, guid: fea28cd2092bdce4ea11ffe5777bce71, type: 3}
-    _meshData:
+  - _mesh: {fileID: 5330818721451473509, guid: fea28cd2092bdce4ea11ffe5777bce71, type: 3}
+    _hexgridMeshData:
       _mesh: {fileID: 5330818721451473509, guid: fea28cd2092bdce4ea11ffe5777bce71, type: 3}
       _bInitialised: 1
       _vertices:
@@ -24365,9 +24363,8 @@ MonoBehaviour:
       _bakeOutput: "Hexgrid face data for [magneto]:\nMesh: 8640 vertices, 8640 normals,
         17268 triangles.\nResult: 8640 vertices mapped (8640 reverse-mapped) to 1442
         distinct faces.\nErrors: 0\n\t"
-  - _type: 2
-    _meshAsset: {fileID: 8428170792932635414, guid: ced937840b862794ebe938218a5298ed, type: 3}
-    _meshData:
+  - _mesh: {fileID: 8428170792932635414, guid: ced937840b862794ebe938218a5298ed, type: 3}
+    _hexgridMeshData:
       _mesh: {fileID: 8428170792932635414, guid: ced937840b862794ebe938218a5298ed, type: 3}
       _bInitialised: 1
       _vertices:
@@ -39158,9 +39155,8 @@ MonoBehaviour:
       _bakeOutput: "Hexgrid face data for [mass_spectro]:\nMesh: 6332 vertices, 6332
         normals, 12654 triangles.\nResult: 6332 vertices mapped (6332 reverse-mapped)
         to 1057 distinct faces.\nErrors: 0\n\t"
-  - _type: 3
-    _meshAsset: {fileID: 3776723591692892301, guid: e0553c95d629bb24eb93a26aa1507050, type: 3}
-    _meshData:
+  - _mesh: {fileID: 3776723591692892301, guid: e0553c95d629bb24eb93a26aa1507050, type: 3}
+    _hexgridMeshData:
       _mesh: {fileID: 3776723591692892301, guid: e0553c95d629bb24eb93a26aa1507050, type: 3}
       _bInitialised: 1
       _vertices:
