@@ -5,24 +5,17 @@ using UnityEngine;
 
 public class Planet : MonoBehaviour
 {
-	[System.Serializable]
-	private struct PlanetLayerInstance
-	{
-		public Transform _transform;
-		public Mesh _meshInstance;
-		public HexgridMeshData _meshData;
-		// TODO progress, vertex colours, etc.
-	}
-	
 	[Header("Planet config")]
 	[SerializeField, Expandable] private SO_PlanetData _planetData;
 
 	[Header( "Prefab hierarchy references" )]
 	[SerializeField] private MeshFilter _auroraMeshFilter;
+	[SerializeField] private MeshFilter _radarMeshFilter;
 	[SerializeField] private MeshFilter _magnetoMeshFilter;
-	[SerializeField] private MeshFilter _massSpecMeshFilter;
 	[SerializeField] private MeshFilter _plasmaMeshFilter;
+	[SerializeField] private MeshFilter _massSpecMeshFilter;
 	[SerializeField] private MeshFilter _planetMeshRenderer;
+	[SerializeField] private Transform _rotationTransform; // TODO do we ever rotate around something other than y? Are the poles ever not the axis?
 
 	[Header( "Global data references" )]
 	[SerializeField] private SO_PlanetLayerMeshes _layerMeshesCache;
@@ -32,13 +25,37 @@ public class Planet : MonoBehaviour
 	private Dictionary<SO_PlanetData.ESensorType, int> _planetLayerInstanceIdxMap = new Dictionary<SO_PlanetData.ESensorType, int>(); // Synced with _planetLayerInstances
 	
 	private Dictionary<SO_PlanetData.ESensorType, MeshFilter> _meshFilterMap = new Dictionary<SO_PlanetData.ESensorType, MeshFilter>();
-	
+
+	public List<Transform> _debugTrackTransforms = new List<Transform>();
+
+#region Interface
 	public void InitialisePlanet( SO_PlanetData planetData )
 	{
+		if( !Application.isPlaying )
+		{
+			// We'll be creating a mesh instance - don't do this in edit mode
+			return;
+		}
+		
 		_planetData = planetData;
-		InitialiseFromScriptableObjectData();
+		InitialiseInternal();
 	}
 	
+	public void InitialisePlanet()
+	{
+		if( !Application.isPlaying )
+		{
+			// We'll be creating a mesh instance - don't do this in edit mode
+			return;
+		}
+		
+		InitialiseInternal();
+	}
+
+#endregion
+
+#region Edit-Time Initialisations
+
 	[Tooltip("Includes: Layer Meshes, Layer Materials, Planet Material, etc. (TODO)")]
 	[Button("Save prefab data to SO (edit-time)")]
 	private void Editor_SavePrefabMeshesToPlanetData()
@@ -74,28 +91,17 @@ public class Planet : MonoBehaviour
 #endif
 	}
 
+#endregion
+
+#region Runtime Initialisations
+
 	[Button("Initialise (runtime)")]
-	public void EditorInitialisePlanetRuntime()
+	private void Editor_InitialisePlanetRuntime()
 	{
 #if UNITY_EDITOR
 		Undo.RecordObject( this, "Initialise planet" );
 #endif
 		InitialisePlanet();
-	}
-
-	public void InitialisePlanet()
-	{
-		if( !Application.isPlaying )
-		{
-			// We'll be creating a mesh instance - don't do this in edit mode
-			// (TODO: Separate the mesh instancing to elsewhere?)
-			return;
-		}
-		_planetLayerInstances.Clear();
-		
-		InitialiseFromScriptableObjectData();
-
-		// Start listening for satellites (TODO)
 	}
 
 	private void InitialiseLayerInspectorMap()
@@ -105,21 +111,25 @@ public class Planet : MonoBehaviour
 		{
 			_meshFilterMap.Add( SO_PlanetData.ESensorType.Aurora, _auroraMeshFilter );
 		}
+		if( _radarMeshFilter )
+		{
+			_meshFilterMap.Add( SO_PlanetData.ESensorType.Radar, _radarMeshFilter );
+		}
 		if( _magnetoMeshFilter )
 		{
 			_meshFilterMap.Add( SO_PlanetData.ESensorType.Magneto, _magnetoMeshFilter );
-		}
-		if( _massSpecMeshFilter )
-		{
-			_meshFilterMap.Add( SO_PlanetData.ESensorType.MassSpec, _massSpecMeshFilter );
 		}
 		if( _plasmaMeshFilter )
 		{
 			_meshFilterMap.Add( SO_PlanetData.ESensorType.Plasma, _plasmaMeshFilter );
 		}
+		if( _massSpecMeshFilter )
+		{
+			_meshFilterMap.Add( SO_PlanetData.ESensorType.MassSpec, _massSpecMeshFilter );
+		}
 	}
 
-	private void InitialiseFromScriptableObjectData()
+	private void InitialiseInternal()
 	{
 		if( !_planetData || !_layerMeshesCache )
 		{
@@ -128,6 +138,7 @@ public class Planet : MonoBehaviour
 
 		InitialiseLayerInspectorMap();
 
+		_planetLayerInstances.Clear();
 		for( int i = 0; i < _planetData._planetLayers.Count; ++i )
 		{
 			if( _meshFilterMap.TryGetValue(
@@ -136,6 +147,7 @@ public class Planet : MonoBehaviour
 			{
 				Mesh meshAsset = _planetData._planetLayers[i]._mesh;
 				Mesh meshInstance = Instantiate<Mesh>( meshAsset );
+				meshInstance.MarkDynamic();
 				
 				TryInitialiseLayer(
 					_planetData._planetLayers[i]._sensorType,
@@ -146,6 +158,8 @@ public class Planet : MonoBehaviour
 				);
 			}
 		}
+		
+		// TODO start listening for satellites?
 	}
 
 	private bool TryInitialiseLayer(
@@ -184,19 +198,46 @@ public class Planet : MonoBehaviour
 		if( _planetLayerInstanceIdxMap.TryAdd( type, _planetLayerInstances.Count ) )
 		{
 			_planetLayerInstances.Add( newLayer );
+			newLayer.Initialise();
 			return true;
 		}
 		return false;
 	}
+	
+#endregion
 
 #region MonoBehaviour
 
+	void Update()
+	{
+		// DEBUG TODO
+		Vector3[] satellites = new Vector3[_debugTrackTransforms.Count];
+		for( int i = 0; i < _debugTrackTransforms.Count; ++i )
+		{
+			satellites[i] = _debugTrackTransforms[i].position;
+		}
+		
+		for( int i = 0; i < _planetLayerInstances.Count; ++i )
+		{
+			if( satellites.Length > 0 )
+			{
+				_planetLayerInstances[i].UpdateDiscoveryFromSatellitePositions( satellites );
+			}
+
+			_planetLayerInstances[i].UpdateFadeOut( Time.deltaTime );
+			
+			//todo: only need to do this for the active one
+			_planetLayerInstances[i].RefreshMeshColours();
+		}
+	}
+	
 	void OnDestroy()
 	{
 		for( int i = 0; i < _planetLayerInstances.Count; ++i )
 		{
 			if( _planetLayerInstances[i]._meshInstance != null )
 			{
+				// Clean up mesh instances created - this is not done automatically
 				Destroy( _planetLayerInstances[i]._meshInstance );
 			}
 		}

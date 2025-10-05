@@ -11,17 +11,15 @@ public class SO_PlanetData : ScriptableObject
 		INVALID = -1,
 		
 		Aurora,
+		Radar,
 		Magneto,
-		MassSpec,
 		Plasma,
+		MassSpec,
 		// Add others here
 		
 		COUNT
 	}
 	
-	public string _key;
-	public string _displayName;
-
 	[System.Serializable]
 	public struct PlanetLayerTuple
 	{
@@ -31,8 +29,12 @@ public class SO_PlanetData : ScriptableObject
 		// TODO textures?
 	}
 	
+	public string _key;
+	public string _displayName;
 	public List<PlanetLayerTuple> _planetLayers = new List<PlanetLayerTuple>();
-	// Other info here! rotation speed, ....etc. TODO
+
+	[Tooltip( "Full rotations per second" )]
+	public float _rotationSpeed = 0.0f;
 
 	[Button]
 	public void Validate()

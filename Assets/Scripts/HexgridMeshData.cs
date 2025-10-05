@@ -32,13 +32,13 @@ public class HexgridMeshData
 
 	[SerializeField, ReadOnly, TextArea( 1, 50 )] private string _bakeOutput;
 
-	public void InitialiseFromMesh( Mesh inMesh )
+	public void InitialiseFromMesh( Mesh inMesh, bool bForce = false )
 	{
 		if( inMesh == null )
 		{
 			Clear();
 		}
-		else if( inMesh != _mesh )
+		else if( bForce || inMesh != _mesh )
 		{
 			_mesh = inMesh;
 			Refresh();

@@ -16,5 +16,14 @@ MonoBehaviour:
   _displayName: 
   _planetLayers:
   - _sensorType: 0
-    _mesh: {fileID: 1908012735059086017, guid: 0e5f8739be5e6f840969af2b018c5148, type: 3}
-    _material: {fileID: 2100000, guid: e9f489be55f42af469af1e8e53af24d9, type: 2}
+    _mesh: {fileID: 1908012735059086017, guid: 47eb4852e3cd2c24da4b349421919c19, type: 3}
+    _material: {fileID: 2100000, guid: 33ad18545a781ca46a31d33942b0dda7, type: 2}
+  - _sensorType: 1
+    _mesh: {fileID: -2944970759498101532, guid: 599336b6e9dade1428102e86d07d9081, type: 3}
+    _material: {fileID: 2100000, guid: 33ad18545a781ca46a31d33942b0dda7, type: 2}
+  - _sensorType: 2
+    _mesh: {fileID: 5330818721451473509, guid: afa5066efc07ca5498d001f750f649c6, type: 3}
+    _material: {fileID: 2100000, guid: 33ad18545a781ca46a31d33942b0dda7, type: 2}
+  - _sensorType: 3
+    _mesh: {fileID: 3776723591692892301, guid: 05ff56c648a5bcd4aa292c51ddcc00df, type: 3}
+    _material: {fileID: 2100000, guid: 33ad18545a781ca46a31d33942b0dda7, type: 2}
