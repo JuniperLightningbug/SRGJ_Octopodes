@@ -121,7 +121,7 @@ public class SatelliteOrbit : MonoBehaviour
 				}
 				
 				// TODO fix
-				HexgridMaterialTracker.Instance.TrackTransform( newSatelliteObj.transform );
+				//HexgridMaterialTracker.Instance.TrackTransform( newSatelliteObj.transform );
 				
 				return true;
 			}

@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Planet : MonoBehaviour
 {
 	[Header("Planet config")]
-	[SerializeField, Expandable] private SO_PlanetData _planetData;
+	[SerializeField, Expandable] private SO_PlanetConfig _planetConfig;
 
 	[Header( "Prefab hierarchy references" )]
 	[SerializeField] private MeshFilter _auroraMeshFilter;
@@ -18,18 +20,48 @@ public class Planet : MonoBehaviour
 	[SerializeField] private Transform _rotationTransform; // TODO do we ever rotate around something other than y? Are the poles ever not the axis?
 
 	[Header( "Global data references" )]
-	[SerializeField] private SO_PlanetLayerMeshes _layerMeshesCache;
-	
-	[Header("Runtime instance data")]
+	[SerializeField] private SO_CompiledPlanetLayerMeshes _layerMeshesCache;
+
+	[Header( "Runtime instance data" )]
+	[ShowNonSerializedField, NonSerialized]
+	public bool _bInitialised = false;
 	[SerializeField, ReadOnly, AllowNesting] private List<PlanetLayerInstance> _planetLayerInstances = new List<PlanetLayerInstance>();
-	private Dictionary<SO_PlanetData.ESensorType, int> _planetLayerInstanceIdxMap = new Dictionary<SO_PlanetData.ESensorType, int>(); // Synced with _planetLayerInstances
+	private Dictionary<SO_PlanetConfig.ESensorType, int> _planetLayerInstanceIdxMap = new Dictionary<SO_PlanetConfig.ESensorType, int>(); // Synced with _planetLayerInstances
+	private Dictionary<SO_PlanetConfig.ESensorType, MeshFilter> _meshFilterMap = new Dictionary<SO_PlanetConfig.ESensorType, MeshFilter>();
 	
-	private Dictionary<SO_PlanetData.ESensorType, MeshFilter> _meshFilterMap = new Dictionary<SO_PlanetData.ESensorType, MeshFilter>();
-
+	private float RotationSpeed =>
+		!_bInitialised || _planetConfig._rotationTime <= 0.0f || Mathf.Approximately( _planetConfig._rotationTime, 0.0f ) ?
+		0.0f :
+		1.0f / _planetConfig._rotationTime;
+	
+	
 	public List<Transform> _debugTrackTransforms = new List<Transform>();
+	[OnValueChanged("DebugChangedCurrentSensorType")]
+	public SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
 
+#region Debug
+
+	public void DebugChangedCurrentSensorType()
+	{
+		// Value changed in the inspector - simulate the switch
+		TurnOffAllSensorViews(); // We don't know the previous value here - turn everything off
+		
+		// Turn the right one back on
+		ToggleSensorView( _currentSensorType, true );
+	}
+
+	private void TurnOffAllSensorViews()
+	{
+		for( int i = 0; i < (int)SO_PlanetConfig.ESensorType.COUNT; ++i )
+		{
+			ToggleSensorView( (SO_PlanetConfig.ESensorType)i, false );
+		}
+	}
+
+#endregion
+	
 #region Interface
-	public void InitialisePlanet( SO_PlanetData planetData )
+	public void InitialisePlanet( SO_PlanetConfig planetConfig )
 	{
 		if( !Application.isPlaying )
 		{
@@ -37,7 +69,7 @@ public class Planet : MonoBehaviour
 			return;
 		}
 		
-		_planetData = planetData;
+		_planetConfig = planetConfig;
 		InitialiseInternal();
 	}
 	
@@ -52,6 +84,27 @@ public class Planet : MonoBehaviour
 		InitialiseInternal();
 	}
 
+	public void ChangeSensorType( SO_PlanetConfig.ESensorType newSensorType )
+	{
+		if( _currentSensorType != newSensorType )
+		{
+			ToggleSensorView( _currentSensorType, false );
+			_currentSensorType = newSensorType;
+			ToggleSensorView( _currentSensorType, true );
+		}
+	}
+	
+	private void ToggleSensorView( SO_PlanetConfig.ESensorType type, bool bOn )
+	{
+		if( _bInitialised && _planetLayerInstanceIdxMap.TryGetValue( type, out int idx ) )
+		{
+			if( _planetLayerInstances[idx] != null )
+			{
+				_planetLayerInstances[idx].ToggleView( bOn );
+			}
+		}
+	}
+
 #endregion
 
 #region Edit-Time Initialisations
@@ -64,20 +117,20 @@ public class Planet : MonoBehaviour
 		// Loads the current meshes from the prefab hierarchy into the attached scriptable object.
 		// Will likely fail if attempted at runtime because the meshes will be instanced.
 		
-		if( !_planetData || !_layerMeshesCache )
+		if( !_planetConfig || !_layerMeshesCache )
 		{
 			return;
 		}
 		
 		InitialiseLayerInspectorMap();
 
-		_planetData._planetLayers.Clear();
-		foreach( KeyValuePair<SO_PlanetData.ESensorType, MeshFilter> tuple in _meshFilterMap )
+		_planetConfig._planetLayers.Clear();
+		foreach( KeyValuePair<SO_PlanetConfig.ESensorType, MeshFilter> tuple in _meshFilterMap )
 		{
 			if( tuple.Value.sharedMesh != null )
 			{
 				MeshRenderer meshRenderer = tuple.Value.GetComponent<MeshRenderer>();
-				_planetData._planetLayers.Add( new SO_PlanetData.PlanetLayerTuple()
+				_planetConfig._planetLayers.Add( new SO_PlanetConfig.PlanetLayerTuple()
 				{
 					_sensorType = tuple.Key,
 					_mesh = tuple.Value.sharedMesh,
@@ -87,7 +140,7 @@ public class Planet : MonoBehaviour
 		}
 
 #if UNITY_EDITOR
-		EditorUtility.SetDirty( _planetData );
+		EditorUtility.SetDirty( _planetConfig );
 #endif
 	}
 
@@ -106,32 +159,32 @@ public class Planet : MonoBehaviour
 
 	private void InitialiseLayerInspectorMap()
 	{
-		_meshFilterMap = new Dictionary<SO_PlanetData.ESensorType, MeshFilter>();
+		_meshFilterMap = new Dictionary<SO_PlanetConfig.ESensorType, MeshFilter>();
 		if( _auroraMeshFilter )
 		{
-			_meshFilterMap.Add( SO_PlanetData.ESensorType.Aurora, _auroraMeshFilter );
+			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Aurora, _auroraMeshFilter );
 		}
 		if( _radarMeshFilter )
 		{
-			_meshFilterMap.Add( SO_PlanetData.ESensorType.Radar, _radarMeshFilter );
+			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Radar, _radarMeshFilter );
 		}
 		if( _magnetoMeshFilter )
 		{
-			_meshFilterMap.Add( SO_PlanetData.ESensorType.Magneto, _magnetoMeshFilter );
+			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Magneto, _magnetoMeshFilter );
 		}
 		if( _plasmaMeshFilter )
 		{
-			_meshFilterMap.Add( SO_PlanetData.ESensorType.Plasma, _plasmaMeshFilter );
+			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Plasma, _plasmaMeshFilter );
 		}
 		if( _massSpecMeshFilter )
 		{
-			_meshFilterMap.Add( SO_PlanetData.ESensorType.MassSpec, _massSpecMeshFilter );
+			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.MassSpec, _massSpecMeshFilter );
 		}
 	}
 
 	private void InitialiseInternal()
 	{
-		if( !_planetData || !_layerMeshesCache )
+		if( !_planetConfig || !_layerMeshesCache || _bInitialised )
 		{
 			return;
 		}
@@ -139,31 +192,35 @@ public class Planet : MonoBehaviour
 		InitialiseLayerInspectorMap();
 
 		_planetLayerInstances.Clear();
-		for( int i = 0; i < _planetData._planetLayers.Count; ++i )
+		for( int i = 0; i < _planetConfig._planetLayers.Count; ++i )
 		{
 			if( _meshFilterMap.TryGetValue(
-				   _planetData._planetLayers[i]._sensorType,
+				   _planetConfig._planetLayers[i]._sensorType,
 				   out MeshFilter meshFilter ) )
 			{
-				Mesh meshAsset = _planetData._planetLayers[i]._mesh;
+				Mesh meshAsset = _planetConfig._planetLayers[i]._mesh;
 				Mesh meshInstance = Instantiate<Mesh>( meshAsset );
 				meshInstance.MarkDynamic();
 				
 				TryInitialiseLayer(
-					_planetData._planetLayers[i]._sensorType,
+					_planetConfig._planetLayers[i]._sensorType,
 					meshFilter,
 					meshAsset,
 					meshInstance,
-					_planetData._planetLayers[i]._material
+					_planetConfig._planetLayers[i]._material
 				);
 			}
 		}
+
+		TurnOffAllSensorViews();
 		
 		// TODO start listening for satellites?
+
+		_bInitialised = true;
 	}
 
 	private bool TryInitialiseLayer(
-		SO_PlanetData.ESensorType type,
+		SO_PlanetConfig.ESensorType type,
 		MeshFilter meshFilter,
 		Mesh meshAsset,
 		Mesh meshInstance,
@@ -210,7 +267,12 @@ public class Planet : MonoBehaviour
 
 	void Update()
 	{
-		// DEBUG TODO
+		if( !_bInitialised )
+		{
+			return;
+		}
+		
+		// DEBUG TODO - update layers with satellite data
 		Vector3[] satellites = new Vector3[_debugTrackTransforms.Count];
 		for( int i = 0; i < _debugTrackTransforms.Count; ++i )
 		{
@@ -228,6 +290,12 @@ public class Planet : MonoBehaviour
 			
 			//todo: only need to do this for the active one
 			_planetLayerInstances[i].RefreshMeshColours();
+		}
+		
+		// Rotate planet if necessary
+		if( _rotationTransform )
+		{
+			_rotationTransform.Rotate( Vector3.up, RotationSpeed );
 		}
 	}
 	

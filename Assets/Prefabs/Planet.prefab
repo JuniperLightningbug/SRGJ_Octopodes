@@ -212,7 +212,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3187456311205553712}
-  m_Mesh: {fileID: -2944970759498101532, guid: 599336b6e9dade1428102e86d07d9081, type: 3}
+  m_Mesh: {fileID: 3776723591692892301, guid: 05ff56c648a5bcd4aa292c51ddcc00df, type: 3}
 --- !u!23 &148533057390871730
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -553,4 +553,6 @@ MonoBehaviour:
   _rotationTransform: {fileID: 6366552374202768083}
   _layerMeshesCache: {fileID: 11400000, guid: e69d7ba4b0e10b84da778463f6e4e936, type: 2}
   _planetLayerInstances: []
-  _debugTrackTransforms: []
+  _debugTrackTransforms:
+  - {fileID: 0}
+  _currentSensorType: -1

@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
-using Object = System.Object;
+using Random = UnityEngine.Random;
 
 /**
  * Runtime instance of a planet layer.
@@ -54,15 +52,68 @@ public class PlanetLayerInstance
 		_bInitialised = true;
 		return true;
 	}
+
+#region Debug Interface
 	
 	public void DebugDrawMeshDataGizmos()
 	{
-		if( _bInitialised && _meshData != null )
+		if( _bInitialised )
 		{
 			Vector3[] debugMeshNormals = _meshData.GetDebugFaceNormals( 0.1f );
 			_transform.TransformVectors( debugMeshNormals );
 			Gizmos.color = Color.yellow;
 			Gizmos.DrawLineList( debugMeshNormals );
+		}
+	}
+	
+	public void DebugShowFaces()
+	{
+		if( _bInitialised )
+		{
+			for( int faceIdx = 0; faceIdx < _meshData._faceCentres.Length; ++faceIdx )
+			{
+				Color randomColour = Random.ColorHSV( 0.0f, 1.0f, 0.3f, 0.8f, 0.5f, 0.8f, 1.0f, 1.0f );
+
+				for( int i = 0; i < HexgridMeshData.kFaceVertexCountMax; ++i )
+				{
+					int vertexIdx = _meshData._faceIdxToVertexIdxs[faceIdx * HexgridMeshData.kFaceVertexCountMax + i];
+					if( vertexIdx >= 0 )
+					{
+						_vertexColours[vertexIdx] = randomColour;
+					}
+				}
+			}
+
+			_meshInstance.SetColors( _vertexColours );
+		}
+	}
+
+	public void DebugShowFaceNormals()
+	{
+		if( _bInitialised )
+		{
+			for( int vertexIdx = 0; vertexIdx < _meshData._vertices.Length; ++vertexIdx )
+			{
+				Vector3 faceNormal = _meshData._faceNormals[_meshData._vertexIdxToFaceIdx[vertexIdx]];
+				Color normalColour = new Color(
+					faceNormal.x,
+					faceNormal.y,
+					faceNormal.z,
+					1.0f );
+				_vertexColours[vertexIdx] = normalColour;
+			}
+
+			_meshInstance.SetColors( _vertexColours );
+		}
+	}
+	
+#endregion
+
+	public void ToggleView( bool bOn )
+	{
+		if( _transform )
+		{
+			_transform.gameObject.SetActive( bOn );
 		}
 	}
 
@@ -82,7 +133,7 @@ public class PlanetLayerInstance
 		
 		for( int satelliteIdx = 0; satelliteIdx < satellitePositions.Length; ++satelliteIdx )
 		{
-			// Convert to local space (accounts for planet rotation without recalculating normals)
+			// Transform the satellite positions to avoid recalculating the mesh normals array
 			_transform.InverseTransformPoints( satellitePositions );
 			for( int i = 0; i < satellitePositions.Length; ++i )
 			{
