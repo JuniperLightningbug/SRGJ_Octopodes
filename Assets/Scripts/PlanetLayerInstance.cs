@@ -106,6 +106,14 @@ public class PlanetLayerInstance
 			_meshInstance.SetColors( _vertexColours );
 		}
 	}
+
+	public void DebugClearDiscoveryAlphas()
+	{
+		if( _bInitialised )
+		{
+			_meshInstance.SetColors( _vertexColoursOriginal );
+		}
+	}
 	
 #endregion
 
@@ -116,7 +124,7 @@ public class PlanetLayerInstance
 			_transform.gameObject.SetActive( bOn );
 		}
 	}
-
+	
 	public void UpdateDiscoveryFromSatellitePosition( Vector3 satellitePosition )
 	{
 		UpdateDiscoveryFromSatellitePositions( new Vector3[] { satellitePosition } );

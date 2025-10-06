@@ -6,7 +6,7 @@ public class PlanetManager : MonoBehaviour
 	[SerializeField] private SO_PlanetsConfig _planetsData;
 	[SerializeField] private Object _planetPrefab;
 
-	[SerializeField] private int _activePlanetIdx;
+	[SerializeField] private int _activePlanetIdx = -1;
 	[SerializeField] private Planet _activePlanet;
 
 	[Button( "Create Planet" )]
@@ -40,7 +40,7 @@ public class PlanetManager : MonoBehaviour
 		_activePlanetIdx = planetIdx;
 		ClearPlanet();
 
-		if( _planetsData && planetIdx > 0 && planetIdx < _planetsData._planetConfigs.Count )
+		if( _planetsData && planetIdx >= 0 && planetIdx < _planetsData._planetConfigs.Count )
 		{
 			GameObject newPlanetObj = Instantiate( _planetPrefab, transform ) as GameObject;
 			Planet newPlanet = newPlanetObj?.GetComponent<Planet>();

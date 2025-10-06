@@ -26,11 +26,13 @@ public class SO_PlanetConfig : ScriptableObject
 		public ESensorType _sensorType;
 		public Mesh _mesh;
 		public Material _material;
-		// TODO textures?
+		public bool _bActive;
 	}
 	
 	public string _name;
 	public List<PlanetLayerTuple> _planetLayers = new List<PlanetLayerTuple>();
+	public Mesh _planetMesh;
+	public Material _planetMaterial;
 
 	[Tooltip( "RotationTime" )]
 	public float _rotationTime = 0.0f;

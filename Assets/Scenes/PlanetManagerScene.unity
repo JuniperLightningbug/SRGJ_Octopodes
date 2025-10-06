@@ -148,6 +148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c52d696f88671a24090911d66a7985f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _planetsData: {fileID: 11400000, guid: 5fbce8306e16762499b5d1fb9fa9ecf2, type: 2}
+  _planetPrefab: {fileID: 8809114909611930375, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+  _activePlanetIdx: -1
+  _activePlanet: {fileID: 0}
 --- !u!4 &144516647
 Transform:
   m_ObjectHideFlags: 0
@@ -569,10 +573,66 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 148533057390871730, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: f980fce2d5b89994f915c126dbac0ba8, type: 2}
+    - target: {fileID: 1244483531910837587, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4741459374081926023, guid: 97929db0d0b4a684fb3865cb502cf64a, type: 3}
+    - target: {fileID: 1901829262716872521, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2516270522769984027, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6b960e5a532f076409e9bf1ef2248272, type: 2}
+    - target: {fileID: 2918982808559762290, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6d38752a75af48b46a6a5064b96535c3, type: 2}
+    - target: {fileID: 3028496121034010783, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -8499846781133215037, guid: 765694947bad52c44adf16a70b7d9558, type: 3}
+    - target: {fileID: 3187456311205553712, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3362454373348352726, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3511638591434432644, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 81eb5143adc047246875e2fe70652606, type: 2}
+    - target: {fileID: 3555428927273958778, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3652649497279873031, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: _planetConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: bafd67bac6d736d4c8b69352a1933d97, type: 2}
     - target: {fileID: 3652649497279873031, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
       propertyPath: '_debugTrackTransforms.Array.data[0]'
       value: 
       objectReference: {fileID: 390737189}
+    - target: {fileID: 4056725681207033684, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555234437906585761, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 3776723591692892301, guid: 2aa60aeb7bfea3a4b81d4f4392663e74, type: 3}
+    - target: {fileID: 6145862399630101271, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e6f3aff3118863d44a09a448eed964b1, type: 2}
     - target: {fileID: 6733665816867402154, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -613,14 +673,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7115394836059877607, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 3776723591692892301, guid: 2aa60aeb7bfea3a4b81d4f4392663e74, type: 3}
     - target: {fileID: 8809114909611930375, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
       propertyPath: m_Name
       value: Planet
       objectReference: {fileID: 0}
     - target: {fileID: 8809114909611930375, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8877071457627348528, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8927db2620de9b642bde8e6e25f37307, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

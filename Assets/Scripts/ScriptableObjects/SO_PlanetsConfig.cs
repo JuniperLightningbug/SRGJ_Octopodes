@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SO_PlanetsConfig", menuName = "Scriptable Objects/SO_PlanetsConfig")]
+[CreateAssetMenu(fileName = "PlanetsConfig", menuName = "Scriptable Objects/PlanetsConfig")]
 public class SO_PlanetsConfig : ScriptableObject
 {
+	[Expandable]
     public List<SO_PlanetConfig> _planetConfigs;
 }
