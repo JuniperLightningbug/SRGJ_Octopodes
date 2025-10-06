@@ -100,7 +100,7 @@ public class SatelliteOrbit : MonoBehaviour
 		       MM.MathsUtils.Approximately( Mathf.Abs( a.z ), Mathf.Abs( b.z ), epsilon );
 	}
 
-	public bool LaunchSatellite()
+	public Transform LaunchSatellite()
 	{
 		if( _satellitePrefab )
 		{
@@ -120,13 +120,10 @@ public class SatelliteOrbit : MonoBehaviour
 					newMeshRenderer.material.SetColor( "_BaseColor", Random.ColorHSV(0.0f, 1.0f, 0.3f, 0.8f, 0.5f, 0.8f, 1.0f, 1.0f ) );
 				}
 				
-				// TODO fix
-				//HexgridMaterialTracker.Instance.TrackTransform( newSatelliteObj.transform );
-				
-				return true;
+				return newSatelliteObj.transform;
 			}
 		}
 
-		return false;
+		return null;
 	}
 }

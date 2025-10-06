@@ -1,7 +1,8 @@
+using MM;
 using NaughtyAttributes;
 using UnityEngine;
 
-public class PlanetManager : MonoBehaviour
+public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 {
 	[SerializeField] private SO_PlanetsConfig _planetsData;
 	[SerializeField] private Object _planetPrefab;
@@ -9,6 +10,8 @@ public class PlanetManager : MonoBehaviour
 	[SerializeField] private int _activePlanetIdx = -1;
 	[SerializeField] private Planet _activePlanet;
 
+	public Planet ActivePlanet => _activePlanet;
+	
 	[Button( "Create Planet" )]
 	private void Editor_CreatePlanet()
 	{

@@ -53,8 +53,8 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Output_AddAndCompile()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject( this, "Clear compiled meshes" );
 		AddAndCompileInputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 
@@ -63,9 +63,9 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Output_ReplaceAndCompile()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject( this, "Clear compiled meshes" );
 		ClearOutputs();
 		AddAndCompileInputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 
@@ -73,8 +73,8 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Input_Clear()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject(this, "Clear compiled meshes" );
 		ClearInputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 
@@ -82,8 +82,8 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Output_Clear()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject(this, "Clear compiled meshes" );
 		ClearOutputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 
@@ -91,8 +91,8 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Output_RemoveInvalid()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject(this, "Recompile output meshes" );
 		RemoveUncompiledOutputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 
@@ -100,10 +100,10 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Output_RecompileInvalid()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject(this, "Recompile output meshes" );
 		RemoveInvalidOutputs();
 		TryRecompileOutputs( false );
 		RemoveUncompiledOutputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 	
@@ -111,10 +111,10 @@ public class SO_CompiledPlanetLayerMeshes : ScriptableObject
 	public void Editor_Output_RecompileAll()
 	{
 #if UNITY_EDITOR
-		Undo.RecordObject( this, "Force recompile output meshes" );
 		RemoveInvalidOutputs();
 		TryRecompileOutputs( true );
 		RemoveUncompiledOutputs();
+		EditorUtility.SetDirty( this );
 #endif
 	}
 	

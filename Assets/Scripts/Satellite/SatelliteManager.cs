@@ -141,7 +141,13 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 		{
 			for( int i = 0; i < num; ++i )
 			{
-				_lastOrbit.LaunchSatellite();
+				Transform satelliteTransform = _lastOrbit.LaunchSatellite();
+				if( satelliteTransform && PlanetManager.Instance?.ActivePlanet )
+				{
+					PlanetManager.Instance.ActivePlanet.StartTrackingSatellite( satelliteTransform );
+					// TODO: Make this better. Events, higher singleton. Cache the planet. Something.
+					// TODO: Need to remove satellites as well.
+				}
 			}
 		}
 	}

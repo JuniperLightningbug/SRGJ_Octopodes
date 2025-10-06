@@ -30,7 +30,7 @@ public class Planet : MonoBehaviour
 	[ShowNonSerializedField, NonSerialized]
 	public bool _bInitialised = false;
 
-	[SerializeField, ReadOnly, AllowNesting]
+	[SerializeField, AllowNesting]
 	private List<PlanetLayerInstance> _planetLayerInstances = new List<PlanetLayerInstance>();
 
 	private Dictionary<SO_PlanetConfig.ESensorType, int> _planetLayerInstanceIdxMap =
@@ -39,23 +39,27 @@ public class Planet : MonoBehaviour
 	private Dictionary<SO_PlanetConfig.ESensorType, MeshFilter> _meshFilterMap =
 		new Dictionary<SO_PlanetConfig.ESensorType, MeshFilter>();
 
+	// TODO move this up to a singleton? it's a game state kind-of
+	[OnValueChanged( "DebugChangedCurrentSensorType" )]
+	public SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
+	
 	private float RotationSpeed =>
 		!_bInitialised || _planetConfig._rotationTime <= 0.0f ||
 		Mathf.Approximately( _planetConfig._rotationTime, 0.0f ) ?
 			0.0f :
 			1.0f / _planetConfig._rotationTime;
 
-	[SerializeField] private bool _bDebugRemoveDiscoveryAlpha = false;
-	public List<Transform> _debugTrackTransforms = new List<Transform>();
-
-	// T[SO_PlanetConfig.ESensorType][idx]
-	private List<IndexedHashSet<Transform>> _trackedSatelliteTransforms;
-
-	[OnValueChanged( "DebugChangedCurrentSensorType" )]
-	public SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
-
 #region Debug
+	
+	[SerializeField] private bool _bDebugRemoveDiscoveryAlpha = false;
+	public Transform _debugSatelliteTransform;
 
+	[Button( "Add debug satellite" )]
+	private void AddDebugSatellite()
+	{
+		StartTrackingSatellite( _debugSatelliteTransform );
+	}
+	
 	public void DebugChangedCurrentSensorType()
 	{
 		// Value changed in the inspector - simulate the switch
@@ -106,6 +110,30 @@ public class Planet : MonoBehaviour
 			{
 				_planetLayerInstances[idx].ToggleView( bOn );
 			}
+		}
+	}
+
+	public void StartTrackingSatellite( Transform satellite )
+	{
+		StartTrackingSatellite( _currentSensorType, satellite );
+	}
+	public void StartTrackingSatellite( SO_PlanetConfig.ESensorType type, Transform satellite )
+	{
+		if( _bInitialised && _planetLayerInstanceIdxMap.TryGetValue( _currentSensorType, out int idx ) )
+		{
+			_planetLayerInstances[idx].StartTrackingSatellite( satellite );
+		}
+	}
+	
+	public void StopTrackingSatellite( Transform satellite )
+	{
+		StartTrackingSatellite( _currentSensorType, satellite );
+	}
+	public void StopTrackingSatellite( SO_PlanetConfig.ESensorType type, Transform satellite )
+	{
+		if( _bInitialised && _planetLayerInstanceIdxMap.TryGetValue( _currentSensorType, out int idx ) )
+		{
+			_planetLayerInstances[idx].StopTrackingSatellite( satellite );
 		}
 	}
 
@@ -207,7 +235,7 @@ public class Planet : MonoBehaviour
 				newLayer.Initialise();
 			}
 		}
-
+		
 		TurnOffAllSensorViews();
 		_bInitialised = true;
 	}
@@ -320,18 +348,6 @@ public class Planet : MonoBehaviour
 			return;
 		}
 
-		// DEBUG TODO - update layers with satellite data
-		if( _debugTrackTransforms == null )
-		{
-			_debugTrackTransforms = new List<Transform>();
-		}
-
-		Vector3[] satellites = new Vector3[_debugTrackTransforms.Count];
-		for( int i = 0; i < _debugTrackTransforms.Count; ++i )
-		{
-			satellites[i] = _debugTrackTransforms[i].position;
-		}
-
 		for( int i = 0; i < _planetLayerInstances.Count; ++i )
 		{
 			if( _bDebugRemoveDiscoveryAlpha )
@@ -340,10 +356,7 @@ public class Planet : MonoBehaviour
 			}
 			else
 			{
-				if( satellites.Length > 0 )
-				{
-					_planetLayerInstances[i].UpdateDiscoveryFromSatellitePositions( satellites );
-				}
+				_planetLayerInstances[i].UpdateDiscoveryFromTrackedSatellites();
 
 				_planetLayerInstances[i].UpdateFadeOut( Time.deltaTime );
 

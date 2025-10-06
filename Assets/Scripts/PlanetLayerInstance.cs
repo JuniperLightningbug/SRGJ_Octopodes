@@ -1,3 +1,4 @@
+using MM;
 using NaughtyAttributes;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -15,7 +16,7 @@ public class PlanetLayerInstance
 	public Transform _transform;
 	public Mesh _meshInstance;
 	public HexgridMeshData _meshData;
-	public float _fadeTime = 0.0f;
+	public float _fadeTime = 0.5f;
 	
 	// Interpreted data
 	private float _fadeAmountPerSecond = 0.0f;
@@ -24,7 +25,9 @@ public class PlanetLayerInstance
 	[SerializeField, ReadOnly] private float[] _satelliteDiscoveryAlphas;
 	
 	// Testing - do we want angles instead? Change it depending on parameters? Cone from satellite pos ws?
-	[SerializeField] private float _satelliteDiscoveryRadius = 0.1f;
+	[SerializeField] private float _satelliteDiscoveryRadius = 0.3f;
+	
+	public IndexedHashSet<Transform> _trackedSatellites = new IndexedHashSet<Transform>();
 
 	public bool Initialise( Transform inTransform, Mesh inMeshInstance, HexgridMeshData inMeshData )
 	{
@@ -124,6 +127,37 @@ public class PlanetLayerInstance
 			_transform.gameObject.SetActive( bOn );
 		}
 	}
+
+	public void StartTrackingSatellite( Transform inTransform )
+	{
+		_trackedSatellites.Add( inTransform );
+	}
+
+	public void StopTrackingSatellite( Transform inTransform )
+	{
+		_trackedSatellites.Remove( inTransform );
+	}
+
+	private void ClearNullSatellites()
+	{
+		foreach( Transform transform in _trackedSatellites )
+		{
+			if( !_transform )
+			{
+				_trackedSatellites.Remove(transform);
+			}
+		}
+	}
+
+	public void UpdateDiscoveryFromTrackedSatellites()
+	{
+		Vector3[] positions = new Vector3[_trackedSatellites.Count];
+		for( int i = 0; i < _trackedSatellites.Count; ++i )
+		{
+			positions[i] = _trackedSatellites[i].position;
+		}
+		UpdateDiscoveryFromSatellitePositions( positions );
+	}
 	
 	public void UpdateDiscoveryFromSatellitePosition( Vector3 satellitePosition )
 	{
@@ -139,10 +173,11 @@ public class PlanetLayerInstance
 
 		float satelliteDiscoveryRadiusSqr = _satelliteDiscoveryRadius * _satelliteDiscoveryRadius;
 		
+		// Transform the satellite positions to avoid recalculating the mesh normals array
+		_transform.InverseTransformPoints( satellitePositions );
+		
 		for( int satelliteIdx = 0; satelliteIdx < satellitePositions.Length; ++satelliteIdx )
 		{
-			// Transform the satellite positions to avoid recalculating the mesh normals array
-			_transform.InverseTransformPoints( satellitePositions );
 			for( int i = 0; i < satellitePositions.Length; ++i )
 			{
 				// Project onto sphere
@@ -176,7 +211,7 @@ public class PlanetLayerInstance
 		for( int i = 0; i < _satelliteDiscoveryAlphas.Length; ++i )
 		{
 			alpha = _satelliteDiscoveryAlphas[i];
-			_satelliteDiscoveryAlphas[i] = Mathf.Max( alpha, alpha - _fadeAmountPerSecond * deltaTime );
+			_satelliteDiscoveryAlphas[i] = Mathf.Max( 0.0f, alpha - _fadeAmountPerSecond * deltaTime );
 		}
 	}
 
