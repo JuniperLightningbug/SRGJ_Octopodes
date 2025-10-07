@@ -38,6 +38,11 @@ namespace MM
 				return _instance;
 			}
 		}
+		
+		/**
+		 * Alternate accessor to avoid creating a missing singleton
+		 */
+		public static T InstanceOrNull => _instance;
 
 		private void Awake()
 		{

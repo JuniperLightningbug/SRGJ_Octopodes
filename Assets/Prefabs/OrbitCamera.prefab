@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 3744380307944246427}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.59}
+  m_LocalPosition: {x: 0, y: 0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44,7 +44,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.08419366, g: 0.13216446, b: 0.20754719, a: 0}
+  m_BackGroundColor: {r: 0.051456027, g: 0.081141636, b: 0.12452829, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -184,3 +184,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _orbitSpeed: {x: 1, y: 1}
   _orbitXRange: {x: -90, y: 90}
+  _FOVZoomSpeed: 2
+  _FOVZoomRange: {x: 15, y: 80}
+  _distanceZoomSpeed: 0.2
+  _distanceZoomRange: {x: -5, y: -1.5}
+  _zoomType: 1
+  _orbitCamera: {fileID: 5856561628754012578}
+  _eulerRotationDefault: {x: 45.411003, y: 214.5, z: -0.0000012161734}
+  _zoomFOVDefault: 60
+  _zoomDistanceDefault: -3

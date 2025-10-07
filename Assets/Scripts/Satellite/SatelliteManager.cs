@@ -1,46 +1,41 @@
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /**
  * Singleton class handles orbital creation and bookkeeping, satellite deployment, etc. from player inputs
  */
-public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
+public class SatelliteManager : MonoBehaviour
 {
-	protected override bool BPersistent
-	{
-		get { return false; }
-	}
 
 	[Header("Project data")]
 	[SerializeField] private Object _orbitPrefab;
 
-	[Header("Scene data")]
-	[SerializeField] private Transform _orbitCentreTransform;
-	[SerializeField] private Collider _orbitClickableCollider;
+	[Header("Scene components")]
+	[SerializeField] private Transform _orbitCentreAnchor;
 	[SerializeField] private Camera _camera;
 	
+	[Header("Prefab components")]
+	[SerializeField] private SphereCollider _orbitClickableCollider;
+	
 	[Header("Behaviour")]
-	[SerializeField] private bool _bMeasureOrbitRadiusFromPlanetSurface = false;
-	[SerializeField] private float _orbitRadius = 1.0f;
 	[SerializeField, Tooltip("Rotations Per Second")] private float _orbitSpeed = 1.0f;
+	[SerializeField, Tooltip("Elevation above the clicked collider")] private float _orbitRadiusOffset = 0.3f;
+	[SerializeField] private bool _bAutomaticallyLaunchOnceOnOrbitRelease = true;
 
 	private List<SatelliteOrbit> _orbits = new List<SatelliteOrbit>();
-	private SatelliteOrbit _newOrbit;
+	private SatelliteOrbit _activeOrbit;
 	private SatelliteOrbit _lastOrbit;
+	
+	private float OrbitRadiusProjection => _orbitClickableCollider ? _orbitClickableCollider.radius : 1.0f;
+	private float OrbitRadiusOuter => OrbitRadiusProjection + Mathf.Max( _orbitRadiusOffset, 0.0f );
 
-	protected override void Initialise()
+	void Awake()
 	{
 		if( !_camera )
 		{
 			_camera = Camera.main;
-		}
-
-		if( !_orbitClickableCollider && _orbitCentreTransform )
-		{
-			_orbitClickableCollider = _orbitCentreTransform.gameObject.GetComponent<Collider>();
-			Debug.LogWarningFormat( "Collider isn't assigned in inspector - we're using {0} on {1} instead",
-				_orbitClickableCollider.name, _orbitClickableCollider.gameObject.name );
 		}
 		
 		// We'll be keeping the spawned objects in a local hierarchy - don't apply any transformations
@@ -51,42 +46,53 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 
 	void Update()
 	{
-		if( !_orbitPrefab || !_orbitCentreTransform )
+		if( !_orbitClickableCollider || !_orbitPrefab )
 		{
 			return;
 		}
 		
+		// Anchor the orbit collider to the planet if necessary
+		UpdateOrbitAnchor();
+		
+		ProcessInputs();
+	}
+
+	private void UpdateOrbitAnchor()
+	{
+		if( _orbitCentreAnchor )
+		{
+			_orbitClickableCollider.transform.SetPositionAndRotation(
+				_orbitCentreAnchor.position,
+				_orbitCentreAnchor.rotation );
+		}
+	}
+
+	private void ProcessInputs()
+	{
 		if( Mouse.current.leftButton.wasPressedThisFrame )
 		{
 			TryCreateOrbit();
 		}
 		else if( Mouse.current.leftButton.isPressed )
 		{
-			TryUpdateOrbitDirection();
+			UpdateActiveOrbitDirection();
 		}
 		else if( Mouse.current.leftButton.wasReleasedThisFrame )
 		{
-			TryReleaseOrbit();
+			ReleaseActiveOrbit();
 		}
 
 		if( Keyboard.current.spaceKey.wasPressedThisFrame )
 		{
-			TryLaunchSatellites( 1 ); // TODO: This is temporary - needs a design decision
+			LaunchSatellites( _lastOrbit, 1 ); // TODO: This is temporary - needs a design decision
 		}
 	}
 
 	private void TryCreateOrbit()
 	{
-		if( !_orbitPrefab || !_orbitCentreTransform )
+		if( _activeOrbit )
 		{
-			Debug.LogError( "Orbit scene reference not initialised correctly. Ignoring orbit prefab instantiation." );
-			return;
-		}
-		
-		if( _newOrbit )
-		{
-			Debug.LogErrorFormat( "Orbit {0} was not finalised before creating a new one", _newOrbit.gameObject.name );
-			Destroy( _newOrbit.gameObject );
+			Debug.LogErrorFormat( "Orbit {0} was not finalised before creating a new one", _activeOrbit.gameObject.name );
 		}
 		
 		// First check raycast
@@ -95,18 +101,20 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 			GameObject newOrbitObject = GameObject.Instantiate(
 				_orbitPrefab,
 				transform ) as GameObject;
-			_newOrbit = newOrbitObject?.GetComponent<SatelliteOrbit>();
+			_activeOrbit = newOrbitObject?.GetComponent<SatelliteOrbit>();
 
-			if( _newOrbit )
+			if( _activeOrbit )
 			{
-				_newOrbit.Initialise(
-					_orbitCentreTransform.position,
-					_orbitCentreTransform.rotation,
-					_orbitRadius,
-					_bMeasureOrbitRadiusFromPlanetSurface,
+				_activeOrbit.Initialise(
+					_orbitClickableCollider.transform.position,
+					_orbitClickableCollider.transform.rotation,
+					OrbitRadiusProjection,
+					OrbitRadiusOuter,
 					_orbitSpeed,
 					referencePosition
 					);
+
+				_activeOrbit.ToggleActivePositioningVisuals( true );
 			}
 			else
 			{
@@ -115,38 +123,48 @@ public class SatelliteManager : MM.StandaloneSingletonBase<SatelliteManager>
 		}
 	}
 
-	private void TryUpdateOrbitDirection()
+	private void UpdateActiveOrbitDirection()
 	{
-		if( _newOrbit && TryGetInputReferencePosition( out Vector3 newReferencePosition ) )
+		if( _activeOrbit && TryGetInputReferencePosition( out Vector3 newReferencePosition ) )
 		{
-			_newOrbit.UpdateSecondReferencePosition( newReferencePosition );
+			_activeOrbit.UpdateSecondReferencePosition( newReferencePosition );
 		}
 	}
 
-	private void TryReleaseOrbit()
+	private void ReleaseActiveOrbit()
 	{
-		if( _newOrbit )
+		if( _activeOrbit )
 		{
-			TryUpdateOrbitDirection();
+			UpdateActiveOrbitDirection();
+			
+			// TODO: Trying out a different (simpler) input scheme: Launch one single satellite on orbital creation
+			if( _bAutomaticallyLaunchOnceOnOrbitRelease )
+			{
+				LaunchSatellites( _activeOrbit, 1 );
+			}
 
-			_orbits.Add( _newOrbit );
-			_lastOrbit = _newOrbit;
-			_newOrbit = null;
+			_activeOrbit.ToggleActivePositioningVisuals( false );
+			_orbits.Add( _activeOrbit );
+			_lastOrbit = _activeOrbit;
+			_activeOrbit = null;
 		}
 	}
 
-	private void TryLaunchSatellites( int num )
+	private void LaunchSatellites( SatelliteOrbit orbit, int num = 1 )
 	{
-		if( _lastOrbit )
+		if( orbit )
 		{
+			SO_PlanetConfig.ESensorType sensorType = GameManager.TryGetCurrentSensorType();
 			for( int i = 0; i < num; ++i )
 			{
-				Transform satelliteTransform = _lastOrbit.LaunchSatellite();
-				if( satelliteTransform && PlanetManager.Instance?.ActivePlanet )
+				Transform newSatelliteTransform = orbit.LaunchSatellite();
+				
+				if( newSatelliteTransform )
 				{
-					PlanetManager.Instance.ActivePlanet.StartTrackingSatellite( satelliteTransform );
-					// TODO: Make this better. Events, higher singleton. Cache the planet. Something.
-					// TODO: Need to remove satellites as well.
+					(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) eventPackage = new(
+						sensorType,
+						newSatelliteTransform );
+					EventBus.Invoke( this, EventBus.EEventType.LaunchedSatellite, eventPackage );
 				}
 			}
 		}

@@ -15,33 +15,53 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 	[Button( "Create Planet" )]
 	private void Editor_CreatePlanet()
 	{
-		CreatePlanet( _activePlanetIdx );
+		TryCreatePlanet( _activePlanetIdx );
 	}
 
-	[Button( "Clear Planet" )]
-	private void Editor_ClearPlanet()
+	[Button( "Clear Active Planet" )]
+	private void Editor_ClearActivePlanet()
 	{
-		ClearPlanet();
+		ClearActivePlanet();
 	}
 
 	[Button( "Next Planet" )]
 	private void Editor_NextPlanet()
 	{
+		GoToNextPlanet( true );
+	}
+
+	public void GoToNextPlanet( bool bCreateImmediately, bool bWrap = false )
+	{
+		GoToPlanetIdx( _activePlanetIdx + 1, bCreateImmediately, bWrap );
+	}
+
+	public void GoToPlanetIdx( int planetIdx, bool bCreateImmediately, bool bWrap = false )
+	{
 		if( _planetsData )
 		{
-			_activePlanetIdx = (_activePlanetIdx + 1) % _planetsData._planetConfigs.Count;
+			if( bWrap )
+			{
+				planetIdx %= _planetsData._planetConfigs.Count;
+			}
+
+			_activePlanetIdx = planetIdx;
+		}
+
+		if( bCreateImmediately )
+		{
+			TryCreatePlanet( _activePlanetIdx );
 		}
 	}
 
-	public void CreatePlanet()
+	public Planet TryCreatePlanet()
 	{
-		CreatePlanet( _activePlanetIdx );
+		return TryCreatePlanet( _activePlanetIdx );
 	}
 	
-	public void CreatePlanet( int planetIdx )
+	public Planet TryCreatePlanet( int planetIdx )
 	{
 		_activePlanetIdx = planetIdx;
-		ClearPlanet();
+		ClearActivePlanet();
 
 		if( _planetsData && planetIdx >= 0 && planetIdx < _planetsData._planetConfigs.Count )
 		{
@@ -50,12 +70,16 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 			if( newPlanet )
 			{
 				newPlanet.InitialisePlanet( _planetsData._planetConfigs[planetIdx] );
+				newPlanet.ChangeSensorType( GameManager.TryGetCurrentSensorType() );
 				_activePlanet = newPlanet;
 			}
+			return newPlanet;
 		}
+
+		return null;
 	}
 
-	public void ClearPlanet()
+	public void ClearActivePlanet()
 	{
 		if( _activePlanet != null )
 		{

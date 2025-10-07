@@ -39,7 +39,8 @@ public class Planet : MonoBehaviour
 	private Dictionary<SO_PlanetConfig.ESensorType, MeshFilter> _meshFilterMap =
 		new Dictionary<SO_PlanetConfig.ESensorType, MeshFilter>();
 
-	// TODO move this up to a singleton? it's a game state kind-of
+	// This mirrors data in the GameManager if it's present
+	// Caching here means we aren't dependent on the GameManager for testing
 	[OnValueChanged( "DebugChangedCurrentSensorType" )]
 	public SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
 	
@@ -51,7 +52,6 @@ public class Planet : MonoBehaviour
 
 #region Debug
 	
-	[SerializeField] private bool _bDebugRemoveDiscoveryAlpha = false;
 	public Transform _debugSatelliteTransform;
 
 	[Button( "Add debug satellite" )]
@@ -62,24 +62,26 @@ public class Planet : MonoBehaviour
 	
 	public void DebugChangedCurrentSensorType()
 	{
-		// Value changed in the inspector - simulate the switch
-		TurnOffAllSensorViews(); // We don't know the previous value here - turn everything off
-
-		// Turn the right one back on
-		ToggleSensorView( _currentSensorType, true );
-	}
-
-	private void TurnOffAllSensorViews()
-	{
-		for( int i = 0; i < (int)SO_PlanetConfig.ESensorType.COUNT; ++i )
-		{
-			ToggleSensorView( (SO_PlanetConfig.ESensorType)i, false );
-		}
+		OnUpdateSensorType();
 	}
 
 #endregion
 
 #region Interface
+
+	public bool GetActiveLayerInstance( out PlanetLayerInstance outInstance )
+	{
+		if( _planetLayerInstanceIdxMap.TryGetValue( _currentSensorType, out int idx ) )
+		{
+			outInstance = _planetLayerInstances[idx];
+			return outInstance != null;
+		}
+
+		outInstance = null;
+		return false;
+	}
+	
+
 
 	public void InitialisePlanet( SO_PlanetConfig planetConfig )
 	{
@@ -108,6 +110,7 @@ public class Planet : MonoBehaviour
 		{
 			if( _planetLayerInstances[idx] != null )
 			{
+				_planetLayerInstances[idx].RefreshMeshColours();
 				_planetLayerInstances[idx].ToggleView( bOn );
 			}
 		}
@@ -119,9 +122,9 @@ public class Planet : MonoBehaviour
 	}
 	public void StartTrackingSatellite( SO_PlanetConfig.ESensorType type, Transform satellite )
 	{
-		if( _bInitialised && _planetLayerInstanceIdxMap.TryGetValue( _currentSensorType, out int idx ) )
+		if( _bInitialised && GetActiveLayerInstance( out PlanetLayerInstance activeInstance ) )
 		{
-			_planetLayerInstances[idx].StartTrackingSatellite( satellite );
+			activeInstance.StartTrackingSatellite( satellite );
 		}
 	}
 	
@@ -131,9 +134,9 @@ public class Planet : MonoBehaviour
 	}
 	public void StopTrackingSatellite( SO_PlanetConfig.ESensorType type, Transform satellite )
 	{
-		if( _bInitialised && _planetLayerInstanceIdxMap.TryGetValue( _currentSensorType, out int idx ) )
+		if( _bInitialised && GetActiveLayerInstance( out PlanetLayerInstance activeInstance ) )
 		{
-			_planetLayerInstances[idx].StopTrackingSatellite( satellite );
+			activeInstance.StopTrackingSatellite( satellite );
 		}
 	}
 
@@ -236,7 +239,8 @@ public class Planet : MonoBehaviour
 			}
 		}
 		
-		TurnOffAllSensorViews();
+		OnUpdateSensorType();
+		
 		_bInitialised = true;
 	}
 	
@@ -339,7 +343,102 @@ public class Planet : MonoBehaviour
 
 #endregion
 
+#region Runtime Behaviour
+
+	private void OnUpdateSensorType()
+	{
+		// We don't know the previous value here - turn everything off
+		for( int i = 0; i < (int)SO_PlanetConfig.ESensorType.COUNT; ++i )
+		{
+			ToggleSensorView( (SO_PlanetConfig.ESensorType)i, false );
+		}
+
+		// Turn the right one back on
+		ToggleSensorView( _currentSensorType, true );
+	}
+
+	private void UpdateSatelliteDiscovery( float deltaTime )
+	{
+		for( int i = 0; i < _planetLayerInstances.Count; ++i )
+		{
+			_planetLayerInstances[i].UpdateDiscoveryFromTrackedSatellites();
+
+			_planetLayerInstances[i].UpdateFadeOut( Time.deltaTime );
+		}
+	}
+
+	private void UpdateActiveLayerVisuals()
+	{
+		// Refresh the visuals on the active layer
+		if( GetActiveLayerInstance( out PlanetLayerInstance activeInstance ) )
+		{
+#if UNITY_EDITOR
+			if( DEBUG_Globals.ActiveProfile._bShowPlanetLayerFaces )
+			{
+				activeInstance.DebugShowFaces();
+			}
+			else if( DEBUG_Globals.ActiveProfile._bRemovePlanetLayerFOW )
+			{
+				activeInstance.RefreshMeshColours( true );
+			}
+			else
+			{
+#endif
+				// Release version behaviour
+				activeInstance.RefreshMeshColours( false );
+				// End release version behaviour
+#if UNITY_EDITOR
+			}
+#endif
+		}
+	}
+
+	private void UpdateRotatePlanet( float deltaTime )
+	{
+		if( _rotationTransform )
+		{
+			_rotationTransform.Rotate( Vector3.up, RotationSpeed );
+		}
+	}
+
+#endregion
+
+#region Callbacks
+
+	private void OnGlobalEvent_ActiveSensorTypeChanged( EventBus.EventContext context, object obj = null )
+	{
+		if( obj != null )
+		{
+			_currentSensorType = (SO_PlanetConfig.ESensorType)obj;
+			OnUpdateSensorType();
+		}
+	}
+
+	private void OnGlobalEvent_LaunchedSatellite( EventBus.EventContext context, object obj = null )
+	{
+		if( obj != null )
+		{
+			(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) newSatellite =
+				(ValueTuple<SO_PlanetConfig.ESensorType, Transform>)obj;
+			StartTrackingSatellite( newSatellite.type, newSatellite.satelliteTransform );
+		}
+	}
+
+#endregion
+
 #region MonoBehaviour
+
+	void OnEnable()
+	{
+		EventBus.StartListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_ActiveSensorTypeChanged );
+		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+	}
+
+	void OnDisable()
+	{
+		EventBus.StopListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_ActiveSensorTypeChanged );
+		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+	}
 
 	void Update()
 	{
@@ -347,29 +446,12 @@ public class Planet : MonoBehaviour
 		{
 			return;
 		}
-
-		for( int i = 0; i < _planetLayerInstances.Count; ++i )
-		{
-			if( _bDebugRemoveDiscoveryAlpha )
-			{
-				_planetLayerInstances[i].DebugClearDiscoveryAlphas();
-			}
-			else
-			{
-				_planetLayerInstances[i].UpdateDiscoveryFromTrackedSatellites();
-
-				_planetLayerInstances[i].UpdateFadeOut( Time.deltaTime );
-
-				//todo: only need to do this for the active one
-				_planetLayerInstances[i].RefreshMeshColours();
-			}
-		}
-
-		// Rotate planet if necessary
-		if( _rotationTransform )
-		{
-			_rotationTransform.Rotate( Vector3.up, RotationSpeed );
-		}
+		
+		float deltaTime = Time.deltaTime;
+		
+		UpdateSatelliteDiscovery( deltaTime );
+		UpdateActiveLayerVisuals();
+		UpdateRotatePlanet( deltaTime );
 	}
 
 	void OnDestroy()
@@ -383,6 +465,17 @@ public class Planet : MonoBehaviour
 			}
 		}
 	}
+
+#if UNITY_EDITOR
+	void OnDrawGizmos()
+	{
+		if( DEBUG_Globals.ActiveProfile._bShowPlanetLayerFaceNormals &&
+		    GetActiveLayerInstance( out PlanetLayerInstance activeInstance ) )
+		{
+			activeInstance.DebugDrawMeshDataGizmos();
+		}
+	}
+#endif
 
 #endregion
 }

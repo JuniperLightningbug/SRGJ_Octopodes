@@ -14,8 +14,9 @@ public class SatelliteOrbit : MonoBehaviour
 	 *
 	 * -> Root (with attached script): world space, moves to planet position but does not rotate
 	 * |-> _orbitalTransformRoot: Rotates to the correct direction
-	 * |--> _orbitalVisualsToScaleRoot (component or child transform if necessary for visuals scale or rotation offset)
-	 * |--> _satelliteRootTransform: root of all spawned satellites (rotates in local space over time)
+	 * |--> _orbitalProjectionCircleVisuals: Scales to the projection radius
+	 * |--> _orbitalOuterCircleVisuals: Scales to the orbit radius (TODO: We should change the circle renderer radius instead)
+	 * |--> _satelliteRootTransform: Scales to the orbit radius and rotates over time
 	 * |---> [n] spawned satellites
 	 *
 	 * We're using the root's Y-up for the orbitals (i.e. the visualisation and inputs are for XZ, the axis is Y)
@@ -24,8 +25,9 @@ public class SatelliteOrbit : MonoBehaviour
 	// Rotate the orbital circle to the input direction
 	[SerializeField] private Transform _orbitalTransformRoot;
 	
-	// Transform to apply a _scale_ to in order to create the desired radius (e.g. a circle from a line renderer)
-	[SerializeField] private Transform _orbitalVisualsToScaleRoot;
+	// Transforms to apply a _scale_ to in order to create the desired radius (e.g. a circle from a line renderer)
+	[SerializeField] private Transform _orbitalProjectionCircleVisuals;
+	[SerializeField] private Transform _orbitalOuterCircleVisuals;
 	
 	// Transform parenting all the satellites. Since we're rotating them at the same rate, we can do it once.
 	// But we don't necessarily want to rotate the whole object (e.g. the line renderer, other visuals)
@@ -33,26 +35,32 @@ public class SatelliteOrbit : MonoBehaviour
 
 	[SerializeField] private Object _satellitePrefab;
 
-	[ReadOnly, SerializeField] private List<Transform> _satelliteTransforms;
+	[ReadOnly, SerializeField] public List<Transform> _satelliteTransforms;
 
-	[SerializeField, Tooltip("Set by instantiating manager")] private float _radius = 1.0f;
+	[SerializeField, Tooltip("Set by instantiating manager")] private float _projectionRadius = 1.0f;
+	[SerializeField, Tooltip("Set by instantiating manager")] private float _orbitRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager (Rotations Per Second)")] private float _orbitSpeed = 1.0f;
 
 	private Vector3 _directionReference0 = Vector3.right;
 	private Vector3 _directionReference1 = Vector3.forward;
 	private Vector3 _cachedTransformUp = Vector3.up;
 
-	public void Initialise( Vector3 centre, Quaternion rotation, float radius, bool bApplyRadiusFromSurface, float orbitSpeed, Vector3 startReferencePosition )
+	public void Initialise( Vector3 centre, Quaternion rotation, float projectionRadius, float orbitRadius, float orbitSpeed, Vector3 startReferencePosition )
 	{
 		transform.position = centre;
 		transform.rotation = rotation;
 		transform.localScale = Vector3.one;
 		_cachedTransformUp = transform.up;
-
-		_radius = bApplyRadiusFromSurface ? startReferencePosition.magnitude + radius : radius;
-		if( _orbitalVisualsToScaleRoot )
+		_projectionRadius = projectionRadius;
+		_orbitRadius = orbitRadius;
+		
+		if( _orbitalProjectionCircleVisuals )
 		{
-			_orbitalVisualsToScaleRoot.localScale = Vector3.one * _radius;
+			_orbitalProjectionCircleVisuals.localScale = Vector3.one * _projectionRadius;
+		}
+		if( _orbitalOuterCircleVisuals )
+		{
+			_orbitalOuterCircleVisuals.localScale = Vector3.one * _orbitRadius;
 		}
 		_orbitSpeed = orbitSpeed;
 
@@ -87,7 +95,7 @@ public class SatelliteOrbit : MonoBehaviour
 		}
 		
 		// New up direction is the normal of the plane formed by (0,0,0), _directionReference0 and _directionReference1
-		Vector3 upDirection = Vector3.Cross(_directionReference0, _directionReference1  ).normalized;
+		Vector3 upDirection = Vector3.Cross( _directionReference1, _directionReference0 ).normalized;
 		_orbitalTransformRoot.rotation = Quaternion.FromToRotation( _cachedTransformUp, upDirection );
 	}
 	
@@ -111,7 +119,8 @@ public class SatelliteOrbit : MonoBehaviour
 			GameObject newSatelliteObj = Instantiate( _satellitePrefab, satelliteRoot ) as GameObject;
 			if( newSatelliteObj )
 			{
-				newSatelliteObj.transform.localPosition = satelliteRoot.InverseTransformDirection( _directionReference0 ) * _radius;
+				Transform newSatelliteTransform = newSatelliteObj.transform;
+				newSatelliteTransform.localPosition = satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
 				
 				// TODO TEMP: COLOUR MAT
 				MeshRenderer newMeshRenderer = newSatelliteObj.GetComponent<MeshRenderer>();
@@ -120,10 +129,25 @@ public class SatelliteOrbit : MonoBehaviour
 					newMeshRenderer.material.SetColor( "_BaseColor", Random.ColorHSV(0.0f, 1.0f, 0.3f, 0.8f, 0.5f, 0.8f, 1.0f, 1.0f ) );
 				}
 				
-				return newSatelliteObj.transform;
+				_satelliteTransforms.Add( newSatelliteTransform );
+				
+				return newSatelliteTransform;
 			}
 		}
 
 		return null;
 	}
+
+#region Visuals Interface
+	
+	public void ToggleActivePositioningVisuals( bool bActive )
+	{
+		if( _orbitalProjectionCircleVisuals )
+		{
+			_orbitalProjectionCircleVisuals.gameObject.SetActive( bActive );
+		}
+	}
+	
+#endregion
+	
 }
