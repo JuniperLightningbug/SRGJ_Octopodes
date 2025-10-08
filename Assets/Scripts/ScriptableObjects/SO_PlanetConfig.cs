@@ -27,6 +27,7 @@ public class SO_PlanetConfig : ScriptableObject
 		public Mesh _mesh;
 		public Material _material;
 		public bool _bActive;
+		public bool _bHasTexture;
 	}
 	
 	public string _name;

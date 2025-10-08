@@ -24,12 +24,22 @@ public class SatelliteManager : MonoBehaviour
 	[SerializeField, Tooltip("Elevation above the clicked collider")] private float _orbitRadiusOffset = 0.3f;
 	[SerializeField] private bool _bAutomaticallyLaunchOnceOnOrbitRelease = true;
 
-	private List<SatelliteOrbit> _orbits = new List<SatelliteOrbit>();
+	private readonly List<SatelliteOrbit> _orbits = new List<SatelliteOrbit>();
 	private SatelliteOrbit _activeOrbit;
 	private SatelliteOrbit _lastOrbit;
 	
 	private float OrbitRadiusProjection => _orbitClickableCollider ? _orbitClickableCollider.radius : 1.0f;
 	private float OrbitRadiusOuter => OrbitRadiusProjection + Mathf.Max( _orbitRadiusOffset, 0.0f );
+
+	[Button( "Debug Reset (Runtime)" )]
+	private void Inspector_Reset()
+	{
+#if UNITY_EDITOR
+		ClearSatellites();
+#endif
+	}
+
+#region MonoBehaviour
 
 	void Awake()
 	{
@@ -57,6 +67,29 @@ public class SatelliteManager : MonoBehaviour
 		ProcessInputs();
 	}
 
+#endregion
+
+#region Interface
+
+	public void ClearSatellites()
+	{
+		if( _activeOrbit )
+		{
+			ReleaseActiveOrbit( false );
+		}
+		
+		for( int i = _orbits.Count - 1; i >= 0; --i )
+		{
+			if( _orbits[i] )
+			{
+				MM.ComponentUtils.DestroyPlaymodeSafe( _orbits[i].gameObject );
+			}
+		}
+		_orbits.Clear();
+	}
+
+#endregion
+
 	private void UpdateOrbitAnchor()
 	{
 		if( _orbitCentreAnchor )
@@ -79,7 +112,7 @@ public class SatelliteManager : MonoBehaviour
 		}
 		else if( Mouse.current.leftButton.wasReleasedThisFrame )
 		{
-			ReleaseActiveOrbit();
+			ReleaseActiveOrbit( _bAutomaticallyLaunchOnceOnOrbitRelease );
 		}
 
 		if( Keyboard.current.spaceKey.wasPressedThisFrame )
@@ -131,14 +164,14 @@ public class SatelliteManager : MonoBehaviour
 		}
 	}
 
-	private void ReleaseActiveOrbit()
+	private void ReleaseActiveOrbit( bool bWithLaunch )
 	{
 		if( _activeOrbit )
 		{
 			UpdateActiveOrbitDirection();
 			
 			// TODO: Trying out a different (simpler) input scheme: Launch one single satellite on orbital creation
-			if( _bAutomaticallyLaunchOnceOnOrbitRelease )
+			if( bWithLaunch )
 			{
 				LaunchSatellites( _activeOrbit, 1 );
 			}

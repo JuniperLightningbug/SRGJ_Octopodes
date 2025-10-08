@@ -17,12 +17,15 @@ public class PlanetLayerInstance
 	public Mesh _meshInstance;
 	public HexgridMeshData _meshData;
 	public float _fadeTime = 0.5f;
+	public SO_PlanetConfig.ESensorType _sensorType;
+	public bool _bHasTexture = false;
 	
 	// Interpreted data
 	[SerializeField, ReadOnly] private Color[] _vertexColoursOriginal;
 	[SerializeField, ReadOnly] private Color[] _vertexColours; // Cached to avoid allocations, but values are recalculated before use
-	[SerializeField, ReadOnly] private float[] _satelliteDiscoveryAlphas;
+	[SerializeField, ReadOnly] private float[] _faceDiscoveryValues;
 	private Color[] _debugColours;
+	[SerializeField, ReadOnly] public float _discoveryValue = 0.0f;
 	
 	// TODO: We can precalculate this or cache on init.
 	// At the moment it's useful to expose it to the inspector in this format
@@ -35,11 +38,16 @@ public class PlanetLayerInstance
 	
 	public IndexedHashSet<Transform> _trackedSatellites = new IndexedHashSet<Transform>();
 
-	public bool Initialise( Transform inTransform, Mesh inMeshInstance, HexgridMeshData inMeshData )
+	public bool Initialise(
+		Transform inTransform,
+		Mesh inMeshInstance,
+		HexgridMeshData inMeshData,
+		SO_PlanetConfig.ESensorType inSensorType )
 	{
 		_transform = inTransform;
 		_meshInstance = inMeshInstance;
 		_meshData = inMeshData;
+		_sensorType = inSensorType;
 		return Initialise();
 	}
 	
@@ -52,15 +60,11 @@ public class PlanetLayerInstance
 		
 		_vertexColoursOriginal = _meshInstance.colors;
 		_vertexColours = new Color[_vertexColoursOriginal.Length];
-		_satelliteDiscoveryAlphas = new float[_vertexColoursOriginal.Length];
+		
+		_faceDiscoveryValues = new float[_meshData._faceCentres.Length];
 
 		_bInitialised = true;
 		return true;
-	}
-
-	private void DoThing()
-	{
-		Debug.LogError( "FJEIWPFJ" );
 	}
 
 #region Debug Interface
@@ -160,22 +164,23 @@ public class PlanetLayerInstance
 		}
 	}
 
-	public void UpdateDiscoveryFromTrackedSatellites()
+	// Returns value 0..1 for proportion of planet discovered
+	public void AddDiscoveryFromTrackedSatellites()
 	{
 		Vector3[] positions = new Vector3[_trackedSatellites.Count];
 		for( int i = 0; i < _trackedSatellites.Count; ++i )
 		{
 			positions[i] = _trackedSatellites[i].position;
 		}
-		UpdateDiscoveryFromSatellitePositions( positions );
+		AddDiscoveryFromSatellitePositions( positions );
 	}
 	
 	public void UpdateDiscoveryFromSatellitePosition( Vector3 satellitePosition )
 	{
-		UpdateDiscoveryFromSatellitePositions( new Vector3[] { satellitePosition } );
+		AddDiscoveryFromSatellitePositions( new Vector3[] { satellitePosition } );
 	}
 
-	public void UpdateDiscoveryFromSatellitePositions( Vector3[] satellitePositions )
+	public void AddDiscoveryFromSatellitePositions( Vector3[] satellitePositions )
 	{
 		if( !_bInitialised )
 		{
@@ -201,30 +206,45 @@ public class PlanetLayerInstance
 				if( (_meshData._faceCentres[faceIdx] - satellitePositions[satelliteIdx]).sqrMagnitude <
 				    satelliteDiscoveryRadiusSqr )
 				{
-					for( int j = 0; j < HexgridMeshData.kFaceVertexCountMax; ++j )
-					{
-						int vertexIdx = _meshData._faceIdxToVertexIdxs[
-							faceIdx * HexgridMeshData.kFaceVertexCountMax + j];
-						if( vertexIdx >= 0 )
-						{
-							_satelliteDiscoveryAlphas[vertexIdx] = 1.0f;
-						}
-					}
+					_faceDiscoveryValues[faceIdx] = 1.0f;
 				}
 			}
 		}
 	}
 
-	public void UpdateFadeOut( float deltaTime )
+	public void FadeDiscovery( float deltaTime )
 	{
 		// TODO: Once we're not using the vertex colours for actual colour, we can apply a custom remap ramp in the shader
-		float alpha; // Ignore rider suggestion - caching here is better for big loops
 		float fadeAmount = FadeAmountPerSecond * deltaTime;
-		for( int i = 0; i < _satelliteDiscoveryAlphas.Length; ++i )
+		
+		for( int i = 0; i < _faceDiscoveryValues.Length; ++i )
 		{
-			alpha = _satelliteDiscoveryAlphas[i];
-			_satelliteDiscoveryAlphas[i] = Mathf.Max( 0.0f, alpha - fadeAmount );
+			_faceDiscoveryValues[i] = Mathf.Max( 0.0f, _faceDiscoveryValues[i] - fadeAmount );
 		}
+	}
+
+	public float RecalculateCurrentDiscoveryValue()
+	{
+		if( _faceDiscoveryValues == null || _faceDiscoveryValues.Length == 0 )
+		{
+			return 0.0f;
+		}
+
+		float totalDiscovery = 0.0f;
+		for( int i = 0; i < _faceDiscoveryValues.Length; ++i )
+		{
+			totalDiscovery += _faceDiscoveryValues[i];
+		}
+
+		_discoveryValue = totalDiscovery / _faceDiscoveryValues.Length;
+		return _discoveryValue;
+	}
+
+	public float UpdateDiscovery( float deltaTime )
+	{
+		FadeDiscovery( deltaTime );
+		AddDiscoveryFromTrackedSatellites();
+		return RecalculateCurrentDiscoveryValue();
 	}
 
 	public void RefreshMeshColours( bool bShowUndiscovered = false )
@@ -236,17 +256,39 @@ public class PlanetLayerInstance
 
 		if( bShowUndiscovered )
 		{
-			_meshInstance.colors = _vertexColoursOriginal;
+			if( _bHasTexture )
+			{
+				for( int i = 0; i < _vertexColours.Length; ++i )
+				{
+					_vertexColours[i].a = 1.0f;
+				}
+			}
+			else
+			{
+				_meshInstance.colors = _vertexColoursOriginal;
+			}
 		}
 		else
 		{
-			// For now, we're also using the vertex colours to colour the material.
-			// Ideally we wouldn't need this intermediate step & we'd just apply the discovery alphas directly to the vertex colour array cache
-			for( int i = 0; i < _vertexColours.Length; ++i )
+			if( _bHasTexture )
 			{
-				_vertexColours[i] = _vertexColoursOriginal[i];
-				_vertexColours[i].a *= _satelliteDiscoveryAlphas[i];
+				// TODO: Ideally this is the only case in future, in which case we can apply the vertex colours as the
+				// alphas are calculated and avoid a separate loop
+				for( int i = 0; i < _vertexColours.Length; ++i )
+				{
+					_vertexColours[i].a = _faceDiscoveryValues[_meshData._vertexIdxToFaceIdx[i]];
+				}
 			}
+			else
+			{
+				// Else, we're colouring the mesh using vertex colours. Take the original values into account.
+				for( int i = 0; i < _vertexColours.Length; ++i )
+				{
+					_vertexColours[i] = _vertexColoursOriginal[i];
+					_vertexColours[i].a *= _faceDiscoveryValues[_meshData._vertexIdxToFaceIdx[i]];
+				}
+			}
+
 			_meshInstance.colors = _vertexColours;
 		}
 	}

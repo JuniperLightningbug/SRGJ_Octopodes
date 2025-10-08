@@ -200,8 +200,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.05, y: 1.05, z: 1.05}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6366552374202768083}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
@@ -641,6 +641,5 @@ MonoBehaviour:
   _rotationTransform: {fileID: 6366552374202768083}
   _layerMeshesCache: {fileID: 11400000, guid: e69d7ba4b0e10b84da778463f6e4e936, type: 2}
   _planetLayerInstances: []
-  _bDebugRemoveDiscoveryAlpha: 0
-  _debugTrackTransforms: []
   _currentSensorType: -1
+  _debugSatelliteTransform: {fileID: 0}

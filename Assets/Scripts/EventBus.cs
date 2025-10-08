@@ -14,10 +14,13 @@ public static class EventBus
 		UI_CreatePlanet,
 		UI_NextPlanet,
 		
+		// Value Changes
+		OnChanged_LayerDiscovery, // (SO_PlanetConfig.ESensorType type, float newValue) layerDiscovery
+		
 		// Game Manager
 		ActiveSensorTypeChanged, // SO_PlanetConfig.ESensorType toSensorType
 		SpawnNewPlanet,
-		DestroyOldPlanet,
+		ClearActivePlanet,
 		
 		// Gameplay Events
 		LaunchedSatellite, // (SO_PlanetConfig.ESensorType type, Transform satelliteTransform) newSatellite

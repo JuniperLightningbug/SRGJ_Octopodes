@@ -64,6 +64,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		if( _planetManager )
 		{
 			_planetManager.ClearActivePlanet();
+			_satelliteManager.ClearSatellites();
 		}
 	}
 
@@ -97,7 +98,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	void OnDisable()
 	{
-		EventBus.StopListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_UIChangeActiveSensorType );
+		EventBus.StopListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
 		EventBus.StopListening( EventBus.EEventType.UI_ClearActivePlanet, OnGlobalEvent_UIClearActivePlanet );
 		EventBus.StopListening( EventBus.EEventType.UI_CreatePlanet, OnGlobalEvent_UICreatePlanet );
 		EventBus.StopListening( EventBus.EEventType.UI_NextPlanet, OnGlobalEvent_UIGoToNextPlanet );

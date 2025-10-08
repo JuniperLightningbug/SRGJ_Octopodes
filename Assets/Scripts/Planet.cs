@@ -32,12 +32,8 @@ public class Planet : MonoBehaviour
 
 	[SerializeField, AllowNesting]
 	private List<PlanetLayerInstance> _planetLayerInstances = new List<PlanetLayerInstance>();
-
 	private Dictionary<SO_PlanetConfig.ESensorType, int> _planetLayerInstanceIdxMap =
 		new Dictionary<SO_PlanetConfig.ESensorType, int>(); // Synced with _planetLayerInstances
-
-	private Dictionary<SO_PlanetConfig.ESensorType, MeshFilter> _meshFilterMap =
-		new Dictionary<SO_PlanetConfig.ESensorType, MeshFilter>();
 
 	// This mirrors data in the GameManager if it's present
 	// Caching here means we aren't dependent on the GameManager for testing
@@ -156,19 +152,19 @@ public class Planet : MonoBehaviour
 		{
 			return;
 		}
-
-		InitialiseLayerInspectorMap();
-
+		
 		_planetConfig._planetLayers.Clear();
-		foreach( KeyValuePair<SO_PlanetConfig.ESensorType, MeshFilter> tuple in _meshFilterMap )
+
+		for( int i = 0; i < (int)SO_PlanetConfig.ESensorType.COUNT; ++i )
 		{
-			if( tuple.Value.sharedMesh != null )
+			MeshFilter meshFilter = GetPrefabAssignedMeshFilter( (SO_PlanetConfig.ESensorType)i );
+			if( meshFilter?.sharedMesh )
 			{
-				MeshRenderer meshRenderer = tuple.Value.GetComponent<MeshRenderer>();
+				MeshRenderer meshRenderer = meshFilter.GetComponent<MeshRenderer>();
 				_planetConfig._planetLayers.Add( new SO_PlanetConfig.PlanetLayerTuple()
 				{
-					_sensorType = tuple.Key,
-					_mesh = tuple.Value.sharedMesh,
+					_sensorType = (SO_PlanetConfig.ESensorType)i,
+					_mesh = meshFilter.sharedMesh,
 					_material = meshRenderer ? meshRenderer.sharedMaterial : null,
 				} );
 			}
@@ -209,7 +205,6 @@ public class Planet : MonoBehaviour
 			return;
 		}
 
-		InitialiseLayerInspectorMap();
 		InitialiseConfigComponentProperties();
 	}
 	
@@ -223,7 +218,6 @@ public class Planet : MonoBehaviour
 			return;
 		}
 		
-		InitialiseLayerInspectorMap();
 		InitialiseConfigComponentProperties();
 
 		_planetLayerInstances.Clear();
@@ -243,58 +237,52 @@ public class Planet : MonoBehaviour
 		
 		_bInitialised = true;
 	}
-	
-	
-	private void InitialiseLayerInspectorMap()
+
+	private MeshFilter GetPrefabAssignedMeshFilter( SO_PlanetConfig.ESensorType type )
 	{
-		_meshFilterMap = new Dictionary<SO_PlanetConfig.ESensorType, MeshFilter>();
-		if( _auroraMeshFilter )
+		switch( type )
 		{
-			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Aurora, _auroraMeshFilter );
+			case SO_PlanetConfig.ESensorType.Aurora:
+				return _auroraMeshFilter;
+			case SO_PlanetConfig.ESensorType.Radar:
+				return _radarMeshFilter;
+			case SO_PlanetConfig.ESensorType.Magneto:
+				return _magnetoMeshFilter;
+			case SO_PlanetConfig.ESensorType.Plasma:
+				return _plasmaMeshFilter;
+			case SO_PlanetConfig.ESensorType.MassSpec:
+				return _massSpecMeshFilter;
+			default:
+				return null;
 		}
-
-		if( _radarMeshFilter )
-		{
-			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Radar, _radarMeshFilter );
-		}
-
-		if( _magnetoMeshFilter )
-		{
-			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Magneto, _magnetoMeshFilter );
-		}
-
-		if( _plasmaMeshFilter )
-		{
-			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.Plasma, _plasmaMeshFilter );
-		}
-
-		if( _massSpecMeshFilter )
-		{
-			_meshFilterMap.Add( SO_PlanetConfig.ESensorType.MassSpec, _massSpecMeshFilter );
-		}
+	}
+	private bool TryGetPrefabAssignedMeshFilter( SO_PlanetConfig.ESensorType type, out MeshFilter outMeshFilter )
+	{
+		outMeshFilter = GetPrefabAssignedMeshFilter( type );
+		return outMeshFilter != null;
 	}
 
 	private void InitialiseConfigComponentProperties()
 	{
 		// Prefab assignments from the planet config SO
 		// Valid at edit time or runtime
-		
+
 		for( int i = 0; i < _planetConfig._planetLayers.Count; ++i )
 		{
-			if( _planetConfig._planetLayers[i]._bActive &&
-			    _meshFilterMap.TryGetValue(
-				    _planetConfig._planetLayers[i]._sensorType,
-				    out MeshFilter meshFilter ) )
+			if( _planetConfig._planetLayers[i]._bActive )
 			{
-				meshFilter.sharedMesh = _planetConfig._planetLayers[i]._mesh;
-				MeshRenderer meshRenderer = meshFilter.GetComponent<MeshRenderer>();
-				if( _planetConfig._planetLayers[i]._material && meshRenderer )
+				if( TryGetPrefabAssignedMeshFilter(_planetConfig._planetLayers[i]._sensorType, out MeshFilter meshFilter) )
 				{
-					meshRenderer.sharedMaterial = _planetConfig._planetLayers[i]._material;
+					meshFilter.sharedMesh = _planetConfig._planetLayers[i]._mesh;
+					MeshRenderer meshRenderer = meshFilter.GetComponent<MeshRenderer>();
+					if( _planetConfig._planetLayers[i]._material && meshRenderer )
+					{
+						meshRenderer.sharedMaterial = _planetConfig._planetLayers[i]._material;
+					}
 				}
 			}
 		}
-		
+
 		if( _planetMeshFilter && _planetConfig._planetMesh )
 		{
 			_planetMeshFilter.sharedMesh = _planetConfig._planetMesh;
@@ -315,18 +303,14 @@ public class Planet : MonoBehaviour
 				layerConfig._mesh.name );
 			return null;
 		}
-		
+
 		if( layerConfig._bActive &&
-		    _meshFilterMap != null &&
-		    _meshFilterMap.TryGetValue(
-			    layerConfig._sensorType,
-			    out MeshFilter meshFilter ) )
+		    TryGetPrefabAssignedMeshFilter( layerConfig._sensorType, out MeshFilter meshFilter ) )
 		{
-			
 			// Instance the mesh - we'll be modifying the vertex colours
 			Mesh meshInstance = meshFilter.mesh;
 			meshInstance.MarkDynamic();
-		
+
 			// TODO: Do we need to instance the material?
 
 			PlanetLayerInstance newLayer = new PlanetLayerInstance()
@@ -334,10 +318,13 @@ public class Planet : MonoBehaviour
 				_meshInstance = meshInstance, // The runtime copy
 				_meshData = hexgridMeshData,
 				_transform = meshFilter.transform,
+				_sensorType = layerConfig._sensorType,
+				_bHasTexture = layerConfig._bHasTexture,
 			};
 			return newLayer;
-			
+
 		}
+
 		return null;
 	}
 
@@ -361,9 +348,12 @@ public class Planet : MonoBehaviour
 	{
 		for( int i = 0; i < _planetLayerInstances.Count; ++i )
 		{
-			_planetLayerInstances[i].UpdateDiscoveryFromTrackedSatellites();
-
-			_planetLayerInstances[i].UpdateFadeOut( Time.deltaTime );
+			float layerDiscovery = _planetLayerInstances[i].UpdateDiscovery( Time.deltaTime );
+			(SO_PlanetConfig.ESensorType type, float newValue) eventPackage =
+				new ValueTuple<SO_PlanetConfig.ESensorType, float>(
+					_planetConfig._planetLayers[i]._sensorType,
+					layerDiscovery );
+			EventBus.Invoke( this, EventBus.EEventType.OnChanged_LayerDiscovery, eventPackage );
 		}
 	}
 

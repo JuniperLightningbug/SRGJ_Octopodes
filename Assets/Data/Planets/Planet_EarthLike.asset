@@ -18,22 +18,27 @@ MonoBehaviour:
     _mesh: {fileID: 1908012735059086017, guid: 47eb4852e3cd2c24da4b349421919c19, type: 3}
     _material: {fileID: 2100000, guid: 682479a5db870c1418645df81ee8758f, type: 2}
     _bActive: 1
+    _bHasTexture: 0
   - _sensorType: 2
     _mesh: {fileID: 5330818721451473509, guid: afa5066efc07ca5498d001f750f649c6, type: 3}
     _material: {fileID: 2100000, guid: 2e790f4241056ee47aaa5973cd1ca4e3, type: 2}
     _bActive: 1
+    _bHasTexture: 0
   - _sensorType: 4
     _mesh: {fileID: 3776723591692892301, guid: 2aa60aeb7bfea3a4b81d4f4392663e74, type: 3}
     _material: {fileID: 2100000, guid: 9acdc9d7c792cfc4589ad38d9b9208fb, type: 2}
     _bActive: 1
+    _bHasTexture: 0
   - _sensorType: 3
     _mesh: {fileID: 3776723591692892301, guid: 2aa60aeb7bfea3a4b81d4f4392663e74, type: 3}
     _material: {fileID: 2100000, guid: 5415044948553dd47a1957856eded96f, type: 2}
     _bActive: 1
+    _bHasTexture: 0
   - _sensorType: 1
     _mesh: {fileID: -2944970759498101532, guid: 599336b6e9dade1428102e86d07d9081, type: 3}
     _material: {fileID: 2100000, guid: 1247e7a830046564b945f1df316c7ed1, type: 2}
     _bActive: 1
+    _bHasTexture: 1
   _planetMesh: {fileID: -575865206004738883, guid: dff4304222d90ce4aa09797e796c1343, type: 3}
   _planetMaterial: {fileID: 2100000, guid: 688ee1e962bf9f44b9431eb88fb56969, type: 2}
   _rotationTime: 10
