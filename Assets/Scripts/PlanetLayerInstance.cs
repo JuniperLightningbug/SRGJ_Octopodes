@@ -16,7 +16,7 @@ public class PlanetLayerInstance
 	public Transform _transform;
 	public Mesh _meshInstance;
 	public HexgridMeshData _meshData;
-	public float _fadeTime = 0.5f;
+	public float _fadeTime = 3.0f;
 	public SO_PlanetConfig.ESensorType _sensorType;
 	public bool _bHasTexture = false;
 	

@@ -61,7 +61,7 @@ public abstract class UIValuesBase : MonoBehaviour
 		{
 			for( int i = 0; i < UpdateOnEvents.Length; ++i )
 			{
-				EventBus.StopListening( UpdateOnEvents[i], OnGlobalEvent_UpdateDisplay );
+				EventBus.StartListening( UpdateOnEvents[i], OnGlobalEvent_UpdateDisplay );
 			}
 		}
 		UpdateDisplay();

@@ -237,6 +237,10 @@ PrefabInstance:
       propertyPath: m_Text
       value: Mass Spec
       objectReference: {fileID: 0}
+    - target: {fileID: 2160639156989591566, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
+      propertyPath: _type
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3821700315571450970, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
       propertyPath: m_text
       value: Mass Spec
@@ -385,6 +389,10 @@ PrefabInstance:
     - target: {fileID: 1416732350967892206, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
       propertyPath: m_Text
       value: Magneto
+      objectReference: {fileID: 0}
+    - target: {fileID: 2160639156989591566, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
+      propertyPath: _type
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3821700315571450970, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
       propertyPath: m_text
@@ -676,6 +684,10 @@ PrefabInstance:
       propertyPath: m_Text
       value: Plasma
       objectReference: {fileID: 0}
+    - target: {fileID: 2160639156989591566, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
+      propertyPath: _type
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3821700315571450970, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
       propertyPath: m_text
       value: Plasma
@@ -824,6 +836,10 @@ PrefabInstance:
     - target: {fileID: 1416732350967892206, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
       propertyPath: m_Text
       value: Radar
+      objectReference: {fileID: 0}
+    - target: {fileID: 2160639156989591566, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
+      propertyPath: _type
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3821700315571450970, guid: b9dc48ed676f9b64b8837018b46f7991, type: 3}
       propertyPath: m_text
