@@ -346,15 +346,13 @@ public class Planet : MonoBehaviour
 
 	private void UpdateSatelliteDiscovery( float deltaTime )
 	{
+		Dictionary<SO_PlanetConfig.ESensorType, float> discoveryValues = new Dictionary<SO_PlanetConfig.ESensorType, float>();
 		for( int i = 0; i < _planetLayerInstances.Count; ++i )
 		{
-			float layerDiscovery = _planetLayerInstances[i].UpdateDiscovery( Time.deltaTime );
-			(SO_PlanetConfig.ESensorType type, float newValue) eventPackage =
-				new ValueTuple<SO_PlanetConfig.ESensorType, float>(
-					_planetConfig._planetLayers[i]._sensorType,
-					layerDiscovery );
-			EventBus.Invoke( this, EventBus.EEventType.OnChanged_LayerDiscovery, eventPackage );
+			float layerDiscovery = _planetLayerInstances[i].UpdateDiscovery( deltaTime );
+			discoveryValues.Add( _planetConfig._planetLayers[i]._sensorType, layerDiscovery );
 		}
+		EventBus.Invoke( this, EventBus.EEventType.OnChanged_LayerDiscovery, discoveryValues );
 	}
 
 	private void UpdateActiveLayerVisuals()

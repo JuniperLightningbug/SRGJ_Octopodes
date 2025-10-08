@@ -85,7 +85,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.311
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -573,6 +573,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1276363070495442918}
   - component: {fileID: 7762232191304252964}
+  - component: {fileID: 2160639156989591566}
   m_Layer: 5
   m_Name: Toggle_Sensor
   m_TagString: Untagged
@@ -649,3 +650,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 0
+--- !u!114 &2160639156989591566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8687344355322256263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a03a5fa1ab0d3bd40ac3ba116a0aaec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _slider: {fileID: 4793034067546473291}
+  _type: 0
+  _discoveryProgress: 0

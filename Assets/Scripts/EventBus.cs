@@ -15,7 +15,7 @@ public static class EventBus
 		UI_NextPlanet,
 		
 		// Value Changes
-		OnChanged_LayerDiscovery, // (SO_PlanetConfig.ESensorType type, float newValue) layerDiscovery
+		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
 		
 		// Game Manager
 		ActiveSensorTypeChanged, // SO_PlanetConfig.ESensorType toSensorType
