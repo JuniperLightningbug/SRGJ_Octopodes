@@ -610,13 +610,13 @@
     },
     "m_Name": "Split",
     "m_DrawState": {
-        "m_Expanded": false,
+        "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -360.79998779296877,
-            "y": 346.4000244140625,
-            "width": 118.39997863769531,
-            "height": 76.79998779296875
+            "x": -357.3333435058594,
+            "y": 392.0000305175781,
+            "width": 120.0,
+            "height": 78.66665649414063
         }
     },
     "m_Slots": [
