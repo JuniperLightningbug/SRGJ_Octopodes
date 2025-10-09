@@ -207,11 +207,11 @@ namespace MM
 				for( int i = 0; i < _updateOrder.Length; ++i )
 				{
 					if( _debugUpdateGroup._ordered.TryGetValue( _updateOrder[i], 
-						out IndexedHashSet<IControlledDebugUpdate> controlledDebugUpdates ) )
+						   out IndexedHashSet<IControlledDebugUpdate> controlledDebugUpdates ) )
 					{
-						foreach( IControlledDebugUpdate controlledDebugUpdate in controlledDebugUpdates )
+						for( int j = 0; j < controlledDebugUpdates.Count; ++j )
 						{
-							controlledDebugUpdate.ControlledDebugUpdate( deltaTime );
+							controlledDebugUpdates[j].ControlledDebugUpdate( deltaTime );
 						}
 					}
 				}
@@ -219,9 +219,9 @@ namespace MM
 
 			if( _debugUpdateGroup.BHasUnorderedContent )
 			{
-				foreach( IControlledDebugUpdate controlledDebugUpdate in _debugUpdateGroup._unordered )
+				for( int i = 0; i < _debugUpdateGroup._unordered.Count; ++i )
 				{
-					controlledDebugUpdate.ControlledDebugUpdate( deltaTime );
+					_debugUpdateGroup._unordered[i].ControlledDebugUpdate( deltaTime );
 				}
 			}
 		}
@@ -236,12 +236,12 @@ namespace MM
 			{
 				for( int i = 0; i < _updateOrder.Length; ++i )
 				{
-					if( _updateGroup._ordered.TryGetValue( _updateOrder[i],
-						out IndexedHashSet<IControlledUpdate> controlledUpdates ) )
+					if( _updateGroup._ordered.TryGetValue( _updateOrder[i], 
+						   out IndexedHashSet<IControlledUpdate> controlledUpdates ) )
 					{
-						foreach( IControlledUpdate controlledUpdate in controlledUpdates ) // TODO THIS ISN'T WORKING
+						for( int j = 0; j < controlledUpdates.Count; ++j )
 						{
-							controlledUpdate.ControlledUpdate( deltaTime );
+							controlledUpdates[j].ControlledUpdate( deltaTime );
 						}
 					}
 				}
@@ -249,9 +249,9 @@ namespace MM
 
 			if( _updateGroup.BHasUnorderedContent )
 			{
-				foreach( IControlledUpdate controlledUpdate in _updateGroup._unordered )
+				for( int i = 0; i < _updateGroup._unordered.Count; ++i )
 				{
-					controlledUpdate.ControlledUpdate( Time.deltaTime );
+					_updateGroup._unordered[i].ControlledUpdate( deltaTime );
 				}
 			}
 		}
@@ -265,9 +265,9 @@ namespace MM
 					if( _lateUpdateGroup._ordered.TryGetValue( _updateOrder[i], 
 						out IndexedHashSet<IControlledLateUpdate> controlledLateUpdates ) )
 					{
-						foreach( IControlledLateUpdate controlledLateUpdate in controlledLateUpdates )
+						for( int j = 0; j < controlledLateUpdates.Count; ++j )
 						{
-							controlledLateUpdate.ControlledLateUpdate( deltaTime );
+							controlledLateUpdates[j].ControlledLateUpdate( deltaTime );
 						}
 					}
 				}
@@ -275,9 +275,9 @@ namespace MM
 
 			if( _lateUpdateGroup.BHasUnorderedContent )
 			{
-				foreach( IControlledLateUpdate controlledLateUpdate in _lateUpdateGroup._unordered )
+				for( int i = 0; i < _lateUpdateGroup._unordered.Count; ++i )
 				{
-					controlledLateUpdate.ControlledLateUpdate( Time.deltaTime );
+					_lateUpdateGroup._unordered[i].ControlledLateUpdate( deltaTime );
 				}
 			}
 		}
@@ -288,12 +288,12 @@ namespace MM
 			{
 				for( int i = 0; i < _updateOrder.Length; ++i )
 				{
-					if( _fixedUpdateGroup._ordered.TryGetValue( _updateOrder[i],
-						out IndexedHashSet<IControlledFixedUpdate> controlledFixedUpdates ) )
+					if( _fixedUpdateGroup._ordered.TryGetValue( _updateOrder[i], 
+						   out IndexedHashSet<IControlledFixedUpdate> controlledFixedUpdates ) )
 					{
-						foreach( IControlledFixedUpdate controlledFixedUpdate in controlledFixedUpdates )
+						for( int j = 0; j < controlledFixedUpdates.Count; ++j )
 						{
-							controlledFixedUpdate.ControlledFixedUpdate( fixedDeltaTime );
+							controlledFixedUpdates[j].ControlledFixedUpdate( fixedDeltaTime );
 						}
 					}
 				}
@@ -301,9 +301,9 @@ namespace MM
 
 			if( _fixedUpdateGroup.BHasUnorderedContent )
 			{
-				foreach( IControlledFixedUpdate controlledFixedUpdate in _fixedUpdateGroup._unordered )
+				for( int i = 0; i < _fixedUpdateGroup._unordered.Count; ++i )
 				{
-					controlledFixedUpdate.ControlledFixedUpdate( Time.fixedDeltaTime );
+					_fixedUpdateGroup._unordered[i].ControlledFixedUpdate( fixedDeltaTime );
 				}
 			}
 		}

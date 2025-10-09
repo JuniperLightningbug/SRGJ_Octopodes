@@ -13,8 +13,8 @@ public static class EventBus
 		UI_ClearActivePlanet,
 		UI_CreatePlanet,
 		UI_NextPlanet,
-		UI_QueueSatellite, // SO_PlanetConfig.ESensorType satelliteSensortype
-		UI_DequeueSatellite, // SO_PlanetConfig.ESensorType satelliteSensortype
+		UI_QueueSatelliteCard, // SO_Satellite satellite
+		UI_DequeueSatelliteCard,
 		
 		// Value Changes
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
@@ -25,7 +25,9 @@ public static class EventBus
 		ClearActivePlanet,
 		
 		// Gameplay Events
-		LaunchedSatellite, // (SO_PlanetConfig.ESensorType type, Transform satelliteTransform) newSatellite
+		LaunchedSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) newSatellite
+		StopTrackingSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) oldSatellite
+		DrawSatelliteCard, // SO_Satellite newSatellite
 		
 		// Value late-updates for UI
 		PostActiveSensorTypeChanged, // SO_PlanetConfig.ESensorType toSensorType

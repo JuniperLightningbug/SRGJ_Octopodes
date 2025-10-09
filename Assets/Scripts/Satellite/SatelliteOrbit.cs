@@ -32,6 +32,12 @@ public class SatelliteOrbit : MonoBehaviour
 	// Transform parenting all the satellites. Since we're rotating them at the same rate, we can do it once.
 	// But we don't necessarily want to rotate the whole object (e.g. the line renderer, other visuals)
 	[SerializeField] private Transform _satelliteTransformRoot;
+	
+	// This will be moved to the projection radius (without being scaled)
+	[SerializeField] private Transform _satelliteLaunchProjectionIndicator;
+		
+	// This will be moved to the orbit radius (without being scaled)
+	[SerializeField] private Transform _satelliteLaunchPositionIndicator;
 
 	[SerializeField] private Object _satellitePrefab;
 
@@ -40,8 +46,8 @@ public class SatelliteOrbit : MonoBehaviour
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _projectionRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _orbitRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager (Rotations Per Second)")] private float _orbitSpeed = 1.0f;
-	
-	[SerializeField] private SO_PlanetConfig.ESensorType _sensorType = SO_PlanetConfig.ESensorType.INVALID;
+
+	[SerializeField] private SO_Satellite _satelliteData = null;
 
 	private bool _bOrbitIsActive = false;
 	private Vector3 _directionReference0 = Vector3.right;
@@ -63,7 +69,7 @@ public class SatelliteOrbit : MonoBehaviour
 	public float _currentHealth = 1.0f;
 
 	public void Initialise(
-		SO_PlanetConfig.ESensorType sensorType,
+		SO_Satellite satelliteData,
 		Vector3 centre,
 		Quaternion rotation,
 		float projectionRadius,
@@ -71,7 +77,7 @@ public class SatelliteOrbit : MonoBehaviour
 		float orbitSpeed,
 		Vector3 startReferencePosition )
 	{
-		_sensorType = sensorType;
+		_satelliteData = satelliteData;
 		transform.position = centre;
 		transform.rotation = rotation;
 		transform.localScale = Vector3.one;
@@ -88,6 +94,26 @@ public class SatelliteOrbit : MonoBehaviour
 			_orbitalOuterCircleVisuals.localScale = Vector3.one * _orbitRadius;
 		}
 		_orbitSpeed = orbitSpeed;
+
+		// Move the launch projection visual to the projection radius without scaling it 
+		if( _satelliteLaunchProjectionIndicator )
+		{
+			_satelliteLaunchProjectionIndicator.localPosition = new Vector3(
+				_satelliteLaunchProjectionIndicator.localPosition.x,
+				_satelliteLaunchProjectionIndicator.localPosition.y,
+				_projectionRadius );
+			_satelliteLaunchProjectionIndicator.gameObject.SetActive( true );
+		}
+		
+		// Move the launch position visual to the orbit radius without scaling it 
+		if( _satelliteLaunchPositionIndicator )
+		{
+			_satelliteLaunchPositionIndicator.localPosition = new Vector3(
+				_satelliteLaunchPositionIndicator.localPosition.x,
+				_satelliteLaunchPositionIndicator.localPosition.y,
+				_orbitRadius );
+			_satelliteLaunchPositionIndicator.gameObject.SetActive( true );
+		}
 
 		Vector3 startDirection = transform.InverseTransformPoint( startReferencePosition ).normalized;
 		_directionReference0 = startDirection;
@@ -129,10 +155,7 @@ public class SatelliteOrbit : MonoBehaviour
 					_bIsAlive = false;
 				}
 			}
-
-
 		}
-
 	}
 
 	public void UpdateSecondReferencePosition( Vector3 pos1 )
@@ -148,12 +171,17 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			// Flatten on first radial position instead - this will happen on first frame & can happen again later
 			_directionReference1 = Vector3.Cross( _directionReference0, _cachedTransformUp ).normalized;
-			// Obviously this won't work for a polar reference 0. TODO. We probably should take the camera forward, but it's a corner case so maybe hard code instead.
+			// Obviously this won't work for a polar reference 0. TODO corner-case
 		}
 		
 		// New up direction is the normal of the plane formed by (0,0,0), _directionReference0 and _directionReference1
 		Vector3 upDirection = Vector3.Cross( _directionReference1, _directionReference0 ).normalized;
-		_orbitalTransformRoot.rotation = Quaternion.FromToRotation( _cachedTransformUp, upDirection );
+		
+		//_orbitalTransformRoot.rotation = Quaternion.FromToRotation( _cachedTransformUp, upDirection );
+		
+		// Ideally, we keep a consistent forward pointing at the first reference point. That way, we can show the
+		// satellite launch location in the visuals at local position 0,0,r.
+		_orbitalTransformRoot.rotation = Quaternion.LookRotation( _directionReference0.normalized, upDirection );
 	}
 	
 	// Extend MM.MathsUtils - TODO
@@ -174,27 +202,60 @@ public class SatelliteOrbit : MonoBehaviour
 			if( newSatelliteObj )
 			{
 				_satelliteTransform = newSatelliteObj.transform;
-				_satelliteTransform.localPosition = satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
-				
-				// TODO TEMP: COLOUR MAT
-				MeshRenderer newMeshRenderer = newSatelliteObj.GetComponent<MeshRenderer>();
-				if( newMeshRenderer )
+				if( _satelliteLaunchPositionIndicator )
 				{
-					newMeshRenderer.material.SetColor( "_BaseColor", Random.ColorHSV(0.0f, 1.0f, 0.3f, 0.8f, 0.5f, 0.8f, 1.0f, 1.0f ) );
+					_satelliteTransform.position = _satelliteLaunchPositionIndicator.position;
+					_satelliteTransform.rotation = _satelliteLaunchPositionIndicator.rotation;
+				}
+				else
+				{
+					_satelliteTransform.localPosition =
+						satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
+				}
+				
+				Satellite3D satellite3d = newSatelliteObj.GetComponent<Satellite3D>();
+				if( satellite3d )
+				{
+					satellite3d.Initialise( _satelliteData );
 				}
 				
 				_bOrbitIsActive = true;
 				
-				(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) eventPackage = new(
-					_sensorType,
+				(SO_Satellite satellite, Transform satelliteTransform) eventPackage = new(
+					_satelliteData,
 					_satelliteTransform );
 				EventBus.Invoke( this, EventBus.EEventType.LaunchedSatellite, eventPackage );
+
+				if( _satelliteLaunchProjectionIndicator )
+				{
+					_satelliteLaunchProjectionIndicator.gameObject.SetActive( false );
+				}
+				if( _satelliteLaunchPositionIndicator )
+				{
+					_satelliteLaunchPositionIndicator.gameObject.SetActive( false );
+				}
 				
 				return _satelliteTransform;
 			}
 		}
 
 		return null;
+	}
+
+	private void StopTrackingSatellite()
+	{
+		if( _satelliteTransform )
+		{
+			(SO_Satellite satelliteData, Transform satelliteTransform) eventPackage = new(
+				_satelliteData,
+				_satelliteTransform );
+			EventBus.Invoke( this, EventBus.EEventType.StopTrackingSatellite, eventPackage );
+		}
+	}
+
+	void OnDestroy()
+	{
+		StopTrackingSatellite();
 	}
 
 #region Visuals Interface

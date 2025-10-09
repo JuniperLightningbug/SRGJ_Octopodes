@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0574f94b642fe204db6e77dbd9d2ac8b, type: 3}
+  m_Name: Satellite_DefaultAurora
+  m_EditorClassIdentifier: 
+  _name: DefaultAurora
+  _description: 
+  _mesh: {fileID: 1167426987278568881, guid: 73ad85486d2540449bf10ba7baa20a34, type: 3}
+  _outlineMaterial: {fileID: 2100000, guid: bde8a226238c0dc4db30fa2919d95628, type: 2}
+  _icon: {fileID: 21300000, guid: afd4a7f1e4b92094e81abdfa3bda31da, type: 3}
+  _sensorType: 0

@@ -29,8 +29,8 @@ public class SatelliteManager : MonoBehaviour
 	private SatelliteOrbit _activeOrbit;
 	private SatelliteOrbit _lastOrbit;
 
-	public SO_PlanetConfig.ESensorType _queuedSatelliteType = SO_PlanetConfig.ESensorType.INVALID;
-	public bool BHasQueuedSatellite => _queuedSatelliteType != SO_PlanetConfig.ESensorType.INVALID;
+	public SO_Satellite _queuedSatellite;
+	public bool BHasQueuedSatellite => _queuedSatellite != null;
 	
 	private float OrbitRadiusProjection => _orbitClickableCollider ? _orbitClickableCollider.radius : 1.0f;
 	private float OrbitRadiusOuter => OrbitRadiusProjection + Mathf.Max( _orbitRadiusOffset, 0.0f );
@@ -70,6 +70,18 @@ public class SatelliteManager : MonoBehaviour
 		
 		ProcessInputs();
 	}
+	
+	void OnEnable()
+	{
+		EventBus.StartListening( EventBus.EEventType.UI_QueueSatelliteCard, OnGlobalEvent_UIQueueSatelliteCard );
+		EventBus.StartListening( EventBus.EEventType.UI_DequeueSatelliteCard, OnGlobalEvent_UIDequeueSatelliteCard );
+	}
+
+	void OnDisable()
+	{
+		EventBus.StopListening( EventBus.EEventType.UI_QueueSatelliteCard, OnGlobalEvent_UIQueueSatelliteCard );
+		EventBus.StopListening( EventBus.EEventType.UI_DequeueSatelliteCard, OnGlobalEvent_UIDequeueSatelliteCard );
+	}
 
 #endregion
 
@@ -92,9 +104,9 @@ public class SatelliteManager : MonoBehaviour
 		_orbits.Clear();
 	}
 
-	public void QueueSatellite( SO_PlanetConfig.ESensorType inType )
+	public void QueueSatellite( SO_Satellite inSatellite )
 	{
-		if( inType == SO_PlanetConfig.ESensorType.INVALID )
+		if( inSatellite._sensorType == SO_PlanetConfig.ESensorType.INVALID )
 		{
 			DequeueSatellite();
 			return;
@@ -103,8 +115,8 @@ public class SatelliteManager : MonoBehaviour
 		if( BHasQueuedSatellite )
 		{
 			Debug.LogErrorFormat(
-				"Queueing sensor of type {0} but another of type {1} already exists! Replacing with the new type.",
-				_queuedSatelliteType.ToString(), inType.ToString() );
+				"Queueing sensor ({0}) but another ({1}) already exists! Replacing with the new type.",
+				_queuedSatellite.ReadableString(), inSatellite.ReadableString() );
 		}
 
 		if( _activeOrbit != null )
@@ -113,12 +125,12 @@ public class SatelliteManager : MonoBehaviour
 			return;
 		}
 		
-		_queuedSatelliteType = inType;
+		_queuedSatellite = inSatellite;
 	}
 
-	public void DequeueSatellite( SO_PlanetConfig.ESensorType inType )
+	public void DequeueSatellite( SO_Satellite inSatellite )
 	{
-		if( _queuedSatelliteType == inType )
+		if( _queuedSatellite == inSatellite )
 		{
 			DequeueSatellite();
 		}
@@ -126,11 +138,32 @@ public class SatelliteManager : MonoBehaviour
 
 	public void DequeueSatellite()
 	{
-		_queuedSatelliteType = SO_PlanetConfig.ESensorType.INVALID;
+		_queuedSatellite = null;
 	}
 
 #endregion
 
+#region Callbacks
+
+	private void OnGlobalEvent_UIQueueSatelliteCard( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_Satellite toQueue )
+		{
+			QueueSatellite( toQueue );
+		}
+		else
+		{
+			DequeueSatellite();
+		}
+	}
+	
+	private void OnGlobalEvent_UIDequeueSatelliteCard( EventBus.EventContext context, object obj = null )
+	{
+		DequeueSatellite();
+	}
+
+#endregion
+	
 	private void UpdateOrbitAnchor()
 	{
 		if( _orbitCentreAnchor )
@@ -178,7 +211,7 @@ public class SatelliteManager : MonoBehaviour
 			if( _activeOrbit && BHasQueuedSatellite )
 			{
 				_activeOrbit.Initialise(
-					_queuedSatelliteType,
+					_queuedSatellite,
 					_orbitClickableCollider.transform.position,
 					_orbitClickableCollider.transform.rotation,
 					OrbitRadiusProjection,
@@ -219,7 +252,7 @@ public class SatelliteManager : MonoBehaviour
 			_activeOrbit.ToggleActivePositioningVisuals( false );
 			_orbits.Add( _activeOrbit );
 			_lastOrbit = _activeOrbit;
-			DequeueSatellite( _queuedSatelliteType );
+			DequeueSatellite( _queuedSatellite );
 			_activeOrbit = null;
 		}
 	}

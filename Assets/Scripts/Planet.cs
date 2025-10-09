@@ -80,8 +80,6 @@ public class Planet : MonoBehaviour
 		outInstance = null;
 		return false;
 	}
-	
-
 
 	public void InitialisePlanet( SO_PlanetConfig planetConfig )
 	{
@@ -411,15 +409,28 @@ public class Planet : MonoBehaviour
 	{
 		if( obj != null )
 		{
-			(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) newSatellite =
-				(ValueTuple<SO_PlanetConfig.ESensorType, Transform>)obj;
+			(SO_Satellite satelliteData, Transform satelliteTransform) newSatellite =
+				(ValueTuple<SO_Satellite, Transform>)obj;
 			if( newSatellite.satelliteTransform )
 			{
-				StartTrackingSatellite( newSatellite.type, newSatellite.satelliteTransform );
+				StartTrackingSatellite( newSatellite.satelliteData._sensorType, newSatellite.satelliteTransform );
 			}
 		}
 	}
 
+	private void OnGlobalEvent_StopTrackingSatellite( EventBus.EventContext context, object obj = null )
+	{
+		if( obj != null )
+		{
+			(SO_Satellite satelliteData, Transform satelliteTransform) newSatellite =
+				(ValueTuple<SO_Satellite, Transform>)obj;
+			if( newSatellite.satelliteTransform )
+			{
+				StopTrackingSatellite( newSatellite.satelliteData._sensorType, newSatellite.satelliteTransform );
+			}
+		}
+	}
+	
 #endregion
 
 #region MonoBehaviour
@@ -428,12 +439,14 @@ public class Planet : MonoBehaviour
 	{
 		EventBus.StartListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_ActiveSensorTypeChanged );
 		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StartListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}
 
 	void OnDisable()
 	{
 		EventBus.StopListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_ActiveSensorTypeChanged );
 		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StopListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}
 
 	void Update()

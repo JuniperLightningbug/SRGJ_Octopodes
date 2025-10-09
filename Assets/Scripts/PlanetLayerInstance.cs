@@ -163,11 +163,11 @@ public class PlanetLayerInstance
 
 	private void ClearNullSatellites()
 	{
-		foreach( Transform transform in _trackedSatellites )
+		for( int i = _trackedSatellites.Count - 1; i >= 0; --i)
 		{
-			if( !_transform )
+			if( !_trackedSatellites[i] )
 			{
-				_trackedSatellites.Remove(transform);
+				_trackedSatellites.RemoveAt( i );
 			}
 		}
 	}
@@ -175,6 +175,8 @@ public class PlanetLayerInstance
 	// Returns value 0..1 for proportion of planet discovered
 	public void AddDiscoveryFromTrackedSatellites()
 	{
+		ClearNullSatellites();
+		
 		Vector3[] positions = new Vector3[_trackedSatellites.Count];
 		for( int i = 0; i < _trackedSatellites.Count; ++i )
 		{

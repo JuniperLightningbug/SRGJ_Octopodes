@@ -11,6 +11,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	[SerializeField] private SatelliteManager _satelliteManager;
 	public SatelliteManager SatelliteManagerInstance => _satelliteManager;
 	
+	[SerializeField] private SatelliteDeck _satelliteDeck = new SatelliteDeck();
+	
 	[SerializeField, OnValueChanged( "Inspector_ChangedCurrentSensorType" )]
 	private SO_PlanetConfig.ESensorType _inspectorInputSensorType = SO_PlanetConfig.ESensorType.INVALID;
 	[SerializeField, ReadOnly]
@@ -44,6 +46,24 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	private void Inspector_ChangedCurrentSensorType()
 	{
 		CurrentSensorType = _inspectorInputSensorType;
+	}
+
+	[Button( "Draw 1" )]
+	private void DrawOne()
+	{
+		if( _satelliteDeck != null )
+		{
+			_satelliteDeck.DrawSatellites( 1 );
+		}
+	}
+	
+	[Button( "Draw 3" )]
+	private void DrawThree()
+	{
+		if( _satelliteDeck != null )
+		{
+			_satelliteDeck.DrawSatellites( 3 );
+		}
 	}
 	
 #endregion

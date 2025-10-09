@@ -141,12 +141,11 @@ public class HexgridMeshData
 			{
 				// This is a new face. Create a new face idx by appending to the face normals and face:vertex map.
 				faceNormalsList.Add( triangleNormal );
-				faceIdxToVertexIdxSets.Add( new IndexedHashSet<int>()
-				{
-					_triangles[triangleIdx],
-					_triangles[triangleIdx + 1],
-					_triangles[triangleIdx + 2],
-				} );
+				IndexedHashSet<int> faceIdxToVertexIdxSet = new IndexedHashSet<int>();
+				faceIdxToVertexIdxSet.Add( _triangles[triangleIdx] );
+				faceIdxToVertexIdxSet.Add( _triangles[triangleIdx + 1] );
+				faceIdxToVertexIdxSet.Add( _triangles[triangleIdx + 2] );
+				faceIdxToVertexIdxSets.Add( faceIdxToVertexIdxSet );
 				thisTriangleFaceIdx = faceNormalsList.Count - 1;
 			}
 
