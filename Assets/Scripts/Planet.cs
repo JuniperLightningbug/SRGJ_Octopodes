@@ -34,11 +34,10 @@ public class Planet : MonoBehaviour
 	private List<PlanetLayerInstance> _planetLayerInstances = new List<PlanetLayerInstance>();
 	private Dictionary<SO_PlanetConfig.ESensorType, int> _planetLayerInstanceIdxMap =
 		new Dictionary<SO_PlanetConfig.ESensorType, int>(); // Synced with _planetLayerInstances
-
-	// This mirrors data in the GameManager if it's present
-	// Caching here means we aren't dependent on the GameManager for testing
+	
 	[OnValueChanged( "DebugChangedCurrentSensorType" )]
-	public SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
+	private SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
+	public SO_PlanetConfig.ESensorType CurrentSensorType => _currentSensorType;
 	
 	private float RotationSpeed =>
 		!_bInitialised || _planetConfig._rotationTime <= 0.0f ||
@@ -396,11 +395,11 @@ public class Planet : MonoBehaviour
 
 #region Callbacks
 
-	private void OnGlobalEvent_ActiveSensorTypeChanged( EventBus.EventContext context, object obj = null )
+	private void OnGlobalEvent_UIChangeActiveSensorType( EventBus.EventContext context, object obj = null )
 	{
-		if( obj != null )
+		if( obj is SO_PlanetConfig.ESensorType inType )
 		{
-			_currentSensorType = (SO_PlanetConfig.ESensorType)obj;
+			_currentSensorType = inType;
 			OnUpdateSensorType();
 		}
 	}
@@ -437,14 +436,14 @@ public class Planet : MonoBehaviour
 
 	void OnEnable()
 	{
-		EventBus.StartListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_ActiveSensorTypeChanged );
+		EventBus.StartListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
 		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
 		EventBus.StartListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}
 
 	void OnDisable()
 	{
-		EventBus.StopListening( EventBus.EEventType.ActiveSensorTypeChanged, OnGlobalEvent_ActiveSensorTypeChanged );
+		EventBus.StopListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
 		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
 		EventBus.StopListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}

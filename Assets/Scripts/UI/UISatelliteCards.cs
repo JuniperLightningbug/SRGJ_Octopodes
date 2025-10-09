@@ -19,12 +19,7 @@ public class UISatelliteCards : MonoBehaviour
 		{
 			if( newSatelliteData != null )
 			{
-				Satellite2D newSatellite2D = TryMakeSatelliteCard();
-				if( newSatellite2D )
-				{
-					newSatellite2D.Initialise( newSatelliteData );
-					newSatellite2D.gameObject.SetActive( true );
-				}
+				ActivateCard( newSatelliteData );
 			}
 		}
 	}
@@ -61,9 +56,14 @@ public class UISatelliteCards : MonoBehaviour
 			EventBus.Invoke( this, EventBus.EEventType.UI_DequeueSatelliteCard );
 		}
 	}
-	
-	private Satellite2D TryMakeSatelliteCard()
+
+	private Satellite2D ActivateCard( SO_Satellite newSatelliteData )
 	{
+		if( !newSatelliteData )
+		{
+			return null;
+		}
+		
 		if( _inactiveCards.Count == 0 )
 		{
 			// TODO we could instantiate more
@@ -72,10 +72,19 @@ public class UISatelliteCards : MonoBehaviour
 				_activeCards.Count, _satellite2DMaxNum );
 			return null;
 		}
+
+		Satellite2D newActiveCard = _inactiveCards[_inactiveCards.Count - 1];
 		
-		Satellite2D returnSatellite = _inactiveCards[_inactiveCards.Count - 1];
-		_inactiveCards.RemoveAt(_inactiveCards.Count - 1);
-		return returnSatellite;
+		if( newActiveCard )
+		{
+			newActiveCard.Initialise( newSatelliteData );
+			newActiveCard.gameObject.SetActive( true );
+			_inactiveCards.RemoveAt( _inactiveCards.Count - 1 );
+			_activeCards.Add( newActiveCard );
+			return newActiveCard;
+		}
+		
+		return null;
 	}
 
 	private void DeactivateCurrentSelection()
@@ -105,7 +114,7 @@ public class UISatelliteCards : MonoBehaviour
 
 	private bool DeactivateCardAt( int index )
 	{
-		if( index > 0 && index < _activeCards.Count )
+		if( index >= 0 && index < _activeCards.Count )
 		{
 			Satellite2D toDeactivate = _activeCards[index];
 			_inactiveCards.Add( toDeactivate );
@@ -114,6 +123,7 @@ public class UISatelliteCards : MonoBehaviour
 			if( _selectedCard && _selectedCard == toDeactivate )
 			{
 				_selectedCard.SetSelected( false );
+				_selectedCard.gameObject.SetActive( false );
 				_selectedCard = null;
 			}
 			return true;
@@ -136,7 +146,10 @@ public class UISatelliteCards : MonoBehaviour
 					if( satellite != null )
 					{
 						_inactiveCards.Add( satellite );
-						satellite._button.onClick.AddListener( () => OnCardClicked( satellite ) );
+						if( satellite._button )
+						{
+							satellite._button.onClick.AddListener( () => OnCardClicked( satellite ) );
+						}
 						newCardObj.SetActive( false );
 					}
 					else
@@ -151,10 +164,12 @@ public class UISatelliteCards : MonoBehaviour
 	private void OnEnable()
 	{
 		EventBus.StartListening( EventBus.EEventType.DrawSatelliteCard, OnGlobalEvent_DrawSatelliteCard );
+		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
 	}
 
 	private void OnDisable()
 	{
 		EventBus.StopListening( EventBus.EEventType.DrawSatelliteCard, OnGlobalEvent_DrawSatelliteCard );
+		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
 	}
 }

@@ -12,41 +12,17 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	public SatelliteManager SatelliteManagerInstance => _satelliteManager;
 	
 	[SerializeField] private SatelliteDeck _satelliteDeck = new SatelliteDeck();
-	
-	[SerializeField, OnValueChanged( "Inspector_ChangedCurrentSensorType" )]
-	private SO_PlanetConfig.ESensorType _inspectorInputSensorType = SO_PlanetConfig.ESensorType.INVALID;
-	[SerializeField, ReadOnly]
-	private SO_PlanetConfig.ESensorType _currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
-	
-	public SO_PlanetConfig.ESensorType CurrentSensorType
-	{
-		get => _currentSensorType;
-		private set
-		{
-			if( _currentSensorType != value )
-			{
-				_currentSensorType = value;
-				EventBus.Invoke( this, EventBus.EEventType.ActiveSensorTypeChanged, _currentSensorType );
-				EventBus.Invoke( this, EventBus.EEventType.PostActiveSensorTypeChanged, _currentSensorType );
-			}
-		}
-	}
 
 	// Static accessor
-	public static SO_PlanetConfig.ESensorType TryGetCurrentSensorType()
+	public static SO_PlanetConfig.ESensorType TryGetCurrentSensorViewType()
 	{
-		GameManager gameManagerInstance = GameManager.InstanceOrNull;
-		return gameManagerInstance ?
-			gameManagerInstance.CurrentSensorType :
+		Planet currentPlanet = InstanceOrNull?._planetManager?.ActivePlanet;
+		return currentPlanet ?
+			currentPlanet.CurrentSensorType :
 			SO_PlanetConfig.ESensorType.INVALID;
 	}
 
 #region Runtime Debug Inspector Inputs
-	
-	private void Inspector_ChangedCurrentSensorType()
-	{
-		CurrentSensorType = _inspectorInputSensorType;
-	}
 
 	[Button( "Draw 1" )]
 	private void DrawOne()
@@ -69,16 +45,6 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 #endregion
 
 #region Callbacks (mostly relays from UI events)
-
-	private void OnGlobalEvent_UIChangeActiveSensorType( EventBus.EventContext context, object obj = null )
-	{
-		if( obj != null )
-		{
-			CurrentSensorType = (SO_PlanetConfig.ESensorType)obj;
-			// This posts new events automatically
-		}
-	}
-
 	private void OnGlobalEvent_UIClearActivePlanet( EventBus.EventContext context, object obj = null )
 	{
 		if( _planetManager )
@@ -111,7 +77,6 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	void OnEnable()
 	{
-		EventBus.StartListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
 		EventBus.StartListening( EventBus.EEventType.UI_ClearActivePlanet, OnGlobalEvent_UIClearActivePlanet );
 		EventBus.StartListening( EventBus.EEventType.UI_CreatePlanet, OnGlobalEvent_UICreatePlanet );
 		EventBus.StartListening( EventBus.EEventType.UI_NextPlanet, OnGlobalEvent_UIGoToNextPlanet );
@@ -119,7 +84,6 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	void OnDisable()
 	{
-		EventBus.StopListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
 		EventBus.StopListening( EventBus.EEventType.UI_ClearActivePlanet, OnGlobalEvent_UIClearActivePlanet );
 		EventBus.StopListening( EventBus.EEventType.UI_CreatePlanet, OnGlobalEvent_UICreatePlanet );
 		EventBus.StopListening( EventBus.EEventType.UI_NextPlanet, OnGlobalEvent_UIGoToNextPlanet );

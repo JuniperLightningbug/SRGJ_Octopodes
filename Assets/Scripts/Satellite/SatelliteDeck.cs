@@ -25,6 +25,11 @@ public class SatelliteDeck
 
 	public bool DrawSatellites( int num )
 	{
+		if( !Application.isPlaying )
+		{
+			return false;
+		}
+
 		if( _queuePosition >= _queuedSatellites.Count )
 		{
 			Debug.LogWarningFormat( "Satellite queue is empty!" );

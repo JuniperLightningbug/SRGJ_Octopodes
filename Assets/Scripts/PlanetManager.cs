@@ -70,7 +70,7 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 			if( newPlanet )
 			{
 				newPlanet.InitialisePlanet( _planetsData._planetConfigs[planetIdx] );
-				newPlanet.ChangeSensorType( GameManager.TryGetCurrentSensorType() );
+				newPlanet.ChangeSensorType( SO_PlanetConfig.ESensorType.INVALID );
 				_activePlanet = newPlanet;
 			}
 			return newPlanet;

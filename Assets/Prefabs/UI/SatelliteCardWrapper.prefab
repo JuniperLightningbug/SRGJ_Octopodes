@@ -93,7 +93,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14.45
+  m_fontSize: 5
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -487,12 +487,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f77b52168eb0c3248bb15290e8e458d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _image: {fileID: 0}
-  _nameTMP: {fileID: 0}
+  _image: {fileID: 1300702298998430022}
+  _nameTMP: {fileID: 8404165047918266000}
   _descriptionTMP: {fileID: 0}
   _typeTMP: {fileID: 0}
-  _button: {fileID: 0}
-  _activeHighlightObj: {fileID: 0}
+  _button: {fileID: 8257806571445097829}
+  _activeHighlightObj: {fileID: 869493369078038182}
   _satelliteData: {fileID: 0}
 --- !u!1 &4565022107683651095
 GameObject:
@@ -594,7 +594,7 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0.16976887, g: 0.1368102, b: 0.23018861, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.3372549, g: 0.2784314, b: 0.45490196, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}

@@ -163,8 +163,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 5eea427da969aea41b05d59b88b98b89, type: 2}
     - {fileID: 11400000, guid: eac7d65179f20c746bf4e5e369e3746a, type: 2}
     _queuePosition: 0
-  _inspectorInputSensorType: -1
-  _currentSensorType: -1
 --- !u!4 &40772165
 Transform:
   m_ObjectHideFlags: 0
@@ -843,6 +841,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4640268006953497514, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+      propertyPath: _satellite2DMaxNum
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4939585617914682263, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: _image
       value: 
@@ -858,6 +860,10 @@ PrefabInstance:
     - target: {fileID: 4939585617914682263, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: _activeHighlightObj
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5412598676604129139, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+      propertyPath: m_Name
+      value: TestCard
       objectReference: {fileID: 0}
     - target: {fileID: 5412598676604129139, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_IsActive
@@ -945,27 +951,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5598590316634847713, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5598590316634847713, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5598590316634847713, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 5598590316634847713, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5598590316634847713, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 5598590316634847713, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 6072485917239569584, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_AnchorMax.y

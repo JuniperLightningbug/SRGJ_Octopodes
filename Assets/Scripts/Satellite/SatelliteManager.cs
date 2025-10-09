@@ -111,13 +111,6 @@ public class SatelliteManager : MonoBehaviour
 			DequeueSatellite();
 			return;
 		}
-		
-		if( BHasQueuedSatellite )
-		{
-			Debug.LogErrorFormat(
-				"Queueing sensor ({0}) but another ({1}) already exists! Replacing with the new type.",
-				_queuedSatellite.ReadableString(), inSatellite.ReadableString() );
-		}
 
 		if( _activeOrbit != null )
 		{

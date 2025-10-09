@@ -20,7 +20,6 @@ public static class EventBus
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
 		
 		// Game Manager
-		ActiveSensorTypeChanged, // SO_PlanetConfig.ESensorType toSensorType
 		SpawnNewPlanet,
 		ClearActivePlanet,
 		
@@ -28,9 +27,6 @@ public static class EventBus
 		LaunchedSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) newSatellite
 		StopTrackingSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) oldSatellite
 		DrawSatelliteCard, // SO_Satellite newSatellite
-		
-		// Value late-updates for UI
-		PostActiveSensorTypeChanged, // SO_PlanetConfig.ESensorType toSensorType
 		
 		COUNT,
 	}
