@@ -531,10 +531,16 @@ MonoBehaviour:
   _orbitalOuterCircleVisuals: {fileID: 8889489524247291470}
   _satelliteTransformRoot: {fileID: 7780902978943342853}
   _satellitePrefab: {fileID: 3446865649245523367, guid: cda283cb3075ee747951f3f8172a9b89, type: 3}
-  _satelliteTransforms: []
+  _satelliteTransform: {fileID: 0}
   _projectionRadius: 1
   _orbitRadius: 1
   _orbitSpeed: 0.3
+  _sensorType: -1
+  _safeModeTime: 3
+  _bIsAlive: 1
+  _bIsInSafeMode: 0
+  _safeModeProgress: 0
+  _currentHealth: 1
 --- !u!1 &8279475947886184316
 GameObject:
   m_ObjectHideFlags: 0

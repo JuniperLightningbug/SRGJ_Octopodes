@@ -35,18 +35,43 @@ public class SatelliteOrbit : MonoBehaviour
 
 	[SerializeField] private Object _satellitePrefab;
 
-	[ReadOnly, SerializeField] public List<Transform> _satelliteTransforms;
+	[ReadOnly, SerializeField] public Transform _satelliteTransform;
 
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _projectionRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _orbitRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager (Rotations Per Second)")] private float _orbitSpeed = 1.0f;
+	
+	[SerializeField] private SO_PlanetConfig.ESensorType _sensorType = SO_PlanetConfig.ESensorType.INVALID;
 
+	private bool _bOrbitIsActive = false;
 	private Vector3 _directionReference0 = Vector3.right;
 	private Vector3 _directionReference1 = Vector3.forward;
 	private Vector3 _cachedTransformUp = Vector3.up;
 
-	public void Initialise( Vector3 centre, Quaternion rotation, float projectionRadius, float orbitRadius, float orbitSpeed, Vector3 startReferencePosition )
+	[Header( "Health Config" )]
+	[SerializeField]
+	private float _safeModeTime = 3.0f;
+	
+	[Header("Runtime Health Data")]
+	[SerializeField]
+	public bool _bIsAlive = true;
+	[SerializeField]
+	public bool _bIsInSafeMode = false;
+	[SerializeField, ReadOnly, Range( 0.0f, 1.0f )]
+	private float _safeModeProgress = 0.0f;
+	[SerializeField, Range(0.0f,1.0f)]
+	public float _currentHealth = 1.0f;
+
+	public void Initialise(
+		SO_PlanetConfig.ESensorType sensorType,
+		Vector3 centre,
+		Quaternion rotation,
+		float projectionRadius,
+		float orbitRadius,
+		float orbitSpeed,
+		Vector3 startReferencePosition )
 	{
+		_sensorType = sensorType;
 		transform.position = centre;
 		transform.rotation = rotation;
 		transform.localScale = Vector3.one;
@@ -74,8 +99,40 @@ public class SatelliteOrbit : MonoBehaviour
 	void Update()
 	{
 		// Rotate satellites
-		float frameRotationDegrees = _orbitSpeed * Time.deltaTime * 360.0f;
-		_satelliteTransformRoot.Rotate( new Vector3( 0.0f, -frameRotationDegrees, 0.0f ), Space.Self );
+		if( _bOrbitIsActive )
+		{
+			float frameRotationDegrees = _orbitSpeed * Time.deltaTime * 360.0f;
+			_satelliteTransformRoot.Rotate( new Vector3( 0.0f, -frameRotationDegrees, 0.0f ), Space.Self );
+		}
+		
+		if( _bIsAlive )
+		{
+			// Update safe mode
+			if( _bIsInSafeMode )
+			{
+				_safeModeProgress += Time.deltaTime / _safeModeTime;
+				if( _safeModeProgress >= 1.0f )
+				{
+					_bIsInSafeMode = false;
+					_safeModeProgress = 0.0f;
+				}
+			}
+			
+			// Handle incoming damage
+			if( DEBUG_Globals.ActiveProfile._bDebugStormIsActive && !_bIsInSafeMode )
+			{
+				_currentHealth -= DEBUG_Globals.ActiveProfile._debugStormDamagePerSecond * Time.deltaTime;
+				
+				if( _currentHealth <= 0.0f )
+				{
+					_currentHealth = 0.0f;
+					_bIsAlive = false;
+				}
+			}
+
+
+		}
+
 	}
 
 	public void UpdateSecondReferencePosition( Vector3 pos1 )
@@ -110,17 +167,14 @@ public class SatelliteOrbit : MonoBehaviour
 
 	public Transform LaunchSatellite()
 	{
-		if( _satellitePrefab )
+		if( _satellitePrefab && !_satelliteTransform )
 		{
-			// For now, just use the first direction reference point for the initial position
-			// TODO: We'll need to think of something better for this - and we will need to handle rotations.
-			// TODO: We should apply a local offset and then a local y rotation instead.
 			Transform satelliteRoot = _satelliteTransformRoot ? _satelliteTransformRoot : transform;
 			GameObject newSatelliteObj = Instantiate( _satellitePrefab, satelliteRoot ) as GameObject;
 			if( newSatelliteObj )
 			{
-				Transform newSatelliteTransform = newSatelliteObj.transform;
-				newSatelliteTransform.localPosition = satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
+				_satelliteTransform = newSatelliteObj.transform;
+				_satelliteTransform.localPosition = satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
 				
 				// TODO TEMP: COLOUR MAT
 				MeshRenderer newMeshRenderer = newSatelliteObj.GetComponent<MeshRenderer>();
@@ -129,9 +183,14 @@ public class SatelliteOrbit : MonoBehaviour
 					newMeshRenderer.material.SetColor( "_BaseColor", Random.ColorHSV(0.0f, 1.0f, 0.3f, 0.8f, 0.5f, 0.8f, 1.0f, 1.0f ) );
 				}
 				
-				_satelliteTransforms.Add( newSatelliteTransform );
+				_bOrbitIsActive = true;
 				
-				return newSatelliteTransform;
+				(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) eventPackage = new(
+					_sensorType,
+					_satelliteTransform );
+				EventBus.Invoke( this, EventBus.EEventType.LaunchedSatellite, eventPackage );
+				
+				return _satelliteTransform;
 			}
 		}
 

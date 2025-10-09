@@ -20,17 +20,17 @@ MonoBehaviour:
     _bActive: 1
     _bHasTexture: 0
   - _sensorType: 2
-    _mesh: {fileID: 5330818721451473509, guid: afa5066efc07ca5498d001f750f649c6, type: 3}
+    _mesh: {fileID: 4342293000604295153, guid: d414b6f8453a4e7449cbb98982b99bf2, type: 3}
     _material: {fileID: 2100000, guid: 1a213af8b78e20944a6702c75c8c5a79, type: 2}
     _bActive: 1
     _bHasTexture: 0
   - _sensorType: 4
-    _mesh: {fileID: 3776723591692892301, guid: 2aa60aeb7bfea3a4b81d4f4392663e74, type: 3}
+    _mesh: {fileID: 3494592098979233264, guid: f364264f0a1102b498269c2c4efd1e0c, type: 3}
     _material: {fileID: 2100000, guid: e36e92b14094f0e4c81c9f6c91a18a56, type: 2}
     _bActive: 1
     _bHasTexture: 0
   - _sensorType: 3
-    _mesh: {fileID: 3776723591692892301, guid: 2aa60aeb7bfea3a4b81d4f4392663e74, type: 3}
+    _mesh: {fileID: 5504246153918974603, guid: 56f8d13f6014f8441b1dfd1ac78a5888, type: 3}
     _material: {fileID: 2100000, guid: 1480be2786efe5e43b4d108705664458, type: 2}
     _bActive: 1
     _bHasTexture: 0

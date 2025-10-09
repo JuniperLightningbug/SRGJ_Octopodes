@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 /**
  * Singleton class handles orbital creation and bookkeeping, satellite deployment, etc. from player inputs
@@ -27,6 +28,9 @@ public class SatelliteManager : MonoBehaviour
 	private readonly List<SatelliteOrbit> _orbits = new List<SatelliteOrbit>();
 	private SatelliteOrbit _activeOrbit;
 	private SatelliteOrbit _lastOrbit;
+
+	public SO_PlanetConfig.ESensorType _queuedSatelliteType = SO_PlanetConfig.ESensorType.INVALID;
+	public bool BHasQueuedSatellite => _queuedSatelliteType != SO_PlanetConfig.ESensorType.INVALID;
 	
 	private float OrbitRadiusProjection => _orbitClickableCollider ? _orbitClickableCollider.radius : 1.0f;
 	private float OrbitRadiusOuter => OrbitRadiusProjection + Mathf.Max( _orbitRadiusOffset, 0.0f );
@@ -88,6 +92,43 @@ public class SatelliteManager : MonoBehaviour
 		_orbits.Clear();
 	}
 
+	public void QueueSatellite( SO_PlanetConfig.ESensorType inType )
+	{
+		if( inType == SO_PlanetConfig.ESensorType.INVALID )
+		{
+			DequeueSatellite();
+			return;
+		}
+		
+		if( BHasQueuedSatellite )
+		{
+			Debug.LogErrorFormat(
+				"Queueing sensor of type {0} but another of type {1} already exists! Replacing with the new type.",
+				_queuedSatelliteType.ToString(), inType.ToString() );
+		}
+
+		if( _activeOrbit != null )
+		{
+			Debug.LogErrorFormat( "Trying to queue new sensor without deploying previous orbit. Skipping." );
+			return;
+		}
+		
+		_queuedSatelliteType = inType;
+	}
+
+	public void DequeueSatellite( SO_PlanetConfig.ESensorType inType )
+	{
+		if( _queuedSatelliteType == inType )
+		{
+			DequeueSatellite();
+		}
+	}
+
+	public void DequeueSatellite()
+	{
+		_queuedSatelliteType = SO_PlanetConfig.ESensorType.INVALID;
+	}
+
 #endregion
 
 	private void UpdateOrbitAnchor()
@@ -102,22 +143,20 @@ public class SatelliteManager : MonoBehaviour
 
 	private void ProcessInputs()
 	{
-		if( Mouse.current.leftButton.wasPressedThisFrame )
+		if( BHasQueuedSatellite )
 		{
-			TryCreateOrbit();
-		}
-		else if( Mouse.current.leftButton.isPressed )
-		{
-			UpdateActiveOrbitDirection();
-		}
-		else if( Mouse.current.leftButton.wasReleasedThisFrame )
-		{
-			ReleaseActiveOrbit( _bAutomaticallyLaunchOnceOnOrbitRelease );
-		}
-
-		if( Keyboard.current.spaceKey.wasPressedThisFrame )
-		{
-			LaunchSatellites( _lastOrbit, 1 ); // TODO: This is temporary - needs a design decision
+			if( Mouse.current.leftButton.wasPressedThisFrame )
+			{
+				TryCreateOrbit();
+			}
+			else if( Mouse.current.leftButton.isPressed )
+			{
+				UpdateActiveOrbitDirection();
+			}
+			else if( Mouse.current.leftButton.wasReleasedThisFrame )
+			{
+				ReleaseActiveOrbit( _bAutomaticallyLaunchOnceOnOrbitRelease );
+			}
 		}
 	}
 
@@ -136,9 +175,10 @@ public class SatelliteManager : MonoBehaviour
 				transform ) as GameObject;
 			_activeOrbit = newOrbitObject?.GetComponent<SatelliteOrbit>();
 
-			if( _activeOrbit )
+			if( _activeOrbit && BHasQueuedSatellite )
 			{
 				_activeOrbit.Initialise(
+					_queuedSatelliteType,
 					_orbitClickableCollider.transform.position,
 					_orbitClickableCollider.transform.rotation,
 					OrbitRadiusProjection,
@@ -173,33 +213,22 @@ public class SatelliteManager : MonoBehaviour
 			// TODO: Trying out a different (simpler) input scheme: Launch one single satellite on orbital creation
 			if( bWithLaunch )
 			{
-				LaunchSatellites( _activeOrbit, 1 );
+				LaunchSatellite( _activeOrbit );
 			}
 
 			_activeOrbit.ToggleActivePositioningVisuals( false );
 			_orbits.Add( _activeOrbit );
 			_lastOrbit = _activeOrbit;
+			DequeueSatellite( _queuedSatelliteType );
 			_activeOrbit = null;
 		}
 	}
 
-	private void LaunchSatellites( SatelliteOrbit orbit, int num = 1 )
+	private void LaunchSatellite( SatelliteOrbit orbit )
 	{
-		if( orbit )
+		if( orbit && BHasQueuedSatellite )
 		{
-			SO_PlanetConfig.ESensorType sensorType = GameManager.TryGetCurrentSensorType();
-			for( int i = 0; i < num; ++i )
-			{
-				Transform newSatelliteTransform = orbit.LaunchSatellite();
-				
-				if( newSatelliteTransform )
-				{
-					(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) eventPackage = new(
-						sensorType,
-						newSatelliteTransform );
-					EventBus.Invoke( this, EventBus.EEventType.LaunchedSatellite, eventPackage );
-				}
-			}
+			orbit.LaunchSatellite();
 		}
 	}
 

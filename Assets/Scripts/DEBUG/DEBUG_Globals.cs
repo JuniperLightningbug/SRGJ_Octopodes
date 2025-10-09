@@ -8,6 +8,12 @@ public class DEBUG_Globals : ScriptableObject
 	public bool _bShowPlanetLayerFaces = false;
 	public bool _bShowPlanetLayerFaceNormals = false;
 	public bool _bRemovePlanetLayerFOW = false;
+
+	public float _debugStormDamagePerSecond = 0.1f;
+	public bool _bDebugStormIsActive = false;
+	
+	// Config variables (these belong elsewhere)
+	public float _discoveryFadeTime = 5.0f;
 	
 	
 	// Global access

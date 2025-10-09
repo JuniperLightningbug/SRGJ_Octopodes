@@ -16,7 +16,6 @@ public class PlanetLayerInstance
 	public Transform _transform;
 	public Mesh _meshInstance;
 	public HexgridMeshData _meshData;
-	public float _fadeTime = 3.0f;
 	public SO_PlanetConfig.ESensorType _sensorType;
 	public bool _bHasTexture = false;
 	
@@ -29,9 +28,18 @@ public class PlanetLayerInstance
 	
 	// TODO: We can precalculate this or cache on init.
 	// At the moment it's useful to expose it to the inspector in this format
-	private float FadeAmountPerSecond => _fadeTime <= 0.0f || Mathf.Approximately( _fadeTime, 0.0f ) ?
-		0.0f :
-		1.0f / _fadeTime;
+	private float FadeAmountPerSecond
+	{
+		get
+		{
+			float fadeTime = DEBUG_Globals.ActiveProfile._discoveryFadeTime;
+			return fadeTime <= 0.0f || Mathf.Approximately( fadeTime, 0.0f ) ?
+				0.0f :
+				1.0f / fadeTime;
+		}
+	}
+
+
 	
 	// Testing - do we want angles instead? Change it depending on parameters? Cone from satellite pos ws?
 	[SerializeField] private float _satelliteDiscoveryRadius = 0.3f;

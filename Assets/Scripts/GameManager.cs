@@ -63,8 +63,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	{
 		if( _planetManager )
 		{
-			_planetManager.ClearActivePlanet();
 			_satelliteManager.ClearSatellites();
+			_planetManager.ClearActivePlanet();
 		}
 	}
 
@@ -80,6 +80,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	{
 		if( _planetManager )
 		{
+			_satelliteManager.ClearSatellites();
 			_planetManager.GoToNextPlanet( true, false );
 		}
 	}

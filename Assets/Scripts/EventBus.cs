@@ -13,6 +13,8 @@ public static class EventBus
 		UI_ClearActivePlanet,
 		UI_CreatePlanet,
 		UI_NextPlanet,
+		UI_QueueSatellite, // SO_PlanetConfig.ESensorType satelliteSensortype
+		UI_DequeueSatellite, // SO_PlanetConfig.ESensorType satelliteSensortype
 		
 		// Value Changes
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>

@@ -15,3 +15,6 @@ MonoBehaviour:
   _bShowPlanetLayerFaces: 0
   _bShowPlanetLayerFaceNormals: 0
   _bRemovePlanetLayerFOW: 0
+  _debugStormDamagePerSecond: 0.1
+  _bDebugStormIsActive: 1
+  _discoveryFadeTime: 15

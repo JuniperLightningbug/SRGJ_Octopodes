@@ -67,7 +67,11 @@ public class Planet : MonoBehaviour
 
 	public bool GetActiveLayerInstance( out PlanetLayerInstance outInstance )
 	{
-		if( _planetLayerInstanceIdxMap.TryGetValue( _currentSensorType, out int idx ) )
+		return GetLayerInstance( _currentSensorType, out outInstance );
+	}
+	public bool GetLayerInstance( SO_PlanetConfig.ESensorType inType, out PlanetLayerInstance outInstance )
+	{
+		if( _planetLayerInstanceIdxMap.TryGetValue( inType, out int idx ) )
 		{
 			outInstance = _planetLayerInstances[idx];
 			return outInstance != null;
@@ -118,21 +122,17 @@ public class Planet : MonoBehaviour
 	}
 	public void StartTrackingSatellite( SO_PlanetConfig.ESensorType type, Transform satellite )
 	{
-		if( _bInitialised && GetActiveLayerInstance( out PlanetLayerInstance activeInstance ) )
+		if( _bInitialised && GetLayerInstance( type, out PlanetLayerInstance layerInstance ) )
 		{
-			activeInstance.StartTrackingSatellite( satellite );
+			layerInstance.StartTrackingSatellite( satellite );
 		}
 	}
 	
-	public void StopTrackingSatellite( Transform satellite )
-	{
-		StartTrackingSatellite( _currentSensorType, satellite );
-	}
 	public void StopTrackingSatellite( SO_PlanetConfig.ESensorType type, Transform satellite )
 	{
-		if( _bInitialised && GetActiveLayerInstance( out PlanetLayerInstance activeInstance ) )
+		if( _bInitialised && GetLayerInstance( type, out PlanetLayerInstance layerInstance ) )
 		{
-			activeInstance.StopTrackingSatellite( satellite );
+			layerInstance.StopTrackingSatellite( satellite );
 		}
 	}
 
@@ -346,13 +346,18 @@ public class Planet : MonoBehaviour
 
 	private void UpdateSatelliteDiscovery( float deltaTime )
 	{
-		Dictionary<SO_PlanetConfig.ESensorType, float> discoveryValues = new Dictionary<SO_PlanetConfig.ESensorType, float>();
-		for( int i = 0; i < _planetLayerInstances.Count; ++i )
+		if( _planetLayerInstances.Count > 0 )
 		{
-			float layerDiscovery = _planetLayerInstances[i].UpdateDiscovery( deltaTime );
-			discoveryValues.Add( _planetConfig._planetLayers[i]._sensorType, layerDiscovery );
+			Dictionary<SO_PlanetConfig.ESensorType, float> discoveryValues =
+				new Dictionary<SO_PlanetConfig.ESensorType, float>();
+			for( int i = 0; i < _planetLayerInstances.Count; ++i )
+			{
+				float layerDiscovery = _planetLayerInstances[i].UpdateDiscovery( deltaTime );
+				discoveryValues.Add( _planetConfig._planetLayers[i]._sensorType, layerDiscovery );
+			}
+
+			EventBus.Invoke( this, EventBus.EEventType.OnChanged_LayerDiscovery, discoveryValues );
 		}
-		EventBus.Invoke( this, EventBus.EEventType.OnChanged_LayerDiscovery, discoveryValues );
 	}
 
 	private void UpdateActiveLayerVisuals()
@@ -408,7 +413,10 @@ public class Planet : MonoBehaviour
 		{
 			(SO_PlanetConfig.ESensorType type, Transform satelliteTransform) newSatellite =
 				(ValueTuple<SO_PlanetConfig.ESensorType, Transform>)obj;
-			StartTrackingSatellite( newSatellite.type, newSatellite.satelliteTransform );
+			if( newSatellite.satelliteTransform )
+			{
+				StartTrackingSatellite( newSatellite.type, newSatellite.satelliteTransform );
+			}
 		}
 	}
 

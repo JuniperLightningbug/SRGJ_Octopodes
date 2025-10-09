@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _planetManager: {fileID: 144516646}
-  _satelliteManager: {fileID: 0}
+  _satelliteManager: {fileID: 1737105184}
   _inspectorInputSensorType: -1
   _currentSensorType: -1
 --- !u!4 &40772165
@@ -452,59 +452,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8191929332655340784, guid: 886251e46a6c64d4693389a9e5cde7ed, type: 3}
   m_PrefabInstance: {fileID: 635318819}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &954292196
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 954292197}
-  - component: {fileID: 954292198}
-  m_Layer: 0
-  m_Name: InputMouseCollider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &954292197
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954292196}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1737105183}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &954292198
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954292196}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1476978150
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -518,17 +465,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1739677601}
     - target: {fileID: 2147968766378359604, guid: 0e854aafedf71744186205535f05348d, type: 3}
-      propertyPath: _orbitRadius
-      value: 0.3
+      propertyPath: _orbitSpeed
+      value: 0.1
       objectReference: {fileID: 0}
-    - target: {fileID: 2147968766378359604, guid: 0e854aafedf71744186205535f05348d, type: 3}
-      propertyPath: _orbitCentreTransform
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2147968766378359604, guid: 0e854aafedf71744186205535f05348d, type: 3}
-      propertyPath: _orbitClickableCollider
-      value: 
-      objectReference: {fileID: 954292198}
     - target: {fileID: 5603658663803643310, guid: 0e854aafedf71744186205535f05348d, type: 3}
       propertyPath: m_Name
       value: SatelliteManager
@@ -575,17 +514,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 8809104962541421343, guid: 0e854aafedf71744186205535f05348d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 954292197}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e854aafedf71744186205535f05348d, type: 3}
---- !u!4 &1737105183 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8809104962541421343, guid: 0e854aafedf71744186205535f05348d, type: 3}
+--- !u!114 &1737105184 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2147968766378359604, guid: 0e854aafedf71744186205535f05348d, type: 3}
   m_PrefabInstance: {fileID: 1476978150}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a26fafe89e0456247b8dfd29cef5cf42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!20 &1739677601 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 5856561628754012578, guid: 4f574e413e8196b479cf4e05441e61d0, type: 3}
