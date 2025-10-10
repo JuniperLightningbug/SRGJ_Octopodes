@@ -25,26 +25,24 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	}
 	
 	// Storm
-	[SerializeField] private StormTimer _stormTimer = new StormTimer();
+	[SerializeField] private StormTimer _stormTimer;
 
-	private void ResetStormTimer( SO_StormTimings newTimings )
+	[SerializeField] private bool _bDrawStormGizmos = false;
+	[SerializeField] private bool _bPauseStormTimer = false;
+
+	protected override void Initialise()
 	{
-		if( _stormTimer == null )
-		{
-			_stormTimer = new StormTimer();
-		}
+		_normalTimeScale = Time.timeScale;
 
-		if( !newTimings )
+		_stormTimer = new StormTimer();
+		_stormTimer.Initialise();
+	}
+
+	private void OnDrawGizmos()
+	{
+		if( _bDrawStormGizmos && _stormTimer != null )
 		{
-			if( _stormTimer.BStormIsActive )
-			{
-				EventBus.Invoke( this, EventBus.EEventType.StormEnded );
-			}
-			_stormTimer.Deactivate();
-		}
-		else
-		{
-			_stormTimer.Reset( newTimings );
+			_stormTimer.DrawGizmos();
 		}
 	}
 
@@ -53,45 +51,72 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		if( _planetManager )
 		{
 			Planet newPlanet = _planetManager.TryCreatePlanet();
-			if( newPlanet )
+			
+			if( newPlanet && _stormTimer != null )
 			{
-				ResetStormTimer( newPlanet.PlanetConfig._stormTimings );
+				_stormTimer.Reset( newPlanet );
+				_stormTimer.Start();
 			}
 		}
+	}
+
+	private void ClearActivePlanet()
+	{
+		if( _stormTimer != null )
+		{
+			_stormTimer.Clear();
+		}
+		
+		_satelliteManager?.ClearSatellites();
+		_planetManager?.GoToNextPlanet();
 	}
 
 #region Runtime Debug Inspector Inputs
 
 	[Button( "Draw 1" )]
-	private void DrawOne()
+	private void Inspector_DrawOne()
 	{
-		if( _satelliteDeck != null )
-		{
-			_satelliteDeck.DrawSatellites( 1 );
-		}
+		_satelliteDeck?.DrawSatellites( 1 );
 	}
 	
 	[Button( "Draw 3" )]
-	private void DrawThree()
+	private void Inspector_DrawThree()
 	{
-		if( _satelliteDeck != null )
+		_satelliteDeck?.DrawSatellites( 3 );
+	}
+
+	[Button( "Skip Storm State" )]
+	private void Inspector_SkipStormState()
+	{
+		_stormTimer?.SkipState();
+	}
+
+	[Button( "Restart Current Storm Timer" )]
+	private void Inspector_RestartCurrentStormTimer()
+	{
+		if( _stormTimer != null )
 		{
-			_satelliteDeck.DrawSatellites( 3 );
+			if( _planetManager.ActivePlanet )
+			{
+				_stormTimer.Reset( _planetManager.ActivePlanet );
+			}
+			else
+			{
+				_stormTimer.Deactivate();
+				_stormTimer.Start();
+			}
 		}
 	}
-	
+
 	[SerializeField, ReadOnly] private float _normalTimeScale = 1.0f;
 	
 #endregion
 
 #region Callbacks (mostly relays from UI events)
+
 	private void OnGlobalEvent_UIClearActivePlanet( EventBus.EventContext context, object obj = null )
 	{
-		if( _planetManager )
-		{
-			_satelliteManager.ClearSatellites();
-			_planetManager.ClearActivePlanet();
-		}
+		ClearActivePlanet();
 	}
 
 	private void OnGlobalEvent_UICreatePlanet( EventBus.EventContext context, object obj = null )
@@ -101,12 +126,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	private void OnGlobalEvent_UIGoToNextPlanet( EventBus.EventContext context, object obj = null )
 	{
-		if( _planetManager )
-		{
-			_satelliteManager.ClearSatellites();
-			_planetManager.GoToNextPlanet();
-			TryCreatePlanet(); // Try to create immediately
-		}
+		ClearActivePlanet();
+		TryCreatePlanet(); // Try to create immediately
 	}
 	
 	private void OnGlobalEvent_UIPauseTime( EventBus.EventContext context, object obj = null )
@@ -122,11 +143,6 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 #endregion
 
 #region MonoBehaviour
-
-	void Awake()
-	{
-		_normalTimeScale = Time.timeScale;
-	}
 
 	void OnEnable()
 	{
@@ -148,33 +164,9 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	void Update()
 	{
-		if( _stormTimer != null && _stormTimer.UpdateTimer( Time.deltaTime ) )
+		if( !_bPauseStormTimer )
 		{
-			switch( _stormTimer.CurrentState )
-			{
-				case StormTimer.EStormState.Calm:
-				{
-					break;
-				}
-				case StormTimer.EStormState.Warning:
-				{
-					EventBus.Invoke( this, EventBus.EEventType.StormWarning, _stormTimer.StateTimeRemaining );
-					break;
-				}
-				case StormTimer.EStormState.Active:
-				{
-					EventBus.Invoke( this, EventBus.EEventType.StormActive, _stormTimer.StateTimeRemaining );
-					break;
-				}
-			}
-
-			if( _stormTimer.PreviousState == StormTimer.EStormState.Active )
-			{
-				EventBus.Invoke( this, EventBus.EEventType.StormEnded );
-			}
-
-			Debug.Log( _stormTimer.CurrentState + ": " + _stormTimer.StateTimeRemaining );
-
+			_stormTimer?.Update( Time.deltaTime );
 		}
 	}
 

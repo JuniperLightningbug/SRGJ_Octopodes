@@ -46,6 +46,7 @@ namespace MM
 
 		private void Awake()
 		{
+			_bInitialised = false;
 			InitialiseSingleton();
 		}
 		

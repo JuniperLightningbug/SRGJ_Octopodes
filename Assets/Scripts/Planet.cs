@@ -13,13 +13,13 @@ public class Planet : MonoBehaviour
 
 	[Header( "Prefab hierarchy references" )]
 	[SerializeField] private MeshFilter _auroraMeshFilter;
-
 	[SerializeField] private MeshFilter _radarMeshFilter;
 	[SerializeField] private MeshFilter _magnetoMeshFilter;
 	[SerializeField] private MeshFilter _plasmaMeshFilter;
 	[SerializeField] private MeshFilter _massSpecMeshFilter;
 	[SerializeField] private MeshFilter _planetMeshFilter;
 	[SerializeField] private MeshRenderer _planetMeshRenderer;
+	[SerializeField] public List<Transform> _planetStormZones = new List<Transform>();
 
 	[SerializeField]
 	private Transform _rotationTransform;
@@ -405,28 +405,23 @@ public class Planet : MonoBehaviour
 		}
 	}
 
-	private void OnGlobalEvent_LaunchedSatellite( EventBus.EventContext context, object obj = null )
+	private void OnGlobalEvent_StopTrackingSatellite( EventBus.EventContext context, object obj = null )
 	{
-		if( obj != null )
+		if( obj is (SO_Satellite satelliteData, Satellite3D satellite) )
 		{
-			(SO_Satellite satelliteData, Transform satelliteTransform) newSatellite =
-				(ValueTuple<SO_Satellite, Transform>)obj;
-			if( newSatellite.satelliteTransform )
+			if( satelliteData && satellite )
 			{
-				StartTrackingSatellite( newSatellite.satelliteData._sensorType, newSatellite.satelliteTransform );
+				StopTrackingSatellite( satelliteData._sensorType, satellite.transform );
 			}
 		}
 	}
-
-	private void OnGlobalEvent_StopTrackingSatellite( EventBus.EventContext context, object obj = null )
+	private void OnGlobalEvent_StartTrackingSatellite( EventBus.EventContext context, object obj = null )
 	{
-		if( obj != null )
+		if( obj is (SO_Satellite satelliteData, Satellite3D satellite) )
 		{
-			(SO_Satellite satelliteData, Transform satelliteTransform) newSatellite =
-				(ValueTuple<SO_Satellite, Transform>)obj;
-			if( newSatellite.satelliteTransform )
+			if( satelliteData && satellite )
 			{
-				StopTrackingSatellite( newSatellite.satelliteData._sensorType, newSatellite.satelliteTransform );
+				StartTrackingSatellite( satelliteData._sensorType, satellite.transform );
 			}
 		}
 	}
@@ -438,14 +433,14 @@ public class Planet : MonoBehaviour
 	void OnEnable()
 	{
 		EventBus.StartListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
-		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StartListening( EventBus.EEventType.StartTrackingSatellite, OnGlobalEvent_StartTrackingSatellite );
 		EventBus.StartListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}
 
 	void OnDisable()
 	{
 		EventBus.StopListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
-		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StopListening( EventBus.EEventType.StartTrackingSatellite, OnGlobalEvent_StartTrackingSatellite );
 		EventBus.StopListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}
 

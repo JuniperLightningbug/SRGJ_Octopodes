@@ -38,15 +38,13 @@ public class SatelliteOrbit : MonoBehaviour
 		
 	// This will be moved to the orbit radius (without being scaled)
 	[SerializeField] private Transform _satelliteLaunchPositionIndicator;
-
-	[SerializeField] private Object _satellitePrefab;
-
-	[ReadOnly, SerializeField] public Transform _satelliteTransform;
-	[ReadOnly, SerializeField] public Satellite3D _satelliteComponent;
+	
+	[SerializeField] public Satellite3D _satelliteComponent;
+	[SerializeField] public Transform _satelliteTransform;
 
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _projectionRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _orbitRadius = 1.0f;
-	[SerializeField, Tooltip("Set by instantiating manager (Rotations Per Second)")] private float _orbitSpeed = 1.0f;
+	[SerializeField, Tooltip("Set by instantiating manager (seconds per rotation)")] private float _orbitTime = 10.0f;
 
 	[SerializeField] private SO_Satellite _satelliteData = null;
 
@@ -54,16 +52,13 @@ public class SatelliteOrbit : MonoBehaviour
 	private Vector3 _directionReference0 = Vector3.right;
 	private Vector3 _directionReference1 = Vector3.forward;
 	private Vector3 _cachedTransformUp = Vector3.up;
-
-	[Header( "Health Config" )]
-	[SerializeField]
-	private float _safeModeTime = 3.0f;
 	
 	[Header("Runtime Health Data")]
 	[SerializeField]
-	public bool _bIsAlive = true;
-	[SerializeField]
-	public bool _bIsInSafeMode = false;
+	private bool _bIsAlive = true;
+	public bool BIsAlive => _bIsAlive;
+	private bool _bIsInSafeMode = false;
+	public bool BIsInSafeMode => _bIsInSafeMode;
 	[SerializeField, ReadOnly, Range( 0.0f, 1.0f )]
 	private float _safeModeProgress = 0.0f;
 	[SerializeField, Range(0.0f,1.0f)]
@@ -75,7 +70,7 @@ public class SatelliteOrbit : MonoBehaviour
 		Quaternion rotation,
 		float projectionRadius,
 		float orbitRadius,
-		float orbitSpeed,
+		float orbitTime,
 		Vector3 startReferencePosition )
 	{
 		_satelliteData = satelliteData;
@@ -94,7 +89,7 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_orbitalOuterCircleVisuals.localScale = Vector3.one * _orbitRadius;
 		}
-		_orbitSpeed = orbitSpeed;
+		_orbitTime = orbitTime;
 
 		// Move the launch projection visual to the projection radius without scaling it 
 		if( _satelliteLaunchProjectionIndicator )
@@ -115,6 +110,11 @@ public class SatelliteOrbit : MonoBehaviour
 				_orbitRadius );
 			_satelliteLaunchPositionIndicator.gameObject.SetActive( true );
 		}
+				
+		if( _satelliteComponent )
+		{
+			_satelliteComponent.Initialise( this, _satelliteData );
+		}
 
 		Vector3 startDirection = transform.InverseTransformPoint( startReferencePosition ).normalized;
 		_directionReference0 = startDirection;
@@ -126,9 +126,9 @@ public class SatelliteOrbit : MonoBehaviour
 	void Update()
 	{
 		// Rotate satellites
-		if( _bOrbitIsActive )
+		if( _bOrbitIsActive && !Mathf.Approximately(_orbitTime, 0.0f) )
 		{
-			float frameRotationDegrees = _orbitSpeed * Time.deltaTime * 360.0f;
+			float frameRotationDegrees = Time.deltaTime * 360.0f / _orbitTime;
 			_satelliteTransformRoot.Rotate( new Vector3( 0.0f, -frameRotationDegrees, 0.0f ), Space.Self );
 		}
 		
@@ -137,25 +137,17 @@ public class SatelliteOrbit : MonoBehaviour
 			// Update safe mode
 			if( _bIsInSafeMode )
 			{
-				_safeModeProgress += Time.deltaTime / _safeModeTime;
+				_safeModeProgress += Time.deltaTime / DEBUG_Globals.ActiveProfile._satelliteSafeModeTime;
 				if( _safeModeProgress >= 1.0f )
 				{
-					_bIsInSafeMode = false;
-					_safeModeProgress = 0.0f;
-					ToggleSafeModeVisuals( false );
+					ToggleSafeMode( false );
 				}
 			}
 			
 			// Handle incoming damage
-			if( DEBUG_Globals.ActiveProfile._bDebugStormIsActive && !_bIsInSafeMode )
+			if( DEBUG_Globals.ActiveProfile._bDebugStormIsActive )
 			{
-				_currentHealth -= DEBUG_Globals.ActiveProfile._debugStormDamagePerSecond * Time.deltaTime;
-				
-				if( _currentHealth <= 0.0f )
-				{
-					_currentHealth = 0.0f;
-					_bIsAlive = false;
-				}
+				ApplyDamage( DEBUG_Globals.ActiveProfile._debugStormDamagePerSecond * Time.deltaTime );
 			}
 		}
 	}
@@ -195,72 +187,94 @@ public class SatelliteOrbit : MonoBehaviour
 		       MM.MathsUtils.Approximately( Mathf.Abs( a.z ), Mathf.Abs( b.z ), epsilon );
 	}
 
-	public Transform LaunchSatellite()
+	public bool LaunchSatellite()
 	{
-		if( _satellitePrefab && !_satelliteTransform )
+		if( !_bOrbitIsActive && _satelliteComponent )
 		{
-			Transform satelliteRoot = _satelliteTransformRoot ? _satelliteTransformRoot : transform;
-			GameObject newSatelliteObj = Instantiate( _satellitePrefab, satelliteRoot ) as GameObject;
-			if( newSatelliteObj )
+			if( !_satelliteTransform )
 			{
-				_satelliteTransform = newSatelliteObj.transform;
-				if( _satelliteLaunchPositionIndicator )
-				{
-					_satelliteTransform.position = _satelliteLaunchPositionIndicator.position;
-					_satelliteTransform.rotation = _satelliteLaunchPositionIndicator.rotation;
-				}
-				else
-				{
-					_satelliteTransform.localPosition =
-						satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
-				}
-				
-				_satelliteComponent = newSatelliteObj.GetComponent<Satellite3D>();
-				if( _satelliteComponent )
-				{
-					_satelliteComponent.Initialise( this, _satelliteData );
-				}
-				
-				_bOrbitIsActive = true;
-				
-				(SO_Satellite satellite, Transform satelliteTransform) eventPackage = new(
-					_satelliteData,
-					_satelliteTransform );
-				EventBus.Invoke( this, EventBus.EEventType.LaunchedSatellite, eventPackage );
-
-				if( _satelliteLaunchProjectionIndicator )
-				{
-					_satelliteLaunchProjectionIndicator.gameObject.SetActive( false );
-				}
-				if( _satelliteLaunchPositionIndicator )
-				{
-					_satelliteLaunchPositionIndicator.gameObject.SetActive( false );
-				}
-				
-				return _satelliteTransform;
+				_satelliteTransform = _satelliteComponent.transform;
 			}
+
+			Transform satelliteRoot = _satelliteTransformRoot ? _satelliteTransformRoot : transform;
+
+			if( _satelliteLaunchPositionIndicator )
+			{
+				_satelliteTransform.position = _satelliteLaunchPositionIndicator.position;
+				_satelliteTransform.rotation = _satelliteLaunchPositionIndicator.rotation;
+			}
+			else
+			{
+				_satelliteTransform.localPosition =
+					satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
+			}
+
+			_bOrbitIsActive = true;
+
+			(SO_Satellite satelliteData, Satellite3D satellite) eventPackage = new(
+				_satelliteData,
+				_satelliteComponent );
+			EventBus.Invoke( this, EventBus.EEventType.LaunchedSatellite, eventPackage );
+			
+			StartTrackingSatellite();
+
+			if( _satelliteLaunchProjectionIndicator )
+			{
+				_satelliteLaunchProjectionIndicator.gameObject.SetActive( false );
+			}
+
+			if( _satelliteLaunchPositionIndicator )
+			{
+				_satelliteLaunchPositionIndicator.gameObject.SetActive( false );
+			}
+
+			return _satelliteTransform;
 		}
 
-		return null;
-	}
 
-	public void EnterSafeMode()
-	{
-		if( !_bIsInSafeMode )
-		{
-			_bIsInSafeMode = true;
-			ToggleSafeModeVisuals( true );
-		}
+		return false;
 	}
 
 	private void StopTrackingSatellite()
 	{
-		if( _satelliteTransform )
+		if( _satelliteComponent )
 		{
-			(SO_Satellite satelliteData, Transform satelliteTransform) eventPackage = new(
+			(SO_Satellite satelliteData, Satellite3D satellite) eventPackage = new(
 				_satelliteData,
-				_satelliteTransform );
+				_satelliteComponent );
 			EventBus.Invoke( this, EventBus.EEventType.StopTrackingSatellite, eventPackage );
+		}
+	}
+	
+	private void StartTrackingSatellite()
+	{
+		if( _satelliteComponent )
+		{
+			(SO_Satellite satelliteData, Satellite3D satellite) eventPackage = new(
+				_satelliteData,
+				_satelliteComponent );
+			EventBus.Invoke( this, EventBus.EEventType.StartTrackingSatellite, eventPackage );
+		}
+	}
+
+	public void ApplyDamage( float damage )
+	{
+		if( _bIsInSafeMode || !_bIsAlive )
+		{
+			return;
+		}
+
+		if( !DEBUG_Globals.ActiveProfile._bInfiniteHealth )
+		{
+			_currentHealth -= damage;
+		}
+				
+		if( _currentHealth <= 0.0f )
+		{
+			_currentHealth = 0.0f;
+			_bIsAlive = false;
+			_satelliteComponent?.Kill();
+			StopTrackingSatellite();
 		}
 	}
 
@@ -285,14 +299,33 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_satelliteComponent.Highlight( bActive );
 		}
-		// TODO highlight orbit?
 	}
 
-	public void ToggleSafeModeVisuals( bool bActive )
+	public void ToggleSafeMode( bool bActive )
 	{
+		if( bActive == _bIsInSafeMode )
+		{
+			return;
+		}
+
+		_bIsInSafeMode = bActive;
+		if( !bActive )
+		{
+			_safeModeProgress = 0.0f;
+		}
+		
 		if( _satelliteComponent )
 		{
-			_satelliteComponent.SafeMode( bActive );
+			_satelliteComponent.ToggleSafeMode( DEBUG_Globals.ActiveProfile._satelliteSafeModeTime, bActive );
+		}
+
+		if( bActive )
+		{
+			StopTrackingSatellite();
+		}
+		else
+		{
+			StartTrackingSatellite();
 		}
 	}
 	

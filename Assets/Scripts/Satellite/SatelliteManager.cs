@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using MM;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 /**
  * Singleton class handles orbital creation and bookkeeping, satellite deployment, etc. from player inputs
@@ -21,7 +24,7 @@ public class SatelliteManager : MonoBehaviour
 	[SerializeField] private SphereCollider _orbitClickableCollider;
 	
 	[Header("Behaviour")]
-	[SerializeField, Tooltip("Rotations Per Second")] private float _orbitSpeed = 1.0f;
+	[SerializeField, Tooltip("Seconds per rotation")] private float _orbitTime = 10.0f;
 	[SerializeField, Tooltip("Elevation above the clicked collider")] private float _orbitRadiusOffset = 0.3f;
 	[SerializeField] private bool _bAutomaticallyLaunchOnceOnOrbitRelease = true;
 
@@ -233,7 +236,7 @@ public class SatelliteManager : MonoBehaviour
 	{
 		if( _currentCursorHoverSatellite )
 		{
-			_currentCursorHoverSatellite.EnterSafeMode();
+			_currentCursorHoverSatellite.ToggleSafeMode( true );
 		}
 	}
 
@@ -279,7 +282,7 @@ public class SatelliteManager : MonoBehaviour
 					_orbitClickableCollider.transform.rotation,
 					OrbitRadiusProjection,
 					OrbitRadiusOuter,
-					_orbitSpeed,
+					_orbitTime,
 					referencePosition
 					);
 

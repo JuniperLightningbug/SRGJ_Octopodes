@@ -38,8 +38,6 @@ public class PlanetLayerInstance
 				1.0f / fadeTime;
 		}
 	}
-
-
 	
 	// Testing - do we want angles instead? Change it depending on parameters? Cone from satellite pos ws?
 	[SerializeField] private float _satelliteDiscoveryRadius = 0.3f;

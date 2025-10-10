@@ -6,7 +6,7 @@ public class SO_Satellite : ScriptableObject
 	[SerializeField] public string _name = "";
 	[SerializeField] public string _description = "";
 	[SerializeField] public Mesh _mesh;
-	[SerializeField] public Material _outlineMaterial;
+	[SerializeField] public Color _outlineColour = Color.black;
 	[SerializeField] public Sprite _icon;
 	[SerializeField] public SO_PlanetConfig.ESensorType _sensorType;
 

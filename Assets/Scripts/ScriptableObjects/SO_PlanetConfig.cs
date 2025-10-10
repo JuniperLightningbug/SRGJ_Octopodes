@@ -37,6 +37,8 @@ public class SO_PlanetConfig : ScriptableObject
 
 	[Expandable]
 	public SO_StormTimings _stormTimings;
+	public float _stormZoneRadius = 0.3f;
+	public float _stormDamagePerSecond = 0.1f;
 
 	[Tooltip( "RotationTime" )]
 	public float _rotationTime = 0.0f;

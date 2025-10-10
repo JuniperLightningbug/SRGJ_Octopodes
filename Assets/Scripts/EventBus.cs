@@ -27,11 +27,12 @@ public static class EventBus
 		ClearActivePlanet,
 		
 		// Gameplay Events
-		LaunchedSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) newSatellite
-		StopTrackingSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) oldSatellite
+		LaunchedSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) newSatellite
+		StartTrackingSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) satellite
+		StopTrackingSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) oldSatellite
 		DrawSatelliteCard, // SO_Satellite newSatellite
-		StormWarning, // float timeToStorm
-		StormActive, // float stormTime
+		StormWarningStarted, // float timeToStorm
+		StormStarted, // float stormTime
 		StormEnded,
 		
 		COUNT,

@@ -49,10 +49,11 @@ MonoBehaviour:
   _orbitCentreAnchor: {fileID: 0}
   _camera: {fileID: 0}
   _orbitClickableCollider: {fileID: 9167518707818509396}
-  _orbitSpeed: 0.3
+  _orbitTime: 20
   _orbitRadiusOffset: 0.3
   _bAutomaticallyLaunchOnceOnOrbitRelease: 1
-  _queuedSatelliteType: -1
+  _queuedSatellite: {fileID: 0}
+  _currentCursorHoverSatellite: {fileID: 0}
 --- !u!1 &6160412547517385288
 GameObject:
   m_ObjectHideFlags: 0

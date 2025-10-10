@@ -83,7 +83,6 @@ namespace MM
 			}
 		}
 
-
 		public bool RemoveAt( int index, ref T outRemovedItem )
 		{
 			if( index < 0 || index >= _list.Count )
@@ -99,6 +98,11 @@ namespace MM
 		{
 			_list.Clear();
 			_indices.Clear();
+		}
+
+		public bool Contains( T item )
+		{
+			return _indices.ContainsKey( item );
 		}
 
 #endregion

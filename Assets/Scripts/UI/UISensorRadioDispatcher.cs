@@ -98,11 +98,5 @@ public class UISensorRadioDispatcher : MonoBehaviour
 	private void Start()
 	{
 		StartListeners();
-
-		// TODO THIS IS TEMP FIX
-		_toggles[0]._toggle.isOn = true;
-		EventBus.Invoke( this, EventBus.EEventType.UI_ChangeActiveSensorType, _toggles[0]._sensorType );
-		EventBus.Invoke( this, EventBus.EEventType.UI_NextPlanet, _toggles[0]._sensorType );
-
 	}
 }
