@@ -35,6 +35,8 @@ public class SatelliteManager : MonoBehaviour
 	private float OrbitRadiusProjection => _orbitClickableCollider ? _orbitClickableCollider.radius : 1.0f;
 	private float OrbitRadiusOuter => OrbitRadiusProjection + Mathf.Max( _orbitRadiusOffset, 0.0f );
 
+	[SerializeField, ReadOnly] private SatelliteOrbit _currentCursorHoverSatellite;
+
 	[Button( "Debug Reset (Runtime)" )]
 	private void Inspector_Reset()
 	{
@@ -60,11 +62,11 @@ public class SatelliteManager : MonoBehaviour
 
 	void Update()
 	{
-		if( !_orbitClickableCollider || !_orbitPrefab )
+		if( !_orbitClickableCollider || !_orbitPrefab || Mathf.Approximately( Time.deltaTime, 0.0f ) )
 		{
 			return;
 		}
-		
+
 		// Anchor the orbit collider to the planet if necessary
 		UpdateOrbitAnchor();
 		
@@ -119,6 +121,7 @@ public class SatelliteManager : MonoBehaviour
 		}
 		
 		_queuedSatellite = inSatellite;
+		InputModeManager.Instance?.ToggleSatelliteLaunch( true );
 	}
 
 	public void DequeueSatellite( SO_Satellite inSatellite )
@@ -132,6 +135,7 @@ public class SatelliteManager : MonoBehaviour
 	public void DequeueSatellite()
 	{
 		_queuedSatellite = null;
+		InputModeManager.Instance?.ToggleSatelliteLaunch( false );
 	}
 
 #endregion
@@ -169,20 +173,86 @@ public class SatelliteManager : MonoBehaviour
 
 	private void ProcessInputs()
 	{
-		if( BHasQueuedSatellite )
+		InputModeManager.GameplayInputMode currentMode = InputModeManager.Mode;
+
+		if( currentMode == InputModeManager.GameplayInputMode.Selection )
 		{
+			SelectionUpdateCursorHover();
 			if( Mouse.current.leftButton.wasPressedThisFrame )
 			{
-				TryCreateOrbit();
+				SatelliteSelectionClicked();
 			}
-			else if( Mouse.current.leftButton.isPressed )
+		}
+		else
+		{
+			ClearSelectionHover();
+			
+			if( currentMode == InputModeManager.GameplayInputMode.LaunchingSatellite && BHasQueuedSatellite )
 			{
-				UpdateActiveOrbitDirection();
+				if( Mouse.current.leftButton.wasPressedThisFrame )
+				{
+					TryCreateOrbit();
+				}
+				else if( Mouse.current.leftButton.isPressed )
+				{
+					UpdateActiveOrbitDirection();
+				}
+				else if( Mouse.current.leftButton.wasReleasedThisFrame )
+				{
+					ReleaseActiveOrbit( _bAutomaticallyLaunchOnceOnOrbitRelease );
+				}
 			}
-			else if( Mouse.current.leftButton.wasReleasedThisFrame )
+		}
+	}
+
+	private void SelectionUpdateCursorHover()
+	{
+		if( _camera )
+		{
+			// Update cursor target
+			Ray ray = _camera.ScreenPointToRay( Mouse.current.position.ReadValue() );
+			SatelliteOrbit nextHoverTarget = null;
+			if( Physics.Raycast( ray, out RaycastHit hitInfo, Mathf.Infinity ) )
 			{
-				ReleaseActiveOrbit( _bAutomaticallyLaunchOnceOnOrbitRelease );
+				nextHoverTarget = hitInfo.collider.gameObject.GetComponent<Satellite3D>()?.Orbit;
 			}
+
+			if( !nextHoverTarget )
+			{
+				ClearSelectionHover();
+			}
+			else if( nextHoverTarget != _currentCursorHoverSatellite)
+			{
+				ClearSelectionHover();
+				StartSelectionHover( nextHoverTarget );
+			}
+		}
+	}
+
+	private void SatelliteSelectionClicked()
+	{
+		if( _currentCursorHoverSatellite )
+		{
+			_currentCursorHoverSatellite.EnterSafeMode();
+		}
+	}
+
+	private void ClearSelectionHover()
+	{
+		if( _currentCursorHoverSatellite )
+		{
+			_currentCursorHoverSatellite.ToggleHoverHighlightVisuals( false );
+			_currentCursorHoverSatellite = null;
+		}
+	}
+
+	private void StartSelectionHover(SatelliteOrbit newTarget)
+	{
+		ClearSelectionHover();
+		_currentCursorHoverSatellite = newTarget;
+		if( _currentCursorHoverSatellite )
+		{
+			_currentCursorHoverSatellite.ToggleHoverHighlightVisuals( true );
 		}
 	}
 

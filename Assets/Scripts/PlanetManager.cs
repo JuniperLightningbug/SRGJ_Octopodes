@@ -30,12 +30,12 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 		GoToNextPlanet( true );
 	}
 
-	public void GoToNextPlanet( bool bCreateImmediately, bool bWrap = false )
+	public void GoToNextPlanet( bool bWrap = false )
 	{
-		GoToPlanetIdx( _activePlanetIdx + 1, bCreateImmediately, bWrap );
+		GoToPlanetIdx( _activePlanetIdx + 1, bWrap );
 	}
 
-	public void GoToPlanetIdx( int planetIdx, bool bCreateImmediately, bool bWrap = false )
+	public void GoToPlanetIdx( int planetIdx, bool bWrap = false )
 	{
 		if( _planetsData )
 		{
@@ -45,11 +45,6 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 			}
 
 			_activePlanetIdx = planetIdx;
-		}
-
-		if( bCreateImmediately )
-		{
-			TryCreatePlanet( _activePlanetIdx );
 		}
 	}
 

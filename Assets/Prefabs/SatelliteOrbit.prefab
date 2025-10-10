@@ -856,6 +856,7 @@ MonoBehaviour:
   _satelliteLaunchPositionIndicator: {fileID: 1608490482842108615}
   _satellitePrefab: {fileID: 7474750104527844079, guid: 1553a9353c7a9d14b983032cca166cfc, type: 3}
   _satelliteTransform: {fileID: 0}
+  _satelliteComponent: {fileID: 0}
   _projectionRadius: 1
   _orbitRadius: 1
   _orbitSpeed: 0.3

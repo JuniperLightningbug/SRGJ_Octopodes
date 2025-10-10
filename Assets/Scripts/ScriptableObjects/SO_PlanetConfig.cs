@@ -35,6 +35,9 @@ public class SO_PlanetConfig : ScriptableObject
 	public Mesh _planetMesh;
 	public Material _planetMaterial;
 
+	[Expandable]
+	public SO_StormTimings _stormTimings;
+
 	[Tooltip( "RotationTime" )]
 	public float _rotationTime = 0.0f;
 

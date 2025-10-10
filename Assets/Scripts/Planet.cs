@@ -9,6 +9,7 @@ public class Planet : MonoBehaviour
 {
 	[Header( "Planet config" )]
 	[SerializeField, Expandable] private SO_PlanetConfig _planetConfig;
+	public SO_PlanetConfig PlanetConfig => _planetConfig;
 
 	[Header( "Prefab hierarchy references" )]
 	[SerializeField] private MeshFilter _auroraMeshFilter;
@@ -343,7 +344,7 @@ public class Planet : MonoBehaviour
 
 	private void UpdateSatelliteDiscovery( float deltaTime )
 	{
-		if( _planetLayerInstances.Count > 0 )
+		if( _planetLayerInstances.Count > 0 && !Mathf.Approximately( deltaTime, 0.0f ) )
 		{
 			Dictionary<SO_PlanetConfig.ESensorType, float> discoveryValues =
 				new Dictionary<SO_PlanetConfig.ESensorType, float>();
@@ -387,7 +388,7 @@ public class Planet : MonoBehaviour
 	{
 		if( _rotationTransform )
 		{
-			_rotationTransform.Rotate( Vector3.up, RotationSpeed );
+			_rotationTransform.Rotate( Vector3.up, RotationSpeed * deltaTime * 360.0f );
 		}
 	}
 

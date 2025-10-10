@@ -15,6 +15,9 @@ public static class EventBus
 		UI_NextPlanet,
 		UI_QueueSatelliteCard, // SO_Satellite satellite
 		UI_DequeueSatelliteCard,
+		UI_ShowEncyclopediaEntry, // SO_EncyclopediaEntry
+		UI_PauseTime,
+		UI_UnpauseTime,
 		
 		// Value Changes
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
@@ -27,6 +30,9 @@ public static class EventBus
 		LaunchedSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) newSatellite
 		StopTrackingSatellite, // (SO_Satellite satelliteData, Transform satelliteTransform) oldSatellite
 		DrawSatelliteCard, // SO_Satellite newSatellite
+		StormWarning, // float timeToStorm
+		StormActive, // float stormTime
+		StormEnded,
 		
 		COUNT,
 	}

@@ -42,6 +42,7 @@ public class SatelliteOrbit : MonoBehaviour
 	[SerializeField] private Object _satellitePrefab;
 
 	[ReadOnly, SerializeField] public Transform _satelliteTransform;
+	[ReadOnly, SerializeField] public Satellite3D _satelliteComponent;
 
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _projectionRadius = 1.0f;
 	[SerializeField, Tooltip("Set by instantiating manager")] private float _orbitRadius = 1.0f;
@@ -141,6 +142,7 @@ public class SatelliteOrbit : MonoBehaviour
 				{
 					_bIsInSafeMode = false;
 					_safeModeProgress = 0.0f;
+					ToggleSafeModeVisuals( false );
 				}
 			}
 			
@@ -213,10 +215,10 @@ public class SatelliteOrbit : MonoBehaviour
 						satelliteRoot.InverseTransformDirection( _directionReference0 ) * _orbitRadius;
 				}
 				
-				Satellite3D satellite3d = newSatelliteObj.GetComponent<Satellite3D>();
-				if( satellite3d )
+				_satelliteComponent = newSatelliteObj.GetComponent<Satellite3D>();
+				if( _satelliteComponent )
 				{
-					satellite3d.Initialise( _satelliteData );
+					_satelliteComponent.Initialise( this, _satelliteData );
 				}
 				
 				_bOrbitIsActive = true;
@@ -242,6 +244,15 @@ public class SatelliteOrbit : MonoBehaviour
 		return null;
 	}
 
+	public void EnterSafeMode()
+	{
+		if( !_bIsInSafeMode )
+		{
+			_bIsInSafeMode = true;
+			ToggleSafeModeVisuals( true );
+		}
+	}
+
 	private void StopTrackingSatellite()
 	{
 		if( _satelliteTransform )
@@ -265,6 +276,23 @@ public class SatelliteOrbit : MonoBehaviour
 		if( _orbitalProjectionCircleVisuals )
 		{
 			_orbitalProjectionCircleVisuals.gameObject.SetActive( bActive );
+		}
+	}
+
+	public void ToggleHoverHighlightVisuals( bool bActive )
+	{
+		if( _satelliteComponent )
+		{
+			_satelliteComponent.Highlight( bActive );
+		}
+		// TODO highlight orbit?
+	}
+
+	public void ToggleSafeModeVisuals( bool bActive )
+	{
+		if( _satelliteComponent )
+		{
+			_satelliteComponent.SafeMode( bActive );
 		}
 	}
 	

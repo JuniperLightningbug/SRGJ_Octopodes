@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8efcf7661949cfc4bb4e5b77cf0e941c, type: 3}
+  m_Name: PlasmaInfo
+  m_EditorClassIdentifier: 
+  title: Plasma
+  description: 'The plasmasphere, or inner magnetosphere, is a region of the Earth''s
+    magnetosphere consisting of low-energy (cool) plasma. It is located above the
+    ionosphere. The outer boundary of the plasmasphere is known as the plasmapause,
+    which is defined by an order of magnitude drop in plasma density. '

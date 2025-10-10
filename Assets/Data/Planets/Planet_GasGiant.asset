@@ -41,4 +41,5 @@ MonoBehaviour:
     _bHasTexture: 1
   _planetMesh: {fileID: -8499846781133215037, guid: 765694947bad52c44adf16a70b7d9558, type: 3}
   _planetMaterial: {fileID: 2100000, guid: 8927db2620de9b642bde8e6e25f37307, type: 2}
-  _rotationTime: 10
+  _stormTimings: {fileID: 11400000, guid: 7ca7419bb8da20f4ea83d16a28385a45, type: 2}
+  _rotationTime: 20
