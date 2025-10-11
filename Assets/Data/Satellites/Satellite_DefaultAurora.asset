@@ -15,6 +15,6 @@ MonoBehaviour:
   _name: DefaultAurora
   _description: 
   _mesh: {fileID: 1167426987278568881, guid: 73ad85486d2540449bf10ba7baa20a34, type: 3}
-  _outlineMaterial: {fileID: 2100000, guid: bde8a226238c0dc4db30fa2919d95628, type: 2}
+  _outlineColour: {r: 0.8352942, g: 0.30588236, b: 0.23529413, a: 1}
   _icon: {fileID: 21300000, guid: afd4a7f1e4b92094e81abdfa3bda31da, type: 3}
   _sensorType: 0

@@ -15,6 +15,6 @@ MonoBehaviour:
   _name: DefaultMassSpec
   _description: 
   _mesh: {fileID: -4766377956934333391, guid: c701f9c0f298bad48a07b524c426875b, type: 3}
-  _outlineMaterial: {fileID: 2100000, guid: 319dc5fa16e9ab4488cc30c064acb428, type: 2}
+  _outlineColour: {r: 0.48627454, g: 0.26666668, b: 1, a: 1}
   _icon: {fileID: 21300000, guid: ba017479db4bda944a14863209270d58, type: 3}
   _sensorType: 4

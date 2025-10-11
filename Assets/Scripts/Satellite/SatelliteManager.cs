@@ -150,6 +150,7 @@ public class SatelliteManager : MonoBehaviour
 		if( obj is SO_Satellite toQueue )
 		{
 			QueueSatellite( toQueue );
+			EventBus.Invoke( EventBus.EEventType.SatelliteCardSelected, toQueue );
 		}
 		else
 		{

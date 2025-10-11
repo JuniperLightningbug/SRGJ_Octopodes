@@ -25,11 +25,6 @@ public class UIEncyclopedia : MonoBehaviour
 		}
 	}
 
-	private void OnDestroy()
-	{
-		EventBus.StopListening( EventBus.EEventType.UI_ShowEncyclopediaEntry, OnGlobalEvent_UIInfoButtonClicked );
-	}
-
 	private void OnEnable()
 	{
 		InputModeManager.Instance?.AddUIBlockingObject( gameObject );
@@ -43,6 +38,11 @@ public class UIEncyclopedia : MonoBehaviour
 	public void Initialise()
 	{
 		EventBus.StartListening( EventBus.EEventType.UI_ShowEncyclopediaEntry, OnGlobalEvent_UIInfoButtonClicked );
+	}
+	
+	private void OnDestroy()
+	{
+		EventBus.StopListening( EventBus.EEventType.UI_ShowEncyclopediaEntry, OnGlobalEvent_UIInfoButtonClicked );
 	}
 	
 }

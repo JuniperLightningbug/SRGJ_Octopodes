@@ -12,6 +12,7 @@ public class UISatelliteCards : MonoBehaviour
 	[SerializeField] private List<Satellite2D> _inactiveCards = new List<Satellite2D>();
 	[SerializeField] private List<Satellite2D> _activeCards = new List<Satellite2D>();
 	[SerializeField] private Satellite2D _selectedCard;
+	[SerializeField] private bool _bDisabledInteraction = false;
 	
 	private void OnGlobalEvent_DrawSatelliteCard( EventBus.EventContext context, object obj = null )
 	{
@@ -23,6 +24,16 @@ public class UISatelliteCards : MonoBehaviour
 			}
 		}
 	}
+	
+	private void OnGlobalEvent_DisableInteraction( EventBus.EventContext context, object obj = null )
+	{
+		_bDisabledInteraction = true;
+	}
+	
+	private void OnGlobalEvent_EnableInteraction( EventBus.EventContext context, object obj = null )
+	{
+		_bDisabledInteraction = false;
+	}
 
 	private void OnGlobalEvent_LaunchedSatellite( EventBus.EventContext context, object obj = null )
 	{
@@ -31,6 +42,11 @@ public class UISatelliteCards : MonoBehaviour
 
 	private void OnCardClicked( Satellite2D satelliteClicked )
 	{
+		if( _bDisabledInteraction )
+		{
+			return;
+		}
+		
 		Satellite2D previousSelection = _selectedCard;
 		
 		// Remove old selection
@@ -165,11 +181,15 @@ public class UISatelliteCards : MonoBehaviour
 	{
 		EventBus.StartListening( EventBus.EEventType.DrawSatelliteCard, OnGlobalEvent_DrawSatelliteCard );
 		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StartListening( EventBus.EEventType.TUT_DisableDeckInteraction, OnGlobalEvent_DisableInteraction );
+		EventBus.StartListening( EventBus.EEventType.TUT_EnableDeckInteraction, OnGlobalEvent_EnableInteraction );
 	}
 
 	private void OnDisable()
 	{
 		EventBus.StopListening( EventBus.EEventType.DrawSatelliteCard, OnGlobalEvent_DrawSatelliteCard );
 		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StopListening( EventBus.EEventType.TUT_DisableDeckInteraction, OnGlobalEvent_DisableInteraction );
+		EventBus.StopListening( EventBus.EEventType.TUT_EnableDeckInteraction, OnGlobalEvent_EnableInteraction );
 	}
 }

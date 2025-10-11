@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67a1deccd54cd494b89d322157db2de8, type: 3}
+  m_Name: SatelliteDeck_Default
+  m_EditorClassIdentifier: 
+  _startingSet: []
+  _loopingSet:
+  - {fileID: 11400000, guid: b5f6dd2eb1267d042b7793cb897b9aad, type: 2}
+  - {fileID: 11400000, guid: f49f5187892cf54419c092f45c434044, type: 2}
+  - {fileID: 11400000, guid: b6fa74ce5ae5c1c4797b2984524aefd1, type: 2}
+  - {fileID: 11400000, guid: 5eea427da969aea41b05d59b88b98b89, type: 2}
+  - {fileID: 11400000, guid: eac7d65179f20c746bf4e5e369e3746a, type: 2}
+  - {fileID: 11400000, guid: b5f6dd2eb1267d042b7793cb897b9aad, type: 2}
+  - {fileID: 11400000, guid: f49f5187892cf54419c092f45c434044, type: 2}
+  - {fileID: 11400000, guid: b6fa74ce5ae5c1c4797b2984524aefd1, type: 2}
+  - {fileID: 11400000, guid: 5eea427da969aea41b05d59b88b98b89, type: 2}
+  - {fileID: 11400000, guid: eac7d65179f20c746bf4e5e369e3746a, type: 2}
+  _startingSetPosition: 0
+  _loopingSetPosition: 0

@@ -135,7 +135,7 @@ public class StormTimer
 		_stormTimings = null;
 		_stormCentres.Clear();
 		_trackedSatellites.Clear();
-		_currentlyDamagingSatellites.Clear();
+		StopAllStormDamage();
 	}
 
 	public void Start( bool bForceReset = false )
@@ -293,7 +293,7 @@ public class StormTimer
 			case EStormState.Warning:
 				break;
 			case EStormState.Active:
-				_currentlyDamagingSatellites.Clear();
+				StopAllStormDamage();
 				EventBus.Invoke( this, EventBus.EEventType.StormEnded );
 				break;
 			case EStormState.Disabled:
@@ -377,6 +377,16 @@ public class StormTimer
 		{
 			_currentlyDamagingSatellites[i].Orbit?.ApplyDamage( deltaTime * _stormDamagePerSecond );
 		}
+	}
+
+	private void StopAllStormDamage()
+	{
+		// Process update events
+		for( int i = 0; i < _currentlyDamagingSatellites.Count; ++i )
+		{
+			_currentlyDamagingSatellites[i].DeactivateStormDamage();
+		}
+		_currentlyDamagingSatellites.Clear();
 	}
 
 #endregion

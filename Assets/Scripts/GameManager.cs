@@ -1,7 +1,9 @@
 using System;
 using MM;
 using NaughtyAttributes;
+using Shapes;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class GameManager : StandaloneSingletonBase<GameManager>
 {
@@ -12,8 +14,13 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	
 	[SerializeField] private SatelliteManager _satelliteManager;
 	public SatelliteManager SatelliteManagerInstance => _satelliteManager;
+
+	[SerializeField, Expandable] private SO_SatelliteDeck _satelliteDeck;
 	
-	[SerializeField] private SatelliteDeck _satelliteDeck = new SatelliteDeck();
+	[SerializeField] private TutorialInstance _tutorialInstance;
+	private bool BTutorialIsActive => _tutorialInstance != null && _tutorialInstance._bIsActive;
+
+	[SerializeField] private Object _tutorialPrefab;
 
 	// Static accessor
 	public static SO_PlanetConfig.ESensorType TryGetCurrentSensorViewType()
@@ -51,11 +58,38 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		if( _planetManager )
 		{
 			Planet newPlanet = _planetManager.TryCreatePlanet();
-			
-			if( newPlanet && _stormTimer != null )
+
+			if( newPlanet?.PlanetConfig )
 			{
-				_stormTimer.Reset( newPlanet );
-				_stormTimer.Start();
+				_satelliteDeck = newPlanet.PlanetConfig._satelliteDeck;
+				_satelliteDeck?.Reset();
+				_satelliteDeck?.Shuffle();
+
+				if( newPlanet.PlanetConfig._bActivateTutorial && _tutorialPrefab )
+				{
+					_tutorialInstance?.Cleanup();
+					GameObject newTutorialInstance = Instantiate( _tutorialPrefab, transform) as GameObject;
+					_tutorialInstance = newTutorialInstance?.GetComponent<TutorialInstance>();
+					_tutorialInstance?.Initialise();
+					_tutorialInstance?.StartTutorial();
+				}
+
+				_satelliteDeck = newPlanet.PlanetConfig._satelliteDeck;
+				_satelliteDeck?.Shuffle();
+
+				if( _stormTimer != null )
+				{
+					_stormTimer.Reset( newPlanet );
+
+					if( BTutorialIsActive )
+					{
+						_stormTimer.Deactivate();
+					}
+					else
+					{
+						_stormTimer.Start();
+					}
+				}
 			}
 		}
 	}
@@ -139,6 +173,19 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	{
 		Time.timeScale = _normalTimeScale;
 	}
+	
+	private void OnGlobalEvent_TUTDrawCards( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is int num )
+		{
+			_satelliteDeck?.DrawSatellites( num );
+		}
+	}
+
+	private void OnGlobalEvent_TUTStartFirstStormWarning( EventBus.EventContext context, object obj = null )
+	{
+		_stormTimer?.ChangeState( StormTimer.EStormState.Warning );
+	}
 
 #endregion
 
@@ -151,6 +198,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StartListening( EventBus.EEventType.UI_NextPlanet, OnGlobalEvent_UIGoToNextPlanet );
 		EventBus.StartListening( EventBus.EEventType.UI_PauseTime, OnGlobalEvent_UIPauseTime );
 		EventBus.StartListening( EventBus.EEventType.UI_UnpauseTime, OnGlobalEvent_UIUnpauseTime );
+		EventBus.StartListening( EventBus.EEventType.TUT_DrawCards, OnGlobalEvent_TUTDrawCards );
+		EventBus.StartListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
 	}
 
 	void OnDisable()
@@ -160,6 +209,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StopListening( EventBus.EEventType.UI_NextPlanet, OnGlobalEvent_UIGoToNextPlanet );
 		EventBus.StopListening( EventBus.EEventType.UI_PauseTime, OnGlobalEvent_UIPauseTime );
 		EventBus.StopListening( EventBus.EEventType.UI_UnpauseTime, OnGlobalEvent_UIUnpauseTime );
+		EventBus.StopListening( EventBus.EEventType.TUT_DrawCards, OnGlobalEvent_TUTDrawCards );
+		EventBus.StopListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
 	}
 
 	void Update()

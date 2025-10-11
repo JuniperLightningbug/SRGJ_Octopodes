@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Planets
   m_EditorClassIdentifier: 
   _planetConfigs:
-  - {fileID: 11400000, guid: 2140005a489dd54469ef964ce54f8070, type: 2}
+  - {fileID: 11400000, guid: 5f9c7e4d91a20e4488e5d60df5eab7b9, type: 2}
+  - {fileID: 11400000, guid: 35cb5bff130bd6a42b94e2659c4ddd49, type: 2}
   - {fileID: 11400000, guid: bafd67bac6d736d4c8b69352a1933d97, type: 2}
   - {fileID: 11400000, guid: fc5fa21b5496a444abda4d9d5d8ed9eb, type: 2}
-  - {fileID: 11400000, guid: 35cb5bff130bd6a42b94e2659c4ddd49, type: 2}
+  - {fileID: 11400000, guid: 2140005a489dd54469ef964ce54f8070, type: 2}
   - {fileID: 11400000, guid: 458054b351085b54bba85e6694321704, type: 2}

@@ -19,6 +19,24 @@ public static class EventBus
 		UI_PauseTime,
 		UI_UnpauseTime,
 		
+		// Events from tutorial instance
+		TUT_HideAllLayers,
+		TUT_ShowLayer, // SO_PlanetConfig.ESensorType type
+		TUT_ActivateLayer, // SO_PlanetConfig.ESensorType type
+		TUT_DrawCards, // int num
+		TUT_DisableDeckInteraction,
+		TUT_EnableDeckInteraction,
+		TUT_StartFirstStormWarning,
+		TUT_Popup_CameraControls, // bool bPauseTime
+		TUT_Popup_Satellites, // bool bPauseTime
+		TUT_Popup_Orbitals, // bool bPauseTime
+		TUT_Popup_Layers, // bool bPauseTime
+		TUT_Popup_Storm, // bool bPauseTime
+		TUT_Popup_WinCondition, // bool bPauseTime
+		TUT_Popup_HideAll,
+		TUT_Callback_CameraControlsComplete,
+		// Other callbacks handles using existing events
+		
 		// Value Changes
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
 		
@@ -31,10 +49,11 @@ public static class EventBus
 		StartTrackingSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) satellite
 		StopTrackingSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) oldSatellite
 		DrawSatelliteCard, // SO_Satellite newSatellite
+		SatelliteCardSelected, // SO_Satellite newSatellite
 		StormWarningStarted, // float timeToStorm
 		StormStarted, // float stormTime
 		StormEnded,
-		
+
 		COUNT,
 	}
 

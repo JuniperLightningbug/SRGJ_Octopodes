@@ -15,6 +15,6 @@ MonoBehaviour:
   _name: DefaultRadar
   _description: 
   _mesh: {fileID: -6980050323492176403, guid: e63d0a924696654478eb4bd6ecfb0861, type: 3}
-  _outlineMaterial: {fileID: 2100000, guid: 27ecaf3a354ad7043bc9ba7b67bdfbf2, type: 2}
+  _outlineColour: {r: 0.18823531, g: 0.654902, b: 0.54509807, a: 1}
   _icon: {fileID: 21300000, guid: 57e98333405046849a66f77538791429, type: 3}
   _sensorType: 1

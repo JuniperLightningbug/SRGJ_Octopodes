@@ -28,7 +28,7 @@ public class Satellite3D : MonoBehaviour
 	public float _outlineAlpha = 0.4f;
 	public float _deathScaleDownMult = 0.3f;
 	public float _deathScaleDownAnimationTime = 0.2f;
-	public Color _safeModeMeshColour = Color.blue;
+	public Color _safeModeMeshColour = Color.black;
 	public Color _deadMeshColour = Color.black;
 	public float _damageShakePeriod = 5.0f;
 	//public float _damageShakeStrength_Position = 0.02f;
@@ -75,6 +75,7 @@ public class Satellite3D : MonoBehaviour
 			_meshMaterial = _meshRenderer.materials[0];
 			_outlineMaterial = _meshRenderer.materials[1];
 			_originalMeshColour = _meshMaterial.GetColor( _propertyIDBaseColour );
+			_outlineMaterial?.SetColor( _propertyIDBaseColour, _satelliteData._outlineColour );
 			_meshRenderer.SetMaterials( new List<Material>() { _meshMaterial, _outlineMaterial } );
 		}
 
@@ -198,30 +199,33 @@ public class Satellite3D : MonoBehaviour
 			return;
 		}
 
-		_takeDamageTweenRotation?.Kill( complete: false );
 		_takeDamageFadeSequence?.Kill( complete: false );
-
-		if( bWithFadeOut )
+		if( _takeDamageTweenRotation.IsActive() )
 		{
+			_takeDamageTweenRotation?.Kill( complete: false );
 
-			_takeDamageFadeSequence = DOTween.Sequence();
+			if( bWithFadeOut )
+			{
 
-			_takeDamageFadeSequence.Join( _satelliteMeshRoot.DOShakeRotation(
-				duration: _damageShakeFadeOutTime,
-				strength: _damageShakeStrength_Rotation,
-				vibrato: _damageShakeVibrato,
-				randomness: _damageShakeRandomness,
-				fadeOut: true // Fade out shaking
-			) );
+				_takeDamageFadeSequence = DOTween.Sequence();
 
-			_takeDamageFadeSequence.Append(
-				_satelliteMeshRoot.DOLocalRotate( _originalMeshRootRotation.eulerAngles, 0.1f ) );
+				_takeDamageFadeSequence.Join( _satelliteMeshRoot.DOShakeRotation(
+					duration: _damageShakeFadeOutTime,
+					strength: _damageShakeStrength_Rotation,
+					vibrato: _damageShakeVibrato,
+					randomness: _damageShakeRandomness,
+					fadeOut: true // Fade out shaking
+				) );
+
+				_takeDamageFadeSequence.Append(
+					_satelliteMeshRoot.DOLocalRotate( _originalMeshRootRotation.eulerAngles, 0.1f ) );
+			}
+			else if( _satelliteMeshRoot )
+			{
+				_satelliteMeshRoot.localRotation = _originalMeshRootRotation;
+			}
 		}
-		else if( _satelliteMeshRoot )
-		{
-			_satelliteMeshRoot.localRotation = _originalMeshRootRotation;
-		}
-
+		
 		if( _damageParticles )
 		{
 			_damageParticles.Stop();

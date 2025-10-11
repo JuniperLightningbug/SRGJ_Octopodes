@@ -34,11 +34,16 @@ public class SO_PlanetConfig : ScriptableObject
 	public List<PlanetLayerTuple> _planetLayers = new List<PlanetLayerTuple>();
 	public Mesh _planetMesh;
 	public Material _planetMaterial;
+	
+	[Expandable]
+	public SO_SatelliteDeck _satelliteDeck;
 
 	[Expandable]
 	public SO_StormTimings _stormTimings;
 	public float _stormZoneRadius = 0.3f;
 	public float _stormDamagePerSecond = 0.1f;
+
+	public bool _bActivateTutorial = false;
 
 	[Tooltip( "RotationTime" )]
 	public float _rotationTime = 0.0f;

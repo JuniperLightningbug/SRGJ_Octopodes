@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -64,13 +65,11 @@ public class UISensorRadioDispatcher : MonoBehaviour
 	{
 		if( inToggle?._toggle && inToggle._toggle.isOn )
 		{
-			// TEMP - FIX THIS! We need to be able to toggle off as well. TODO
-			// TODO also use the ui event instead of the gamemanager one
 			EventBus.Invoke( this, EventBus.EEventType.UI_ChangeActiveSensorType, inToggle._sensorType );
 		}
 	}
 
-	private void StartListeners()
+	private void StartToggleListeners()
 	{
 		if( _toggles != null )
 		{
@@ -88,15 +87,86 @@ public class UISensorRadioDispatcher : MonoBehaviour
 		}
 	}
 
-	private void StopListeners()
+	private void StopToggleListeners()
 	{
 		// TODO I'm leaving this for now because it would require caching all of the delegates, and would be a
 		// redundant failsafe (I think). When this object is inactive, so are the child toggles, and there are
 		// no callback event invocations anyway.
 	}
+	
+	private void OnGlobalEvent_TUTHideAllLayers( EventBus.EventContext context, object obj = null )
+	{
+		if( _toggles != null )
+		{
+			for( int i = 0; i < _toggles.Count; ++i )
+			{
+				_toggles[i]._toggle.gameObject.SetActive( false );
+			}
+		}
+	}
+	
+	private void OnGlobalEvent_TUTShowLayer( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType type && _toggles != null )
+		{
+			for( int i = 0; i < _toggles.Count; ++i )
+			{
+				if( _toggles[i]._sensorType == type )
+				{
+					_toggles[i]._toggle.gameObject.SetActive( true );
+				}
+			}
+		}
+	}
+	
+	private void OnGlobalEvent_TUTActivateLayer( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType type && _toggles != null )
+		{
+			ActivateLayer( type );
+		}
+	}
+	
+	private void OnGlobalEvent_SatelliteCardSelected( EventBus.EventContext context, object obj = null )
+	{
+		// If a satellite card is selected, switch to the corresponding view type
+		if( obj is SO_Satellite selection && _toggles != null )
+		{
+			ActivateLayer( selection._sensorType );
+		}
+	}
+
+	private void ActivateLayer( SO_PlanetConfig.ESensorType type )
+	{
+		if( _toggles != null )
+		{
+			for( int i = 0; i < _toggles.Count; ++i )
+			{
+				if( _toggles[i]._sensorType == type && _toggles[i]._toggle.gameObject.activeInHierarchy )
+				{
+					_toggles[i]._toggle.isOn = true;
+				}
+			}
+		}
+	}
 
 	private void Start()
 	{
-		StartListeners();
+		StartToggleListeners();
+		
+		// Also start listening for tutorial control overrides
+		EventBus.StartListening( EventBus.EEventType.TUT_HideAllLayers, OnGlobalEvent_TUTHideAllLayers );
+		EventBus.StartListening( EventBus.EEventType.TUT_ShowLayer, OnGlobalEvent_TUTShowLayer );
+		EventBus.StartListening( EventBus.EEventType.TUT_ActivateLayer, OnGlobalEvent_TUTActivateLayer );
+		EventBus.StartListening( EventBus.EEventType.SatelliteCardSelected, OnGlobalEvent_SatelliteCardSelected );
+
+	}
+
+	private void OnDestroy()
+	{
+		EventBus.StopListening( EventBus.EEventType.TUT_HideAllLayers, OnGlobalEvent_TUTHideAllLayers );
+		EventBus.StopListening( EventBus.EEventType.TUT_ShowLayer, OnGlobalEvent_TUTShowLayer );
+		EventBus.StopListening( EventBus.EEventType.TUT_ActivateLayer, OnGlobalEvent_TUTActivateLayer );
+		EventBus.StopListening( EventBus.EEventType.SatelliteCardSelected, OnGlobalEvent_SatelliteCardSelected );
 	}
 }

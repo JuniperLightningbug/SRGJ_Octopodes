@@ -81,7 +81,7 @@ public class OrbitCameraController : MonoBehaviour
 
 	private void OrbitCamera()
 	{
-		if( Mouse.current.rightButton.isPressed )
+		if( Mouse.current.rightButton.isPressed && !Mouse.current.rightButton.wasPressedThisFrame )
 		{
 			Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
@@ -90,6 +90,10 @@ public class OrbitCameraController : MonoBehaviour
 			_currentEulerRotation.y += mouseDelta.x * _orbitSpeed.y;
 
 			transform.rotation = Quaternion.Euler( _currentEulerRotation );
+		}
+		else if( Mouse.current.rightButton.wasReleasedThisFrame )
+		{
+			EventBus.Invoke( EventBus.EEventType.TUT_Callback_CameraControlsComplete );
 		}
 	}
 
