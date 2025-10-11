@@ -32,13 +32,13 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3437820296257968193}
   - {fileID: 9066717763295499596}
   - {fileID: 2140257185359992769}
   - {fileID: 2352402955395665162}
   - {fileID: 7447081158858766809}
   - {fileID: 7223695391651678533}
   - {fileID: 4899889916136718617}
+  - {fileID: 3437820296257968193}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -127,6 +127,7 @@ MonoBehaviour:
   _stormWarning: {fileID: 5645183330533586871}
   _tutorialPopups: []
   _pauseMenu: {fileID: 4749112325960152210}
+  _planetEndSummary: {fileID: 0}
 --- !u!1 &3294555363700820025
 GameObject:
   m_ObjectHideFlags: 0
@@ -2930,6 +2931,26 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2744867207467294304, guid: 44a8cc0f7161f6f45b76e34d5c1f464d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3477915961777714131, guid: 44a8cc0f7161f6f45b76e34d5c1f464d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3477915961777714131, guid: 44a8cc0f7161f6f45b76e34d5c1f464d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3477915961777714131, guid: 44a8cc0f7161f6f45b76e34d5c1f464d, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3477915961777714131, guid: 44a8cc0f7161f6f45b76e34d5c1f464d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3477915961777714131, guid: 44a8cc0f7161f6f45b76e34d5c1f464d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}

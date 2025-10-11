@@ -62,7 +62,7 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 				}
 			}
 			
-			planetIdx = Mathf.Min( planetIdx, _planetsData._planetConfigs.Count );
+			planetIdx = Mathf.Min( planetIdx, _planetsData._planetConfigs.Count-1 );
 			return _planetsData._planetConfigs[ planetIdx ];
 		}
 

@@ -40,6 +40,7 @@ public static class EventBus
 		// Value Changes
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
 		OnChanged_PlanetProgress, // float
+		DEBUG_CompletePlanet,
 		
 		// Game Manager
 		PostSpawnNewPlanet,

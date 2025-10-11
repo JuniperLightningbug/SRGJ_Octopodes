@@ -182,7 +182,6 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 #endregion
 
 #region Callbacks (mostly relays from UI events)
-
 	private void OnGlobalEvent_UIClearActivePlanet( EventBus.EventContext context, object obj = null )
 	{
 		ClearActivePlanet();
@@ -237,6 +236,11 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		}
 	}
 
+	private void OnGlobalEvent_DebugCompletePlanet( EventBus.EventContext context, object obj = null )
+	{
+		OnGlobalEvent_OnChangedPlanetProgress( context, 2.0f );
+	}
+
 #endregion
 
 #region MonoBehaviour
@@ -251,6 +255,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StartListening( EventBus.EEventType.TUT_DrawCards, OnGlobalEvent_TUTDrawCards );
 		EventBus.StartListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
 		EventBus.StartListening( EventBus.EEventType.OnChanged_PlanetProgress, OnGlobalEvent_OnChangedPlanetProgress );
+		EventBus.StartListening( EventBus.EEventType.DEBUG_CompletePlanet, OnGlobalEvent_DebugCompletePlanet );
 	}
 
 	void OnDisable()
@@ -263,6 +268,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StopListening( EventBus.EEventType.TUT_DrawCards, OnGlobalEvent_TUTDrawCards );
 		EventBus.StopListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
 		EventBus.StopListening( EventBus.EEventType.OnChanged_PlanetProgress, OnGlobalEvent_OnChangedPlanetProgress );
+		EventBus.StopListening( EventBus.EEventType.DEBUG_CompletePlanet, OnGlobalEvent_DebugCompletePlanet );
 	}
 
 	void Update()

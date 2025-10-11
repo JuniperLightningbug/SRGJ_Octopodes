@@ -292,11 +292,11 @@ MonoBehaviour:
   _messageTMP: {fileID: 4181628019206232411}
   _timerTMP: {fileID: 3947949949112211080}
   _warningColor: {r: 0.8000001, g: 0.63529414, b: 0.24705884, a: 1}
-  _warningText: Storm\nIncoming
+  _warningText: Storm\nIncoming...
   _stormColor: {r: 0.8000001, g: 0.24705884, b: 0.29803923, a: 1}
   _stormText: Storm!
   _clearedColor: {r: 0.24705884, g: 0.8000001, b: 0.24705884, a: 1}
-  _clearedText: Cleared
+  _clearedText: -- Storm passed --
   _icon: {fileID: 8848715021033904381}
   _clearMessageTime: 3
 --- !u!1 &5706140182200106851
