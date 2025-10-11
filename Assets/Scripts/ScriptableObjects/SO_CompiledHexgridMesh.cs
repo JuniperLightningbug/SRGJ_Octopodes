@@ -27,7 +27,9 @@ public class SO_CompiledHexgridMesh : ScriptableObject
 		if( _mesh == null )
 		{
 			_meshData.Clear();
+#if UNITY_EDITOR
 			EditorUtility.SetDirty( this );
+#endif
 			return;
 		}
 		

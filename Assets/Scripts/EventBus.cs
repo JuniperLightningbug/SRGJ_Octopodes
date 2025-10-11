@@ -23,7 +23,7 @@ public static class EventBus
 		TUT_HideAllLayers,
 		TUT_ShowLayer, // SO_PlanetConfig.ESensorType type
 		TUT_ActivateLayer, // SO_PlanetConfig.ESensorType type
-		TUT_DrawCards, // int num
+		TUT_DrawCards, // Forces next progression draw
 		TUT_DisableDeckInteraction,
 		TUT_EnableDeckInteraction,
 		TUT_StartFirstStormWarning,
@@ -39,10 +39,11 @@ public static class EventBus
 		
 		// Value Changes
 		OnChanged_LayerDiscovery, // Dictionary<SO_PlanetConfig.ESensorType, float>
+		OnChanged_PlanetProgress, // float
 		
 		// Game Manager
-		SpawnNewPlanet,
-		ClearActivePlanet,
+		PostSpawnNewPlanet,
+		PostClearActivePlanet,
 		
 		// Gameplay Events
 		LaunchedSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) newSatellite

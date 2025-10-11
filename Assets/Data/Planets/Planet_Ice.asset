@@ -44,6 +44,6 @@ MonoBehaviour:
   _satelliteDeck: {fileID: 11400000, guid: d9b06cdef4190084ba6d4dfdbfc96ff5, type: 2}
   _stormTimings: {fileID: 11400000, guid: 7ca7419bb8da20f4ea83d16a28385a45, type: 2}
   _stormZoneRadius: 0.7
-  _stormDamagePerSecond: 0.1
+  _stormDamagePerSecond: 0.3
   _bActivateTutorial: 0
-  _rotationTime: 30
+  _rotationTime: 80

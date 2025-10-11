@@ -19,6 +19,13 @@ public class UIStormWarning : MonoBehaviour
 	[SerializeField] private float _clearMessageTime = 3.0f;
 
 	private float _remainingTime = 0.0f;
+
+
+	private void OnGlobalEvent_PostClearActivePlanet( EventBus.EventContext context, object obj = null )
+	{
+		
+	}
+	
 	private void OnGlobalEvent_StormWarningStarted(EventBus.EventContext context, object obj = null)
 	{
 		if (obj is float warningTime)
@@ -88,7 +95,7 @@ public class UIStormWarning : MonoBehaviour
 		{
 			gameObject.SetActive( false );
 		}
-		else if( gameObject.activeSelf == true && _timerTMP )
+		else if( gameObject.activeSelf && _timerTMP )
 		{
 			_remainingTime -= Time.deltaTime;
 			string _timerText = string.Format( "{0}s", Mathf.CeilToInt( _remainingTime ).ToString() );
@@ -96,11 +103,11 @@ public class UIStormWarning : MonoBehaviour
 		}
 	}
 
-	private void OnDestroy()
+	private void Reset()
 	{
-		EventBus.StopListening(EventBus.EEventType.StormWarningStarted, OnGlobalEvent_StormWarningStarted);
-		EventBus.StopListening(EventBus.EEventType.StormStarted, OnGlobalEvent_StormStarted);
-		EventBus.StopListening(EventBus.EEventType.StormEnded, OnGlobalEvent_StormEnded);
+		_icon.gameObject.SetActive(false);
+		_timerTMP.gameObject.SetActive(false);
+		_remainingTime = -1.0f;
 	}
 
 	public void Initialise()
@@ -108,5 +115,15 @@ public class UIStormWarning : MonoBehaviour
 		EventBus.StartListening(EventBus.EEventType.StormWarningStarted, OnGlobalEvent_StormWarningStarted);
 		EventBus.StartListening(EventBus.EEventType.StormStarted, OnGlobalEvent_StormStarted);
 		EventBus.StartListening(EventBus.EEventType.StormEnded, OnGlobalEvent_StormEnded);
+		EventBus.StartListening( EventBus.EEventType.PostClearActivePlanet, OnGlobalEvent_PostClearActivePlanet );
 	}
+	
+	private void OnDestroy()
+	{
+		EventBus.StopListening(EventBus.EEventType.StormWarningStarted, OnGlobalEvent_StormWarningStarted);
+		EventBus.StopListening(EventBus.EEventType.StormStarted, OnGlobalEvent_StormStarted);
+		EventBus.StopListening(EventBus.EEventType.StormEnded, OnGlobalEvent_StormEnded);
+		EventBus.StopListening( EventBus.EEventType.PostClearActivePlanet, OnGlobalEvent_PostClearActivePlanet );
+	}
+
 }

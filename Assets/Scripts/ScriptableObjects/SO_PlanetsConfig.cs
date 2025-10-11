@@ -7,4 +7,8 @@ public class SO_PlanetsConfig : ScriptableObject
 {
 	[Expandable]
     public List<SO_PlanetConfig> _planetConfigs;
+
+	public SO_PlanetConfig _tutorialPlanetConfig;
+	
+	public bool _bActivateTutorial = true;
 }

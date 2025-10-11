@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8efcf7661949cfc4bb4e5b77cf0e941c, type: 3}
-  m_Name: EncyclopediaEntry
+  m_Name: EncyclopediaEntryTest
   m_EditorClassIdentifier: 
   _title: Test Entry
   _description: 123

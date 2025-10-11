@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIValues_LayerProgress : UIValuesBase
+public class UIValues_PlanetProgress : UIValuesBase
 {
 	protected override EventBus.EEventType[] UpdateOnEvents
 	{
@@ -11,26 +10,27 @@ public class UIValues_LayerProgress : UIValuesBase
 		{
 			return new EventBus.EEventType[]
 			{
-				EventBus.EEventType.OnChanged_LayerDiscovery,
-				EventBus.EEventType.UI_CreatePlanet,
+				EventBus.EEventType.OnChanged_PlanetProgress,
+				EventBus.EEventType.PostClearActivePlanet,
+				EventBus.EEventType.PostSpawnNewPlanet,
 			};
 		}
 	}
-
+	
 	protected override bool BUpdateWhenDisabled => true;
 
 	public Slider _slider;
-	public SO_PlanetConfig.ESensorType _type;
 	public float _discoveryProgress;
 
 	protected override void UpdateDataFromEvent( EventBus.EventContext context, object obj = null )
 	{
-		if( context._eventType == EventBus.EEventType.OnChanged_LayerDiscovery &&
-		    obj is Dictionary<SO_PlanetConfig.ESensorType, float> newValues )
+		if( context._eventType == EventBus.EEventType.OnChanged_PlanetProgress &&
+		    obj is float newProgressValue )
 		{
-			newValues.TryGetValue( _type, out _discoveryProgress );
+			_discoveryProgress = newProgressValue;
 		}
-		else if( context._eventType == EventBus.EEventType.UI_CreatePlanet )
+		else if( context._eventType == EventBus.EEventType.PostClearActivePlanet ||
+		         context._eventType == EventBus.EEventType.PostSpawnNewPlanet )
 		{
 			_discoveryProgress = 0.0f;
 		}
@@ -43,6 +43,4 @@ public class UIValues_LayerProgress : UIValuesBase
 			_slider.value = _discoveryProgress;
 		}
 	}
-
-
 }

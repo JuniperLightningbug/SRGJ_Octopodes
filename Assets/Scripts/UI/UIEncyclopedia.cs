@@ -18,7 +18,7 @@ public class UIEncyclopedia : MonoBehaviour
 
 			if( _descriptionTMP )
 			{
-				_descriptionTMP.SetText( entry._description );
+				_descriptionTMP.SetText( entry._content );
 			}
 			
 			gameObject.SetActive( true );

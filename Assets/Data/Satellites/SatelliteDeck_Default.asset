@@ -24,5 +24,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b6fa74ce5ae5c1c4797b2984524aefd1, type: 2}
   - {fileID: 11400000, guid: 5eea427da969aea41b05d59b88b98b89, type: 2}
   - {fileID: 11400000, guid: eac7d65179f20c746bf4e5e369e3746a, type: 2}
-  _startingSetPosition: 0
-  _loopingSetPosition: 0
+  _cardDrawAtProgress:
+  - 0.1
+  - 0.2
+  - 0.4
+  - 0.6
+  - 0.8
+  _cardDrawNumbers: 020000000300000004000000

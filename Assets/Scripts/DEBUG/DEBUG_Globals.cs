@@ -13,10 +13,11 @@ public class DEBUG_Globals : ScriptableObject
 	public bool _bDebugStormIsActive = false;
 	
 	// Config variables (these belong elsewhere)
-	public float _discoveryFadeTime = 5.0f;
 	public float _satelliteSafeModeTime = 3.0f;
 	public float _satelliteRadius = 0.2f;
 	public bool _bInfiniteHealth = false;
+	public float _discoveryFadeOutStartTime = 5.0f;
+	public float _discoveryFadeOutEndTime = 8.0f;
 	
 	
 	// Global access

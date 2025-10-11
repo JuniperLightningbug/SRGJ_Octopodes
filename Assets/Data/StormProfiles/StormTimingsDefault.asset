@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b04caab7666a89b419582e443f866ef8, type: 3}
   m_Name: StormTimingsDefault
   m_EditorClassIdentifier: 
-  _calmTime: 20
-  _warningTime: 12
-  _stormTime: 10
+  _calmTime: 30
+  _warningTime: 10
+  _stormTime: 15

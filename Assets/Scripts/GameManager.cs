@@ -22,6 +22,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	[SerializeField] private Object _tutorialPrefab;
 
+	[SerializeField] private float _progressWinThreshold = 0.8f;
+
 	// Static accessor
 	public static SO_PlanetConfig.ESensorType TryGetCurrentSensorViewType()
 	{
@@ -100,12 +102,24 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		{
 			_stormTimer.Clear();
 		}
+
+		if( _tutorialInstance )
+		{
+			MM.ComponentUtils.DestroyPlaymodeSafe( _tutorialInstance?.gameObject );
+		}
 		
-		_satelliteManager?.ClearSatellites();
-		_planetManager?.GoToNextPlanet();
+		_planetManager?.ClearActivePlanet();
+		
+		EventBus.Invoke( EventBus.EEventType.PostClearActivePlanet );
 	}
 
 #region Runtime Debug Inspector Inputs
+	
+	[Button( "Draw from next progress value" )]
+	private void Inspector_DrawNextSet()
+	{
+		_satelliteDeck?.TryDrawCardsFromProgress( 2.0f );
+	}
 
 	[Button( "Draw 1" )]
 	private void Inspector_DrawOne()
@@ -161,6 +175,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	private void OnGlobalEvent_UIGoToNextPlanet( EventBus.EventContext context, object obj = null )
 	{
 		ClearActivePlanet();
+		_planetManager?.GoToNextPlanet();
 		TryCreatePlanet(); // Try to create immediately
 	}
 	
@@ -178,13 +193,23 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	{
 		if( obj is int num )
 		{
-			_satelliteDeck?.DrawSatellites( num );
+			_satelliteDeck?.DrawSatellites( num ); // Skip the progress try draw so we can safely resume after the tutorial
 		}
 	}
 
 	private void OnGlobalEvent_TUTStartFirstStormWarning( EventBus.EventContext context, object obj = null )
 	{
 		_stormTimer?.ChangeState( StormTimer.EStormState.Warning );
+	}
+	
+	private void OnGlobalEvent_OnChangedPlanetProgress( EventBus.EventContext context, object obj = null )
+	{
+		// TODO CHECK WIN CONDITION HERE!!!!!
+		
+		if( obj is float newProgress )
+		{
+			_satelliteDeck?.TryDrawCardsFromProgress( newProgress );
+		}
 	}
 
 #endregion
@@ -200,6 +225,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StartListening( EventBus.EEventType.UI_UnpauseTime, OnGlobalEvent_UIUnpauseTime );
 		EventBus.StartListening( EventBus.EEventType.TUT_DrawCards, OnGlobalEvent_TUTDrawCards );
 		EventBus.StartListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
+		EventBus.StartListening( EventBus.EEventType.OnChanged_PlanetProgress, OnGlobalEvent_OnChangedPlanetProgress );
 	}
 
 	void OnDisable()
@@ -211,6 +237,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StopListening( EventBus.EEventType.UI_UnpauseTime, OnGlobalEvent_UIUnpauseTime );
 		EventBus.StopListening( EventBus.EEventType.TUT_DrawCards, OnGlobalEvent_TUTDrawCards );
 		EventBus.StopListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
+		EventBus.StopListening( EventBus.EEventType.OnChanged_PlanetProgress, OnGlobalEvent_OnChangedPlanetProgress );
 	}
 
 	void Update()

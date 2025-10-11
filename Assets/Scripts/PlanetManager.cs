@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 {
-	[SerializeField] private SO_PlanetsConfig _planetsData;
 	[SerializeField] private Object _planetPrefab;
 
+	[SerializeField] private SO_PlanetsConfig _planetsData;
+	[SerializeField] private SO_PlanetConfig _activePlanetData;
 	[SerializeField] private int _activePlanetIdx = -1;
 	[SerializeField] private Planet _activePlanet;
 
@@ -15,7 +16,7 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 	[Button( "Create Planet" )]
 	private void Editor_CreatePlanet()
 	{
-		TryCreatePlanet( _activePlanetIdx );
+		TryCreatePlanet();
 	}
 
 	[Button( "Clear Active Planet" )]
@@ -27,44 +28,63 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 	[Button( "Next Planet" )]
 	private void Editor_NextPlanet()
 	{
-		GoToNextPlanet( true );
+		GoToNextPlanet();
 	}
 
-	public void GoToNextPlanet( bool bWrap = false )
+	public void GoToNextPlanet()
 	{
-		GoToPlanetIdx( _activePlanetIdx + 1, bWrap );
+		GoToPlanetIdx( _activePlanetIdx + 1 );
 	}
 
-	public void GoToPlanetIdx( int planetIdx, bool bWrap = false )
+	public void GoToPlanetIdx( int planetIdx )
 	{
 		if( _planetsData )
 		{
-			if( bWrap )
-			{
-				planetIdx %= _planetsData._planetConfigs.Count;
-			}
-
+			_activePlanetData = GetPlanetConfigAtIdx( planetIdx );
 			_activePlanetIdx = planetIdx;
 		}
 	}
 
+	public SO_PlanetConfig GetPlanetConfigAtIdx( int planetIdx )
+	{
+		if( _planetsData )
+		{
+			if( _planetsData._bActivateTutorial && _planetsData._tutorialPlanetConfig != null )
+			{
+				if( planetIdx <= 0 )
+				{
+					return _planetsData._tutorialPlanetConfig;
+				}
+				else
+				{
+					// We used tutorial planet as 0, so idx=1 should translate to the normal list idx=0, etc.
+					planetIdx--;
+				}
+			}
+			
+			planetIdx = Mathf.Min( planetIdx, _planetsData._planetConfigs.Count );
+			return _planetsData._planetConfigs[ planetIdx ];
+		}
+
+		return null;
+	}
+
 	public Planet TryCreatePlanet()
 	{
-		return TryCreatePlanet( _activePlanetIdx );
-	}
-	
-	public Planet TryCreatePlanet( int planetIdx )
-	{
-		_activePlanetIdx = planetIdx;
 		ClearActivePlanet();
 
-		if( _planetsData && planetIdx >= 0 && planetIdx < _planetsData._planetConfigs.Count )
+		if( _activePlanetData == null )
+		{
+			_activePlanetData = GetPlanetConfigAtIdx( _activePlanetIdx );
+		}
+
+		if( _activePlanetData != null )
 		{
 			GameObject newPlanetObj = Instantiate( _planetPrefab, transform ) as GameObject;
 			Planet newPlanet = newPlanetObj?.GetComponent<Planet>();
 			if( newPlanet )
 			{
-				newPlanet.InitialisePlanet( _planetsData._planetConfigs[planetIdx] );
+				newPlanet.InitialisePlanet( _activePlanetData );
 				newPlanet.ChangeSensorType( SO_PlanetConfig.ESensorType.INVALID );
 				_activePlanet = newPlanet;
 			}

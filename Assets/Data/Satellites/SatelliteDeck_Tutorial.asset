@@ -32,3 +32,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: eac7d65179f20c746bf4e5e369e3746a, type: 2}
   - {fileID: 11400000, guid: b5f6dd2eb1267d042b7793cb897b9aad, type: 2}
   - {fileID: 11400000, guid: b5f6dd2eb1267d042b7793cb897b9aad, type: 2}
+  _cardDrawAtProgress:
+  - 0.5
+  - 0.7
+  - 0.9
+  _cardDrawNumbers: 030000000200000003000000020000000300000003000000040000000300000004000000

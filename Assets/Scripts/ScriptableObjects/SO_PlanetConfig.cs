@@ -51,6 +51,7 @@ public class SO_PlanetConfig : ScriptableObject
 	[Button]
 	public void Validate()
 	{
+#if UNITY_EDITOR
 		Undo.RecordObject( this, "Validate" );
 		List<int> duplicateEntryIdxs = new List<int>();
 		for( int i = (int)ESensorType.INVALID; i <= (int)ESensorType.COUNT; ++i )
@@ -86,6 +87,7 @@ public class SO_PlanetConfig : ScriptableObject
 		{
 			Debug.Log( "Validation complete. No issues found." );
 		}
+#endif
 	}
 
 }

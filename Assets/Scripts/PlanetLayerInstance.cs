@@ -22,22 +22,14 @@ public class PlanetLayerInstance
 	// Interpreted data
 	[SerializeField, ReadOnly] private Color[] _vertexColoursOriginal;
 	[SerializeField, ReadOnly] private Color[] _vertexColours; // Cached to avoid allocations, but values are recalculated before use
+	[SerializeField, ReadOnly] private float[] _faceDiscoveryAges;
 	[SerializeField, ReadOnly] private float[] _faceDiscoveryValues;
 	private Color[] _debugColours;
 	[SerializeField, ReadOnly] public float _discoveryValue = 0.0f;
-	
-	// TODO: We can precalculate this or cache on init.
-	// At the moment it's useful to expose it to the inspector in this format
-	private float FadeAmountPerSecond
-	{
-		get
-		{
-			float fadeTime = DEBUG_Globals.ActiveProfile._discoveryFadeTime;
-			return fadeTime <= 0.0f || Mathf.Approximately( fadeTime, 0.0f ) ?
-				0.0f :
-				1.0f / fadeTime;
-		}
-	}
+
+	private float DiscoveryAgeFadeOutStart => DEBUG_Globals.ActiveProfile._discoveryFadeOutStartTime;
+	private float DiscoveryAgeFadeOutEnd => DEBUG_Globals.ActiveProfile._discoveryFadeOutEndTime;
+	private float AgeForZeroedDiscovery => DiscoveryAgeFadeOutEnd + 1.0f;
 	
 	// Testing - do we want angles instead? Change it depending on parameters? Cone from satellite pos ws?
 	[SerializeField] private float _satelliteDiscoveryRadius = 0.3f;
@@ -67,7 +59,14 @@ public class PlanetLayerInstance
 		_vertexColoursOriginal = _meshInstance.colors;
 		_vertexColours = new Color[_vertexColoursOriginal.Length];
 		
+		_faceDiscoveryAges = new float[_meshData._faceCentres.Length];
 		_faceDiscoveryValues = new float[_meshData._faceCentres.Length];
+		
+		float ageForZeroedDiscovery = AgeForZeroedDiscovery;
+		for( int i = 0; i < _meshData._faceCentres.Length; ++i )
+		{
+			_faceDiscoveryAges[i] = ageForZeroedDiscovery;
+		}
 
 		_bInitialised = true;
 		return true;
@@ -214,7 +213,7 @@ public class PlanetLayerInstance
 				if( (_meshData._faceCentres[faceIdx] - satellitePositions[satelliteIdx]).sqrMagnitude <
 				    satelliteDiscoveryRadiusSqr )
 				{
-					_faceDiscoveryValues[faceIdx] = 1.0f;
+					_faceDiscoveryAges[faceIdx] = 0.0f;
 				}
 			}
 		}
@@ -222,12 +221,13 @@ public class PlanetLayerInstance
 
 	public void FadeDiscovery( float deltaTime )
 	{
-		// TODO: Once we're not using the vertex colours for actual colour, we can apply a custom remap ramp in the shader
-		float fadeAmount = FadeAmountPerSecond * deltaTime;
+		float startFadeAtTime = DiscoveryAgeFadeOutStart;
+		float endFadeAtTime = DiscoveryAgeFadeOutEnd;
 		
-		for( int i = 0; i < _faceDiscoveryValues.Length; ++i )
+		for( int i = 0; i < _faceDiscoveryAges.Length; ++i )
 		{
-			_faceDiscoveryValues[i] = Mathf.Max( 0.0f, _faceDiscoveryValues[i] - fadeAmount );
+			_faceDiscoveryAges[i] += deltaTime;
+			_faceDiscoveryValues[i] = 1.0f - Mathf.InverseLerp( startFadeAtTime, endFadeAtTime, _faceDiscoveryAges[i] );
 		}
 	}
 

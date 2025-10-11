@@ -17,7 +17,8 @@ MonoBehaviour:
   _bRemovePlanetLayerFOW: 0
   _debugStormDamagePerSecond: 0.2
   _bDebugStormIsActive: 0
-  _discoveryFadeTime: 15
   _satelliteSafeModeTime: 3
   _satelliteRadius: 0.2
   _bInfiniteHealth: 0
+  _discoveryFadeOutStartTime: 16
+  _discoveryFadeOutEndTime: 21

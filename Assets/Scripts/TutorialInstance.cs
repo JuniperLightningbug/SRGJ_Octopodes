@@ -32,7 +32,6 @@ public class TutorialInstance : MonoBehaviour
 	// Runtime flags
 	public int _numSatellitesCreated = 0;
 	public bool _bFirstStormPassed = false;
-	public int _numCardDrawEventsPassed = 0;
 	public bool _bWasCameraOrbitTutorialCompleted = false;
 	public bool _bHasSatelliteEverBeenSelected = false;
 
@@ -68,6 +67,12 @@ public class TutorialInstance : MonoBehaviour
 		{
 			StopCoroutine( _tutorialCoroutine );
 		}
+		EventBus.Invoke( this, EventBus.EEventType.TUT_Popup_HideAll );
+	}
+
+	void OnDestroy()
+	{
+		Cleanup();
 	}
 
 	private void OnEnable()
@@ -206,7 +211,7 @@ public class TutorialInstance : MonoBehaviour
 		yield return new WaitUntil( () => _numSatellitesCreated > 3 );
 				
 		// Wait for at least 3 seconds
-		yield return new WaitForSeconds( 2.0f );
+		yield return new WaitForSeconds( 4.0f );
 		
 		// POPUP: Storm
 		EventBus.Invoke( this, EventBus.EEventType.TUT_Popup_HideAll );

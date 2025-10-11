@@ -39,6 +39,14 @@ public class UISatelliteCards : MonoBehaviour
 	{
 		DeactivateCurrentSelection();
 	}
+	
+	private void OnGlobalEvent_PostClearActivePlanet( EventBus.EventContext context, object obj = null )
+	{
+		for( int i = _activeCards.Count - 1; i >= 0; --i )
+		{
+			DeactivateCardAt( i );
+		}
+	}
 
 	private void OnCardClicked( Satellite2D satelliteClicked )
 	{
@@ -181,6 +189,8 @@ public class UISatelliteCards : MonoBehaviour
 	{
 		EventBus.StartListening( EventBus.EEventType.DrawSatelliteCard, OnGlobalEvent_DrawSatelliteCard );
 		EventBus.StartListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StartListening( EventBus.EEventType.PostClearActivePlanet, OnGlobalEvent_PostClearActivePlanet );
+		EventBus.StartListening( EventBus.EEventType.PostSpawnNewPlanet, OnGlobalEvent_PostClearActivePlanet ); // Same as clear
 		EventBus.StartListening( EventBus.EEventType.TUT_DisableDeckInteraction, OnGlobalEvent_DisableInteraction );
 		EventBus.StartListening( EventBus.EEventType.TUT_EnableDeckInteraction, OnGlobalEvent_EnableInteraction );
 	}
@@ -189,6 +199,8 @@ public class UISatelliteCards : MonoBehaviour
 	{
 		EventBus.StopListening( EventBus.EEventType.DrawSatelliteCard, OnGlobalEvent_DrawSatelliteCard );
 		EventBus.StopListening( EventBus.EEventType.LaunchedSatellite, OnGlobalEvent_LaunchedSatellite );
+		EventBus.StopListening( EventBus.EEventType.PostClearActivePlanet, OnGlobalEvent_PostClearActivePlanet );
+		EventBus.StopListening( EventBus.EEventType.PostSpawnNewPlanet, OnGlobalEvent_PostClearActivePlanet ); // Same as clear
 		EventBus.StopListening( EventBus.EEventType.TUT_DisableDeckInteraction, OnGlobalEvent_DisableInteraction );
 		EventBus.StopListening( EventBus.EEventType.TUT_EnableDeckInteraction, OnGlobalEvent_EnableInteraction );
 	}

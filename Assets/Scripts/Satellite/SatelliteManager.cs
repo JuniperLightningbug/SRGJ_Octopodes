@@ -80,12 +80,14 @@ public class SatelliteManager : MonoBehaviour
 	{
 		EventBus.StartListening( EventBus.EEventType.UI_QueueSatelliteCard, OnGlobalEvent_UIQueueSatelliteCard );
 		EventBus.StartListening( EventBus.EEventType.UI_DequeueSatelliteCard, OnGlobalEvent_UIDequeueSatelliteCard );
+		EventBus.StartListening( EventBus.EEventType.PostClearActivePlanet, OnGlobalEvent_PostClearActivePlanet );
 	}
 
 	void OnDisable()
 	{
 		EventBus.StopListening( EventBus.EEventType.UI_QueueSatelliteCard, OnGlobalEvent_UIQueueSatelliteCard );
 		EventBus.StopListening( EventBus.EEventType.UI_DequeueSatelliteCard, OnGlobalEvent_UIDequeueSatelliteCard );
+		EventBus.StopListening( EventBus.EEventType.PostClearActivePlanet, OnGlobalEvent_PostClearActivePlanet );
 	}
 
 #endregion
@@ -161,6 +163,11 @@ public class SatelliteManager : MonoBehaviour
 	private void OnGlobalEvent_UIDequeueSatelliteCard( EventBus.EventContext context, object obj = null )
 	{
 		DequeueSatellite();
+	}
+
+	private void OnGlobalEvent_PostClearActivePlanet( EventBus.EventContext context, object obj = null )
+	{
+		ClearSatellites();
 	}
 
 #endregion

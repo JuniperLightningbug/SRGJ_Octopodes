@@ -31,6 +31,9 @@ public class Planet : MonoBehaviour
 	[ShowNonSerializedField, NonSerialized]
 	public bool _bInitialised = false;
 
+	[ShowNonSerializedField, NonSerialized]
+	public float _overallDiscoveryProgress = 0.0f;
+	
 	[SerializeField, AllowNesting]
 	private List<PlanetLayerInstance> _planetLayerInstances = new List<PlanetLayerInstance>();
 	private Dictionary<SO_PlanetConfig.ESensorType, int> _planetLayerInstanceIdxMap =
@@ -222,12 +225,23 @@ public class Planet : MonoBehaviour
 		_planetLayerInstanceIdxMap.Clear();
 		for( int i = 0; i < _planetConfig._planetLayers.Count; ++i )
 		{
-			PlanetLayerInstance newLayer = TryMakeRuntimeLayerInstance( _planetConfig._planetLayers[i] );
-			if( newLayer != null &&
-			    _planetLayerInstanceIdxMap.TryAdd( _planetConfig._planetLayers[i]._sensorType, _planetLayerInstances.Count ))
+			if( _planetConfig._planetLayers[i]._bActive )
 			{
-				_planetLayerInstances.Add( newLayer );
-				newLayer.Initialise();
+				PlanetLayerInstance newLayer = TryMakeRuntimeLayerInstance( _planetConfig._planetLayers[i] );
+				if( newLayer != null &&
+				    _planetLayerInstanceIdxMap.TryAdd( _planetConfig._planetLayers[i]._sensorType,
+					    _planetLayerInstances.Count ) )
+				{
+					_planetLayerInstances.Add( newLayer );
+					newLayer.Initialise();
+
+					if( !_planetConfig._bActivateTutorial )
+					{
+						// The tutorial might have deactivated layer toggles - enable them here as soon as they're relevant
+						// Otherwise, let the tutorial instance handle the initialisations
+						EventBus.Invoke( EventBus.EEventType.TUT_ShowLayer, _planetConfig._planetLayers[i]._sensorType );
+					}
+				}
 			}
 		}
 		
@@ -344,6 +358,8 @@ public class Planet : MonoBehaviour
 
 	private void UpdateSatelliteDiscovery( float deltaTime )
 	{
+		float currentTotalDiscovery = 0.0f;
+		
 		if( _planetLayerInstances.Count > 0 && !Mathf.Approximately( deltaTime, 0.0f ) )
 		{
 			Dictionary<SO_PlanetConfig.ESensorType, float> discoveryValues =
@@ -351,10 +367,14 @@ public class Planet : MonoBehaviour
 			for( int i = 0; i < _planetLayerInstances.Count; ++i )
 			{
 				float layerDiscovery = _planetLayerInstances[i].UpdateDiscovery( deltaTime );
+				currentTotalDiscovery += layerDiscovery;
 				discoveryValues.Add( _planetConfig._planetLayers[i]._sensorType, layerDiscovery );
 			}
 
+			_overallDiscoveryProgress = currentTotalDiscovery / discoveryValues.Count;
+			
 			EventBus.Invoke( this, EventBus.EEventType.OnChanged_LayerDiscovery, discoveryValues );
+			EventBus.Invoke( this, EventBus.EEventType.OnChanged_PlanetProgress, _overallDiscoveryProgress );
 		}
 	}
 
