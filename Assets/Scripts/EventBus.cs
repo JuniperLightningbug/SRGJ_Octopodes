@@ -44,6 +44,7 @@ public static class EventBus
 		// Game Manager
 		PostSpawnNewPlanet,
 		PostClearActivePlanet,
+		PlanetCompleted, // SO_PlanetConfig planetConfig
 		
 		// Gameplay Events
 		LaunchedSatellite, // (SO_Satellite satelliteData, Satellite3D satellite) newSatellite

@@ -34,6 +34,8 @@ public class SO_PlanetConfig : ScriptableObject
 	public List<PlanetLayerTuple> _planetLayers = new List<PlanetLayerTuple>();
 	public Mesh _planetMesh;
 	public Material _planetMaterial;
+
+	public Object _summaryUIPrefab;
 	
 	[Expandable]
 	public SO_SatelliteDeck _satelliteDeck;

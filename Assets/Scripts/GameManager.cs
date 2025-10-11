@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using MM;
 using NaughtyAttributes;
 using Shapes;
@@ -23,6 +24,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	[SerializeField] private Object _tutorialPrefab;
 
 	[SerializeField] private float _progressWinThreshold = 0.8f;
+	[SerializeField] private bool _bPlanetIsCompleted = false;
 
 	// Static accessor
 	public static SO_PlanetConfig.ESensorType TryGetCurrentSensorViewType()
@@ -45,6 +47,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 		_stormTimer = new StormTimer();
 		_stormTimer.Initialise();
+
+		_bPlanetIsCompleted = false;
 	}
 
 	private void OnDrawGizmos()
@@ -53,6 +57,17 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		{
 			_stormTimer.DrawGizmos();
 		}
+	}
+
+	public void DrawNextCards()
+	{
+		_satelliteDeck?.DrawSatellites();
+	}
+
+	public IEnumerator DrawCardsDelayed( float delay )
+	{
+		yield return new WaitForSeconds( delay );
+		DrawNextCards();
 	}
 
 	private void TryCreatePlanet()
@@ -78,6 +93,10 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 				_satelliteDeck = newPlanet.PlanetConfig._satelliteDeck;
 				_satelliteDeck?.Shuffle();
+				if( !BTutorialIsActive )
+				{
+					StartCoroutine( DrawCardsDelayed( 3.0f ) );
+				}
 
 				if( _stormTimer != null )
 				{
@@ -109,6 +128,8 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		}
 		
 		_planetManager?.ClearActivePlanet();
+
+		_bPlanetIsCompleted = false;
 		
 		EventBus.Invoke( EventBus.EEventType.PostClearActivePlanet );
 	}
@@ -204,10 +225,14 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	
 	private void OnGlobalEvent_OnChangedPlanetProgress( EventBus.EventContext context, object obj = null )
 	{
-		// TODO CHECK WIN CONDITION HERE!!!!!
-		
-		if( obj is float newProgress )
+		if( !_bPlanetIsCompleted && obj is float newProgress )
 		{
+			if( _planetManager?.ActivePlanet?.PlanetConfig != null && newProgress > _progressWinThreshold )
+			{
+				_bPlanetIsCompleted = true;
+				EventBus.Invoke( this, EventBus.EEventType.PlanetCompleted,
+					_planetManager.ActivePlanet.PlanetConfig );
+			}
 			_satelliteDeck?.TryDrawCardsFromProgress( newProgress );
 		}
 	}

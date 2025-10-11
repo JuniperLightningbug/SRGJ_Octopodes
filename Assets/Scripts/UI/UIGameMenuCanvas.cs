@@ -10,6 +10,7 @@ public class UIGameMenuCanvas : MonoBehaviour
 	[SerializeField] private UIStormWarning _stormWarning;
 	[SerializeField] private List<UITutorialPopup> _tutorialPopups;
 	[SerializeField] private GameObject _pauseMenu;
+	[SerializeField] private UIPlanetEndSummary _planetEndSummary;
 	
 	void Update()
 	{
@@ -41,6 +42,11 @@ public class UIGameMenuCanvas : MonoBehaviour
 		{
 			_stormWarning.Initialise();
 			_stormWarning.gameObject.SetActive( false );
+		}
+		if( _planetEndSummary )
+		{
+			_planetEndSummary.Initialise();
+			_planetEndSummary.gameObject.SetActive( true );
 		}
 
 		if( _tutorialPopups != null )

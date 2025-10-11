@@ -41,6 +41,7 @@ MonoBehaviour:
     _bHasTexture: 1
   _planetMesh: {fileID: -4571089354599509575, guid: 057800d65d54a124abf0601274a1b402, type: 3}
   _planetMaterial: {fileID: 2100000, guid: 6ee7cb6267047fc499912be2df87f012, type: 2}
+  _summaryUIPrefab: {fileID: 3816615666432866166, guid: 9def13512d28bc745959ceb6016cb85d, type: 3}
   _satelliteDeck: {fileID: 11400000, guid: d9b06cdef4190084ba6d4dfdbfc96ff5, type: 2}
   _stormTimings: {fileID: 11400000, guid: 7ca7419bb8da20f4ea83d16a28385a45, type: 2}
   _stormZoneRadius: 0.7

@@ -141,15 +141,16 @@ public class UISatelliteCards : MonoBehaviour
 		if( index >= 0 && index < _activeCards.Count )
 		{
 			Satellite2D toDeactivate = _activeCards[index];
-			_inactiveCards.Add( toDeactivate );
-			_activeCards.RemoveAt( index );
-			
-			if( _selectedCard && _selectedCard == toDeactivate )
+
+			if( _selectedCard && toDeactivate && _selectedCard == toDeactivate )
 			{
-				_selectedCard.SetSelected( false );
-				_selectedCard.gameObject.SetActive( false );
 				_selectedCard = null;
 			}
+			
+			_inactiveCards.Add( toDeactivate );
+			_activeCards.RemoveAt( index );
+			toDeactivate.SetSelected( false );
+			toDeactivate.gameObject.SetActive( false );
 			return true;
 		}
 
