@@ -862,6 +862,9 @@ MonoBehaviour:
   _orbitTime: 25
   _satelliteData: {fileID: 0}
   _bIsAlive: 1
+  _bIsInSafeMode: 0
+  _bLayerIsSelected: 0
+  _bLayerIsHovered: 0
   _safeModeProgress: 0
   _currentHealth: 1
 --- !u!1 &8279475947886184316

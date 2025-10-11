@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0574f94b642fe204db6e77dbd9d2ac8b, type: 3}
   m_Name: Satellite_DefaultMagneto
   m_EditorClassIdentifier: 
-  _name: DefaultMagneto
+  _name: Magnetometer
   _description: 
   _mesh: {fileID: -5709714872998970277, guid: c79b95f665692a34889c1cce93697fa4, type: 3}
   _outlineColour: {r: 1, g: 0.81568635, b: 0.27058825, a: 1}

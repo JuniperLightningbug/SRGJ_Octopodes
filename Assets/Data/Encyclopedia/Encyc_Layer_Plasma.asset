@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8efcf7661949cfc4bb4e5b77cf0e941c, type: 3}
-  m_Name: EncyclopediaEntryTest
+  m_Name: Encyc_Layer_Plasma
   m_EditorClassIdentifier: 
-  _title: Test Entry
-  _content: test1212312
+  _title: 'Langmuir Probes: Plasma Density and Temperature'
+  _content: 'Langmuir probes measure the plasma density and temperature in the planet''s
+    upper atmosphere. '

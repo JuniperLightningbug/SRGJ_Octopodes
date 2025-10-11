@@ -9,7 +9,10 @@ public static class EventBus
 		INVALID,
 		
 		// UI (Usually dispatches through GameManager as source-of-truth)
-		UI_ChangeActiveSensorType, // SO_PlanetConfig.ESensorType toSensorType
+		UI_ActivateSensorView, // SO_PlanetConfig.ESensorType toSensorType
+		UI_DeactivateSensorView, // SO_PlanetConfig.ESensorType fromSensorType
+		UI_HoverSensorView, // SO_PlanetConfig.ESensorType fromSensorType
+		UI_StopHoverSensorView, // SO_PlanetConfig.ESensorType fromSensorType
 		UI_ClearActivePlanet,
 		UI_CreatePlanet,
 		UI_NextPlanet,

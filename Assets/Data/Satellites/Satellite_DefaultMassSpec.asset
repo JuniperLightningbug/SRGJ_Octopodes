@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0574f94b642fe204db6e77dbd9d2ac8b, type: 3}
   m_Name: Satellite_DefaultMassSpec
   m_EditorClassIdentifier: 
-  _name: DefaultMassSpec
+  _name: Mass Spectrometer
   _description: 
   _mesh: {fileID: -4766377956934333391, guid: c701f9c0f298bad48a07b524c426875b, type: 3}
   _outlineColour: {r: 0.48627454, g: 0.26666668, b: 1, a: 1}

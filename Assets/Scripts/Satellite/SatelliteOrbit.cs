@@ -57,8 +57,11 @@ public class SatelliteOrbit : MonoBehaviour
 	[SerializeField]
 	private bool _bIsAlive = true;
 	public bool BIsAlive => _bIsAlive;
-	private bool _bIsInSafeMode = false;
+	[SerializeField] private bool _bIsInSafeMode = false;
 	public bool BIsInSafeMode => _bIsInSafeMode;
+	[SerializeField] private bool _bLayerIsSelected = false;
+	[SerializeField] private bool _bLayerIsHovered = false;
+	
 	[SerializeField, ReadOnly, Range( 0.0f, 1.0f )]
 	private float _safeModeProgress = 0.0f;
 	[SerializeField, Range(0.0f,1.0f)]
@@ -114,6 +117,7 @@ public class SatelliteOrbit : MonoBehaviour
 		if( _satelliteComponent )
 		{
 			_satelliteComponent.Initialise( this, _satelliteData );
+			UpdateSatelliteComponentOutline();
 		}
 
 		Vector3 startDirection = transform.InverseTransformPoint( startReferencePosition ).normalized;
@@ -121,35 +125,6 @@ public class SatelliteOrbit : MonoBehaviour
 		_directionReference1 = startDirection;
 		
 		UpdateOrbitRotationToReferencePositions();
-	}
-
-	void Update()
-	{
-		// Rotate satellites
-		if( _bOrbitIsActive && !Mathf.Approximately(_orbitTime, 0.0f) )
-		{
-			float frameRotationDegrees = Time.deltaTime * 360.0f / _orbitTime;
-			_satelliteTransformRoot.Rotate( new Vector3( 0.0f, -frameRotationDegrees, 0.0f ), Space.Self );
-		}
-		
-		if( _bIsAlive )
-		{
-			// Update safe mode
-			if( _bIsInSafeMode )
-			{
-				_safeModeProgress += Time.deltaTime / DEBUG_Globals.ActiveProfile._satelliteSafeModeTime;
-				if( _safeModeProgress >= 1.0f )
-				{
-					ToggleSafeMode( false );
-				}
-			}
-			
-			// Handle incoming damage
-			if( DEBUG_Globals.ActiveProfile._bDebugStormIsActive )
-			{
-				ApplyDamage( DEBUG_Globals.ActiveProfile._debugStormDamagePerSecond * Time.deltaTime );
-			}
-		}
 	}
 
 	public void UpdateSecondReferencePosition( Vector3 pos1 )
@@ -228,6 +203,9 @@ public class SatelliteOrbit : MonoBehaviour
 				_satelliteLaunchPositionIndicator.gameObject.SetActive( false );
 			}
 
+			_bLayerIsSelected = true; // This is always true at this point
+			UpdateSatelliteComponentOutline();
+
 			return _satelliteTransform;
 		}
 
@@ -274,6 +252,7 @@ public class SatelliteOrbit : MonoBehaviour
 			_currentHealth = 0.0f;
 			_bIsAlive = false;
 			_satelliteComponent?.Kill();
+			UpdateSatelliteComponentOutline();
 			StopTrackingSatellite();
 		}
 	}
@@ -317,6 +296,7 @@ public class SatelliteOrbit : MonoBehaviour
 		if( _satelliteComponent )
 		{
 			_satelliteComponent.ToggleSafeMode( DEBUG_Globals.ActiveProfile._satelliteSafeModeTime, bActive );
+			UpdateSatelliteComponentOutline();
 		}
 
 		if( bActive )
@@ -328,7 +308,105 @@ public class SatelliteOrbit : MonoBehaviour
 			StartTrackingSatellite();
 		}
 	}
+
+	public void UpdateSatelliteComponentOutline()
+	{
+		_satelliteComponent?.UpdateOutline(
+			_bOrbitIsActive,
+			_bIsAlive,
+			_bLayerIsSelected,
+			_bLayerIsHovered,
+			_bIsInSafeMode );
+	}
 	
+#endregion
+
+#region Callbacks
+
+	private void OnGlobalEvent_UIActivateSensorView( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType inType && _satelliteData )
+		{
+			_bLayerIsSelected = _satelliteData._sensorType == inType;
+			UpdateSatelliteComponentOutline();
+		}
+	}
+	
+	private void OnGlobalEvent_UIDeactivateSensorView( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType inType && _satelliteData && _satelliteData._sensorType == inType )
+		{
+			_bLayerIsSelected = false;
+			UpdateSatelliteComponentOutline();
+		}
+	}
+	
+	private void OnGlobalEvent_UIHoverSensorView( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType inType && _satelliteData )
+		{
+			_bLayerIsHovered = _satelliteData._sensorType == inType;
+			UpdateSatelliteComponentOutline();
+		}
+	}
+	
+	private void OnGlobalEvent_UIStopHoverSensorView( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType inType && _satelliteData && _satelliteData._sensorType == inType )
+		{
+			_bLayerIsHovered = false;
+			UpdateSatelliteComponentOutline();
+		}
+	}
+
+#endregion
+
+#region MoneBehaviour
+	
+	void Update()
+	{
+		// Rotate satellites
+		if( _bOrbitIsActive && !Mathf.Approximately(_orbitTime, 0.0f) )
+		{
+			float frameRotationDegrees = Time.deltaTime * 360.0f / _orbitTime;
+			_satelliteTransformRoot.Rotate( new Vector3( 0.0f, -frameRotationDegrees, 0.0f ), Space.Self );
+		}
+		
+		if( _bIsAlive )
+		{
+			// Update safe mode
+			if( _bIsInSafeMode )
+			{
+				_safeModeProgress += Time.deltaTime / DEBUG_Globals.ActiveProfile._satelliteSafeModeTime;
+				if( _safeModeProgress >= 1.0f )
+				{
+					ToggleSafeMode( false );
+				}
+			}
+			
+			// Handle incoming damage
+			if( DEBUG_Globals.ActiveProfile._bDebugStormIsActive )
+			{
+				ApplyDamage( DEBUG_Globals.ActiveProfile._debugStormDamagePerSecond * Time.deltaTime );
+			}
+		}
+	}
+
+	void OnEnable()
+	{
+		EventBus.StartListening( EventBus.EEventType.UI_ActivateSensorView, OnGlobalEvent_UIActivateSensorView );
+		EventBus.StartListening( EventBus.EEventType.UI_DeactivateSensorView, OnGlobalEvent_UIDeactivateSensorView );
+		EventBus.StartListening( EventBus.EEventType.UI_HoverSensorView, OnGlobalEvent_UIHoverSensorView );
+		EventBus.StartListening( EventBus.EEventType.UI_StopHoverSensorView, OnGlobalEvent_UIStopHoverSensorView );
+	}
+	void OnDisable()
+	{
+		EventBus.StopListening( EventBus.EEventType.UI_ActivateSensorView, OnGlobalEvent_UIActivateSensorView );
+		EventBus.StopListening( EventBus.EEventType.UI_DeactivateSensorView, OnGlobalEvent_UIDeactivateSensorView );
+		EventBus.StopListening( EventBus.EEventType.UI_HoverSensorView, OnGlobalEvent_UIHoverSensorView );
+		EventBus.StopListening( EventBus.EEventType.UI_StopHoverSensorView, OnGlobalEvent_UIStopHoverSensorView );
+	}
+
 #endregion
 	
 }

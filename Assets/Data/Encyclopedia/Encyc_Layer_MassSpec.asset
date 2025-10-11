@@ -10,7 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8efcf7661949cfc4bb4e5b77cf0e941c, type: 3}
-  m_Name: EncyclopediaEntryTest
+  m_Name: Encyc_Layer_MassSpec
   m_EditorClassIdentifier: 
-  _title: Test Entry
-  _content: test1212312
+  _title: 'Mass Spectrometer: Atmospheric Composition'
+  _content: A mass spectrometer takes atmospheric particles, ionizes them, then measures
+    the mass to charge ratio of these particles. Since different particles have different
+    masses, this tells us about the different particles in the atmosphere.

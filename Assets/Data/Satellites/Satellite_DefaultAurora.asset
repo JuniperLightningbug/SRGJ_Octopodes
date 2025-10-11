@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0574f94b642fe204db6e77dbd9d2ac8b, type: 3}
   m_Name: Satellite_DefaultAurora
   m_EditorClassIdentifier: 
-  _name: DefaultAurora
+  _name: UV
   _description: 
   _mesh: {fileID: 1167426987278568881, guid: 73ad85486d2540449bf10ba7baa20a34, type: 3}
   _outlineColour: {r: 0.8352942, g: 0.30588236, b: 0.23529413, a: 1}

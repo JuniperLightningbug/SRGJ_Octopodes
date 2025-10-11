@@ -130,6 +130,10 @@ MonoBehaviour:
   _damageShakeRandomness: 50
   _damageShakeFadeOutTime: 0.5
   _satelliteData: {fileID: 0}
+  _outlineTweenTime: 0.2
+  _outlineColorDark: {r: 0, g: 0, b: 0, a: 1}
+  _outlineColorNone: {r: 0, g: 0, b: 0, a: 0}
+  _outlineColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!135 &3938560465895190241
 SphereCollider:
   m_ObjectHideFlags: 0

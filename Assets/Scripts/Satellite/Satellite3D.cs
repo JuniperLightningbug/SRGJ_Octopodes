@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using NaughtyAttributes;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Satellite3D : MonoBehaviour
 {
@@ -21,7 +23,6 @@ public class Satellite3D : MonoBehaviour
 
 	public GameObject _highlightObject;
 
-	private Material _outlineMaterial;
 	private Material _meshMaterial;
 	private Color _originalMeshColour;
 
@@ -35,7 +36,6 @@ public class Satellite3D : MonoBehaviour
 
 	public float _damageShakePeriod = 5.0f;
 
-	//public float _damageShakeStrength_Position = 0.02f;
 	public float _damageShakeStrength_Rotation = 16.0f;
 	public int _damageShakeVibrato = 10;
 	public float _damageShakeRandomness = 50.0f;
@@ -52,7 +52,74 @@ public class Satellite3D : MonoBehaviour
 
 	private Sequence _deathSequence;
 
+#region Outline
+
+	[Header("Outline Config")]
+	[SerializeField] private float _outlineTweenTime = 0.2f;
+
+	[SerializeField] private Color _outlineColorDark = Color.black;
+	[SerializeField] private Color _outlineColorNone = new Color( 0, 0, 0, 0 );
+	[SerializeField, Tooltip( "Assigned from object builder - debugging only" )]
+	private Color _outlineColor = Color.white;
+	private Material _outlineMaterial;
+
+	private enum EOutlineState
+	{
+		None,
+		Dark,
+		Colour,
+	}
+	private EOutlineState _currentOutlineState;
 	private Tween _outlineTween;
+
+	public void UpdateOutline(
+		bool bOrbitIsActive,
+		bool bIsAlive,
+		bool bIsSensorTypeSelected,
+		bool bIsSensorTypeHovered,
+		bool bIsSafeModeOn )
+	{
+		EOutlineState newOutlineState = EOutlineState.None;
+		if( !bIsAlive || !bOrbitIsActive )
+		{
+			newOutlineState = EOutlineState.None;
+		}
+		else if( bIsSafeModeOn )
+		{
+			newOutlineState = EOutlineState.Dark;
+		}
+		else if( bIsSensorTypeSelected || bIsSensorTypeHovered )
+		{
+			newOutlineState = EOutlineState.Colour;
+		}
+		// Else EOutlineState.None
+		
+		if( _currentOutlineState == newOutlineState )
+		{
+			return;
+		}
+		_currentOutlineState = newOutlineState;
+
+		Color targetColour = Color.white;
+		_outlineTween?.Kill();
+		switch( _currentOutlineState )
+		{
+			case EOutlineState.Dark:
+				targetColour = _outlineColorDark;
+				break;
+			case EOutlineState.Colour:
+				targetColour = _outlineColor;
+				break;
+			case EOutlineState.None:
+				targetColour = _outlineColorNone;
+				break;
+		}
+		
+		_outlineTween = _outlineMaterial.DOColor( targetColour, _outlineTweenTime ).SetEase( Ease.OutSine );
+	}
+
+#endregion
+
 
 	private Tween _takeDamageTweenRotation;
 	private Sequence _takeDamageFadeSequence;
@@ -79,7 +146,6 @@ public class Satellite3D : MonoBehaviour
 			_meshMaterial = _meshRenderer.materials[0];
 			_outlineMaterial = _meshRenderer.materials[1];
 			_originalMeshColour = _meshMaterial.GetColor( _propertyIDBaseColour );
-			_outlineMaterial?.SetColor( _propertyIDBaseColour, _satelliteData._outlineColour );
 			_meshRenderer.SetMaterials( new List<Material>() { _meshMaterial, _outlineMaterial } );
 		}
 
@@ -97,6 +163,11 @@ public class Satellite3D : MonoBehaviour
 		_originalMeshRootPosition = _satelliteMeshRoot.localPosition;
 		_originalMeshRootRotation = _satelliteMeshRoot.localRotation;
 		_originalMeshRootScale = _satelliteMeshRoot.localScale;
+
+		if( _satelliteData )
+		{
+			_outlineColor = _satelliteData._outlineColour;
+		}
 	}
 
 	public void Highlight( bool bOn )
@@ -107,43 +178,8 @@ public class Satellite3D : MonoBehaviour
 		}
 	}
 
-	public void Outline( bool bOn )
-	{
-		if( bOn && GameManager.TryGetCurrentSensorViewType() != _satelliteData._sensorType )
-		{
-			// Don't make the outline if the current view layer doesn't match the satellite type
-			return;
-		}
-
-		_outlineTween?.Kill();
-		_outlineTween = _outlineMaterial.DOFade( bOn ? _outlineAlpha : 0.0f, 0.2f ).SetEase( Ease.InOutSine );
-	}
-
 	public void ToggleSafeMode( float safeModeTime, bool bOn )
 	{
-		// _safeModeSequence?.Kill( complete: false );
-		// _takeDamageTweenRotation?.Kill( complete: false );
-		// _takeDamageFadeSequence?.Kill( complete: false );
-		//
-		// _safeModeSequence = DOTween.Sequence();
-		// _safeModeSequence.AppendInterval( safeModeTime - 0.1f ); // Subtract a little to give some visual buffer zone
-		//
-		// if( _collider )
-		// {
-		// 	// Disable mouse click while active
-		// 	_collider.enabled = false;
-		// 	_safeModeSequence.AppendCallback( () => { _collider.enabled = true; } );
-		// }
-		//
-		// if( _meshMaterial )
-		// {
-		// 	_meshMaterial.SetColor( _propertyIDBaseColour, _safeModeMeshColour );
-		// 	_safeModeSequence.AppendCallback( () => { _meshMaterial.SetColor( "_BaseColor", _originalMeshColour ); } );
-		// }
-		//
-		// Outline( false );
-		// _safeModeSequence.AppendCallback( () => Outline( true ) );
-
 		if( bOn )
 		{
 			DeactivateStormDamage( false );
@@ -159,8 +195,6 @@ public class Satellite3D : MonoBehaviour
 		{
 			_meshMaterial.SetColor( _propertyIDBaseColour, bOn ? _safeModeMeshColour : _originalMeshColour );
 		}
-
-		Outline( !bOn );
 	}
 
 	[Button( "Debug: Activate Damage Effects" )]
@@ -248,7 +282,6 @@ public class Satellite3D : MonoBehaviour
 
 		DeactivateStormDamage(); // Stop wobbling (with fade)
 
-		Outline( false );
 		if( _collider )
 		{
 			// Disable clickable
@@ -261,7 +294,6 @@ public class Satellite3D : MonoBehaviour
 			.SetEase( Ease.OutQuad ) );
 
 		_meshMaterial.SetColor( _propertyIDBaseColour, _deadMeshColour );
-
 	}
 
 	void OnDestroy()

@@ -63,9 +63,16 @@ public class UISensorRadioDispatcher : MonoBehaviour
 
 	private void OnToggleValueChanged( UISensorToggle inToggle )
 	{
-		if( inToggle?._toggle && inToggle._toggle.isOn )
+		if( inToggle?._toggle )
 		{
-			EventBus.Invoke( this, EventBus.EEventType.UI_ChangeActiveSensorType, inToggle._sensorType );
+			if( inToggle._toggle.isOn )
+			{
+				EventBus.Invoke( this, EventBus.EEventType.UI_ActivateSensorView, inToggle._sensorType );
+			}
+			else
+			{
+				EventBus.Invoke( this, EventBus.EEventType.UI_DeactivateSensorView, inToggle._sensorType );
+			}
 		}
 	}
 

@@ -10,7 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8efcf7661949cfc4bb4e5b77cf0e941c, type: 3}
-  m_Name: EncyclopediaEntryTest
+  m_Name: Encyc_Layer_Magnetometer
   m_EditorClassIdentifier: 
-  _title: Test Entry
-  _content: test1212312
+  _title: 'Magnetometer: Magnetic Fields'
+  _content: This will measures the magnetic field of a planet. Magnetometers can
+    tell us the strength and direction of the magnetic field, where the magnetic
+    poles are, and how solar and geomagnetic storms change the magnetic field structure.

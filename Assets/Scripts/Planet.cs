@@ -416,11 +416,20 @@ public class Planet : MonoBehaviour
 
 #region Callbacks
 
-	private void OnGlobalEvent_UIChangeActiveSensorType( EventBus.EventContext context, object obj = null )
+	private void OnGlobalEvent_UIActivateSensorView( EventBus.EventContext context, object obj = null )
 	{
 		if( obj is SO_PlanetConfig.ESensorType inType )
 		{
 			_currentSensorType = inType;
+			OnUpdateSensorType();
+		}
+	}
+
+	private void OnGlobalEvent_UIDeactivateSensorView( EventBus.EventContext context, object obj = null )
+	{
+		if( obj is SO_PlanetConfig.ESensorType inType && _currentSensorType == inType )
+		{
+			_currentSensorType = SO_PlanetConfig.ESensorType.INVALID;
 			OnUpdateSensorType();
 		}
 	}
@@ -452,14 +461,16 @@ public class Planet : MonoBehaviour
 
 	void OnEnable()
 	{
-		EventBus.StartListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
+		EventBus.StartListening( EventBus.EEventType.UI_ActivateSensorView, OnGlobalEvent_UIActivateSensorView );
+		EventBus.StartListening( EventBus.EEventType.UI_DeactivateSensorView, OnGlobalEvent_UIDeactivateSensorView );
 		EventBus.StartListening( EventBus.EEventType.StartTrackingSatellite, OnGlobalEvent_StartTrackingSatellite );
 		EventBus.StartListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}
 
 	void OnDisable()
 	{
-		EventBus.StopListening( EventBus.EEventType.UI_ChangeActiveSensorType, OnGlobalEvent_UIChangeActiveSensorType );
+		EventBus.StopListening( EventBus.EEventType.UI_ActivateSensorView, OnGlobalEvent_UIActivateSensorView );
+		EventBus.StopListening( EventBus.EEventType.UI_DeactivateSensorView, OnGlobalEvent_UIDeactivateSensorView );
 		EventBus.StopListening( EventBus.EEventType.StartTrackingSatellite, OnGlobalEvent_StartTrackingSatellite );
 		EventBus.StopListening( EventBus.EEventType.StopTrackingSatellite, OnGlobalEvent_StopTrackingSatellite );
 	}

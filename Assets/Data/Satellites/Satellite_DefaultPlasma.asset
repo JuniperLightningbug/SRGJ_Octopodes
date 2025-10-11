@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0574f94b642fe204db6e77dbd9d2ac8b, type: 3}
   m_Name: Satellite_DefaultPlasma
   m_EditorClassIdentifier: 
-  _name: DefaultPlasma
+  _name: Langmuir Probe
   _description: 
   _mesh: {fileID: 8192065565709256411, guid: dc5f76404eaa1cb4394c11d8d6c40f9f, type: 3}
   _outlineColour: {r: 0.94117653, g: 0.36862746, b: 1, a: 1}

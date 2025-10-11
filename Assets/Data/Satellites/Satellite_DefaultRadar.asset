@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0574f94b642fe204db6e77dbd9d2ac8b, type: 3}
   m_Name: Satellite_DefaultRadar
   m_EditorClassIdentifier: 
-  _name: DefaultRadar
+  _name: Aperture Radar
   _description: 
   _mesh: {fileID: -6980050323492176403, guid: e63d0a924696654478eb4bd6ecfb0861, type: 3}
   _outlineColour: {r: 0.18823531, g: 0.654902, b: 0.54509807, a: 1}
