@@ -9,6 +9,7 @@ public class UIGameMenuCanvas : MonoBehaviour
 	[SerializeField] private UIEncyclopedia _encyclopedia;
 	[SerializeField] private UIStormWarning _stormWarning;
 	[SerializeField] private List<UITutorialPopup> _tutorialPopups;
+	[SerializeField] private GameObject _pauseMenu;
 	
 	void Update()
 	{
@@ -16,6 +17,11 @@ public class UIGameMenuCanvas : MonoBehaviour
 		{
 			_bPanelActive_Debug = !_bPanelActive_Debug;
 			_panel_Debug.SetActive( _bPanelActive_Debug );
+		}
+
+		if( Keyboard.current.escapeKey.wasPressedThisFrame && _pauseMenu )
+		{
+			_pauseMenu.SetActive( true );
 		}
 	}
 
