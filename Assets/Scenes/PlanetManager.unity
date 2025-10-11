@@ -119,6 +119,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &47840758 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 675452079855168625, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+  m_PrefabInstance: {fileID: 836554128748298278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8775522b5af9f6b4788219c599c79ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &144516646 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4951162345284145776, guid: 1f2ba741284d2b64eac916a22c4fb47a, type: 3}
@@ -330,6 +341,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &288491951 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1321028293628539166, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+  m_PrefabInstance: {fileID: 836554128748298278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8775522b5af9f6b4788219c599c79ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &470993542
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,7 +494,46 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 470993542}
   m_CullTransparentMesh: 1
---- !u!21 &545595691
+--- !u!21 &566121088
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Disc Transparent (INNER_RADIUS) (instance)
+  m_Shader: {fileID: 4800000, guid: 0736a017ee88a8741b09e7382339ab99, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - INNER_RADIUS
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _StencilComp: 8
+    - _StencilID: 0
+    - _StencilOp: 0
+    - _StencilOpPass: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _ZOffsetFactor: 0
+    - _ZOffsetUnits: 0
+    - _ZTest: 8
+    m_Colors: []
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!21 &581303318
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -526,7 +587,7 @@ PrefabInstance:
     - target: {fileID: 519237999906814429, guid: 886251e46a6c64d4693389a9e5cde7ed, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 545595691}
+      objectReference: {fileID: 581303318}
     - target: {fileID: 936476395476446895, guid: 886251e46a6c64d4693389a9e5cde7ed, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -684,7 +745,7 @@ PrefabInstance:
     - target: {fileID: 5397075720966075536, guid: 1553a9353c7a9d14b983032cca166cfc, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 1356977955}
+      objectReference: {fileID: 956170282}
     - target: {fileID: 7474750104527844079, guid: 1553a9353c7a9d14b983032cca166cfc, type: 3}
       propertyPath: m_Name
       value: Satellite
@@ -899,12 +960,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _fallbackSummaryPrefab: {fileID: 5023069573216675151, guid: a675526f294c734458852a26ea085453, type: 3}
   _summaryObjectCreated: {fileID: 0}
---- !u!224 &1096512805 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5525594672272199255, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+--- !u!114 &950776301 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5564115237508375491, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
   m_PrefabInstance: {fileID: 836554128748298278}
   m_PrefabAsset: {fileID: 0}
---- !u!21 &1356977955
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8775522b5af9f6b4788219c599c79ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!21 &956170282
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -943,6 +1010,50 @@ Material:
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!21 &1043215237
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Disc Transparent (INNER_RADIUS) (instance)
+  m_Shader: {fileID: 4800000, guid: 0736a017ee88a8741b09e7382339ab99, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - INNER_RADIUS
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _StencilComp: 8
+    - _StencilID: 0
+    - _StencilOp: 0
+    - _StencilOpPass: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _ZOffsetFactor: 0
+    - _ZOffsetUnits: 0
+    - _ZTest: 8
+    m_Colors: []
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!224 &1096512805 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5525594672272199255, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+  m_PrefabInstance: {fileID: 836554128748298278}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1476978150
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1004,6 +1115,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e854aafedf71744186205535f05348d, type: 3}
+--- !u!114 &1518066596 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3014203269063178702, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+  m_PrefabInstance: {fileID: 836554128748298278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8775522b5af9f6b4788219c599c79ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1737105184 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2147968766378359604, guid: 0e854aafedf71744186205535f05348d, type: 3}
@@ -1058,6 +1180,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6733665816867402154, guid: ba62a169737e6de4eb49e5e6fe2f2bfa, type: 3}
   m_PrefabInstance: {fileID: 8955849811250267314}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1932031554 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2323075597473652356, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
+  m_PrefabInstance: {fileID: 836554128748298278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8775522b5af9f6b4788219c599c79ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2110976517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2198,23 +2331,23 @@ PrefabInstance:
     - target: {fileID: 8280227624993867223, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: '_tutorialPopups.Array.data[1]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 288491951}
     - target: {fileID: 8280227624993867223, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: '_tutorialPopups.Array.data[2]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1518066596}
     - target: {fileID: 8280227624993867223, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: '_tutorialPopups.Array.data[3]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1932031554}
     - target: {fileID: 8280227624993867223, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: '_tutorialPopups.Array.data[4]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 950776301}
     - target: {fileID: 8280227624993867223, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: '_tutorialPopups.Array.data[5]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 47840758}
     - target: {fileID: 8363745489608756381, guid: ff5b9e0ee8cc70f4eb7cea0e2722329c, type: 3}
       propertyPath: m_SizeDelta.x
       value: -10

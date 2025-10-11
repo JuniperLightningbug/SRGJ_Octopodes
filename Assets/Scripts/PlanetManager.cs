@@ -35,6 +35,11 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 	{
 		GoToPlanetIdx( _activePlanetIdx + 1 );
 	}
+	
+	public void GoToFirstPlanet()
+	{
+		GoToPlanetIdx( 0 );
+	}
 
 	public void GoToPlanetIdx( int planetIdx )
 	{

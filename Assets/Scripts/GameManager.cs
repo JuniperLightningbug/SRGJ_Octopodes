@@ -23,8 +23,11 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	[SerializeField] private Object _tutorialPrefab;
 
+	[SerializeField] private bool _bActivateOnStart = true;
 	[SerializeField] private float _progressWinThreshold = 0.8f;
 	[SerializeField] private bool _bPlanetIsCompleted = false;
+	private Coroutine _drawCardsCoroutine = null;
+	private const float kCardDrawDelay = 3.0f;
 
 	// Static accessor
 	public static SO_PlanetConfig.ESensorType TryGetCurrentSensorViewType()
@@ -40,6 +43,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	[SerializeField] private bool _bDrawStormGizmos = false;
 	[SerializeField] private bool _bPauseStormTimer = false;
+	
 
 	protected override void Initialise()
 	{
@@ -64,7 +68,17 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		_satelliteDeck?.DrawSatellites();
 	}
 
-	public IEnumerator DrawCardsDelayed( float delay )
+	public void DrawNextCardsDelayed( float delay = kCardDrawDelay )
+	{
+		if( _drawCardsCoroutine != null )
+		{
+			StopCoroutine( _drawCardsCoroutine );
+		}
+
+		_drawCardsCoroutine = StartCoroutine( DrawCardsDelayedCoroutine( delay ) );
+	}
+
+	public IEnumerator DrawCardsDelayedCoroutine( float delay )
 	{
 		yield return new WaitForSeconds( delay );
 		DrawNextCards();
@@ -95,7 +109,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 				_satelliteDeck?.Shuffle();
 				if( !BTutorialIsActive )
 				{
-					StartCoroutine( DrawCardsDelayed( 3.0f ) );
+					DrawNextCardsDelayed();
 				}
 
 				if( _stormTimer != null )
@@ -132,6 +146,20 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		_bPlanetIsCompleted = false;
 		
 		EventBus.Invoke( EventBus.EEventType.PostClearActivePlanet );
+	}
+
+	private void GoToNextPlanet()
+	{
+		ClearActivePlanet();
+		_planetManager?.GoToNextPlanet();
+		TryCreatePlanet(); // Try to create immediately
+	}
+
+	private void GoToFirstPlanet()
+	{
+		ClearActivePlanet();
+		_planetManager?.GoToFirstPlanet();
+		TryCreatePlanet(); // Try to create immediately
 	}
 
 #region Runtime Debug Inspector Inputs
@@ -194,9 +222,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	private void OnGlobalEvent_UIGoToNextPlanet( EventBus.EventContext context, object obj = null )
 	{
-		ClearActivePlanet();
-		_planetManager?.GoToNextPlanet();
-		TryCreatePlanet(); // Try to create immediately
+		GoToNextPlanet();
 	}
 	
 	private void OnGlobalEvent_UIPauseTime( EventBus.EventContext context, object obj = null )
@@ -220,6 +246,14 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	private void OnGlobalEvent_TUTStartFirstStormWarning( EventBus.EventContext context, object obj = null )
 	{
 		_stormTimer?.ChangeState( StormTimer.EStormState.Warning );
+	}
+
+	private void OnGlobalEvent_StormEnded( EventBus.EventContext context, object obj = null )
+	{
+		if( _tutorialInstance == null )
+		{
+			DrawNextCardsDelayed();
+		}
 	}
 	
 	private void OnGlobalEvent_OnChangedPlanetProgress( EventBus.EventContext context, object obj = null )
@@ -256,6 +290,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StartListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
 		EventBus.StartListening( EventBus.EEventType.OnChanged_PlanetProgress, OnGlobalEvent_OnChangedPlanetProgress );
 		EventBus.StartListening( EventBus.EEventType.DEBUG_CompletePlanet, OnGlobalEvent_DebugCompletePlanet );
+		EventBus.StartListening( EventBus.EEventType.StormEnded, OnGlobalEvent_StormEnded );
 	}
 
 	void OnDisable()
@@ -269,6 +304,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.StopListening( EventBus.EEventType.TUT_StartFirstStormWarning, OnGlobalEvent_TUTStartFirstStormWarning );
 		EventBus.StopListening( EventBus.EEventType.OnChanged_PlanetProgress, OnGlobalEvent_OnChangedPlanetProgress );
 		EventBus.StopListening( EventBus.EEventType.DEBUG_CompletePlanet, OnGlobalEvent_DebugCompletePlanet );
+		EventBus.StopListening( EventBus.EEventType.StormEnded, OnGlobalEvent_StormEnded );
 	}
 
 	void Update()
@@ -276,6 +312,14 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		if( !_bPauseStormTimer )
 		{
 			_stormTimer?.Update( Time.deltaTime );
+		}
+	}
+
+	void Start()
+	{
+		if( _bActivateOnStart )
+		{
+			GoToFirstPlanet();
 		}
 	}
 

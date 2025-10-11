@@ -7,8 +7,9 @@ public class Satellite3D : MonoBehaviour
 {
 	private static readonly int _propertyIDBaseColour = Shader.PropertyToID( "_BaseColor" );
 
-	[Header("Prefab Components")]
+	[Header( "Prefab Components" )]
 	public MeshRenderer _meshRenderer;
+
 	public MeshFilter _meshFilter;
 	public Collider _collider;
 	public Transform _satelliteZRotationRoot;
@@ -23,14 +24,17 @@ public class Satellite3D : MonoBehaviour
 	private Material _outlineMaterial;
 	private Material _meshMaterial;
 	private Color _originalMeshColour;
-	
-	[Header("Prefab Config")]
+
+	[Header( "Prefab Config" )]
 	public float _outlineAlpha = 0.4f;
+
 	public float _deathScaleDownMult = 0.3f;
 	public float _deathScaleDownAnimationTime = 0.2f;
 	public Color _safeModeMeshColour = Color.black;
 	public Color _deadMeshColour = Color.black;
+
 	public float _damageShakePeriod = 5.0f;
+
 	//public float _damageShakeStrength_Position = 0.02f;
 	public float _damageShakeStrength_Rotation = 16.0f;
 	public int _damageShakeVibrato = 10;
@@ -45,7 +49,7 @@ public class Satellite3D : MonoBehaviour
 
 	// While safe mode is active, this satellite is not selectable
 	private Sequence _safeModeSequence;
-	
+
 	private Sequence _deathSequence;
 
 	private Tween _outlineTween;
@@ -67,7 +71,7 @@ public class Satellite3D : MonoBehaviour
 		_originalMeshRootScale = _satelliteMeshRoot.localScale;
 	}
 
-	[Button("Refresh Visuals")]
+	[Button( "Refresh Visuals" )]
 	public void RefreshVisuals()
 	{
 		if( _meshRenderer )
@@ -89,7 +93,7 @@ public class Satellite3D : MonoBehaviour
 		{
 			_satelliteZRotationRoot.localRotation = Quaternion.Euler( 0.0f, 0.0f, Random.Range( 0.0f, 360.0f ) );
 		}
-		
+
 		_originalMeshRootPosition = _satelliteMeshRoot.localPosition;
 		_originalMeshRootRotation = _satelliteMeshRoot.localRotation;
 		_originalMeshRootScale = _satelliteMeshRoot.localScale;
@@ -110,7 +114,7 @@ public class Satellite3D : MonoBehaviour
 			// Don't make the outline if the current view layer doesn't match the satellite type
 			return;
 		}
-		
+
 		_outlineTween?.Kill();
 		_outlineTween = _outlineMaterial.DOFade( bOn ? _outlineAlpha : 0.0f, 0.2f ).SetEase( Ease.InOutSine );
 	}
@@ -144,22 +148,22 @@ public class Satellite3D : MonoBehaviour
 		{
 			DeactivateStormDamage( false );
 		}
-		
+
 		if( _collider )
 		{
 			// Disable mouse click while active
 			_collider.enabled = !bOn;
 		}
-		
+
 		if( _meshMaterial )
 		{
 			_meshMaterial.SetColor( _propertyIDBaseColour, bOn ? _safeModeMeshColour : _originalMeshColour );
 		}
-		
+
 		Outline( !bOn );
 	}
 
-	[Button("Debug: Activate Damage Effects")]
+	[Button( "Debug: Activate Damage Effects" )]
 	public void ActivateStormDamage()
 	{
 		if( !_satelliteMeshRoot )
@@ -169,16 +173,16 @@ public class Satellite3D : MonoBehaviour
 
 		_takeDamageTweenRotation?.Kill( complete: false );
 		_takeDamageFadeSequence?.Kill( complete: false );
-		
+
 		_satelliteMeshRoot.localRotation = _originalMeshRootRotation;
-		
+
 		_takeDamageTweenRotation = _satelliteMeshRoot.DOShakeRotation(
 			duration: _damageShakePeriod,
 			strength: _damageShakeStrength_Rotation,
 			vibrato: _damageShakeVibrato,
 			randomness: _damageShakeRandomness,
-			fadeOut: false  // Continuous shaking
-		).SetLoops(-1, LoopType.Restart);
+			fadeOut: false // Continuous shaking
+		).SetLoops( -1, LoopType.Restart );
 
 		if( _damageParticles )
 		{
@@ -191,7 +195,7 @@ public class Satellite3D : MonoBehaviour
 	{
 		DeactivateStormDamage( true );
 	}
-	
+
 	public void DeactivateStormDamage( bool bWithFadeOut )
 	{
 		if( !_satelliteMeshRoot )
@@ -225,14 +229,14 @@ public class Satellite3D : MonoBehaviour
 				_satelliteMeshRoot.localRotation = _originalMeshRootRotation;
 			}
 		}
-		
+
 		if( _damageParticles )
 		{
 			_damageParticles.Stop();
 		}
 	}
 
-	[Button("Debug: Activate Kill Effects")]
+	[Button( "Debug: Activate Kill Effects" )]
 	public void Kill()
 	{
 		if( _deathSequence != null )
@@ -243,7 +247,7 @@ public class Satellite3D : MonoBehaviour
 		_safeModeSequence?.Kill( complete: true );
 
 		DeactivateStormDamage(); // Stop wobbling (with fade)
-		
+
 		Outline( false );
 		if( _collider )
 		{
@@ -255,8 +259,17 @@ public class Satellite3D : MonoBehaviour
 		_deathSequence.Join( transform
 			.DOScale( transform.localScale.x * _deathScaleDownMult, _deathScaleDownAnimationTime )
 			.SetEase( Ease.OutQuad ) );
-		
+
 		_meshMaterial.SetColor( _propertyIDBaseColour, _deadMeshColour );
 
+	}
+
+	void OnDestroy()
+	{
+		_safeModeSequence?.Kill();
+		_deathSequence?.Kill();
+		_outlineTween?.Kill();
+		_takeDamageTweenRotation?.Kill();
+		_takeDamageFadeSequence?.Kill();
 	}
 }

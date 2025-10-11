@@ -9,8 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/PlasmaParticlesScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/PlanetManagerScene.unity
+    path: Assets/Scenes/PlanetManager.unity
     guid: f5e1c4f0954800a4281a95ceb6919e2b
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 01e7884bb1c602b499fa9cfbf0efa21e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
