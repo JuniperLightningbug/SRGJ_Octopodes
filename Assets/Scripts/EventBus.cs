@@ -59,6 +59,9 @@ public static class EventBus
 		StormWarningStarted, // float timeToStorm
 		StormStarted, // float stormTime
 		StormEnded,
+		
+		// Audio
+		PlayButtonSound,
 
 		COUNT,
 	}

@@ -47,6 +47,7 @@ public class UIValues_LayerProgress : UIValuesBase, IPointerEnterHandler, IPoint
 
 	private void OnGlobalEvent_TUTHideAllLayers( EventBus.EventContext context, object obj = null )
 	{
+		_toggle.isOn = false;
 		gameObject.SetActive( false );
 	}
 
@@ -54,6 +55,7 @@ public class UIValues_LayerProgress : UIValuesBase, IPointerEnterHandler, IPoint
 	{
 		if( obj is SO_PlanetConfig.ESensorType type && _toggle != null && type == _type )
 		{
+			_toggle.isOn = false;
 			gameObject.SetActive( true );
 		}
 	}

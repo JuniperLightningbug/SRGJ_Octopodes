@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class OrbitCameraController : MonoBehaviour
 {
 	[SerializeField] private Vector2 _orbitSpeed = Vector2.one;
+	[SerializeField] private float _maxOrbitSpeed = 10.0f;
 
 	[SerializeField, MinMaxSlider( -90.0f, 90.0f )]
 	private Vector2 _orbitXRange = new Vector2( -90.0f, 90.0f );
@@ -105,10 +106,14 @@ public class OrbitCameraController : MonoBehaviour
 		if( Mouse.current.rightButton.isPressed && !Mouse.current.rightButton.wasPressedThisFrame )
 		{
 			Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+			Vector2 rotationDelta = new Vector2( -mouseDelta.y * _orbitSpeed.x, mouseDelta.x * _orbitSpeed.y );
+			rotationDelta = Vector2.ClampMagnitude( rotationDelta, _maxOrbitSpeed );
 
-			_currentEulerRotation.x = Mathf.Clamp( _currentEulerRotation.x - mouseDelta.y * _orbitSpeed.x,
+			Vector2 previousEulerRotation = _currentEulerRotation;
+
+			_currentEulerRotation.x = Mathf.Clamp( _currentEulerRotation.x + rotationDelta.x,
 				_orbitXRange.x, _orbitXRange.y );
-			_currentEulerRotation.y += mouseDelta.x * _orbitSpeed.y;
+			_currentEulerRotation.y += rotationDelta.y;
 
 			transform.rotation = Quaternion.Euler( _currentEulerRotation );
 		}
