@@ -1,3 +1,4 @@
+using System;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -28,45 +29,65 @@ public class OrbitCameraController : MonoBehaviour
 	[SerializeField] private EZoomType _zoomType = EZoomType.Distance;
 	[SerializeField] private Camera _orbitCamera;
 
-	[SerializeField] private Vector3 _eulerRotationDefault = Vector3.zero;
-	[SerializeField] private float _zoomFOVDefault = 60.0f;
-	[SerializeField] private float _zoomDistanceDefault = 2.0f;
+	[NonSerialized, ShowNonSerializedField] private Vector3 _eulerRotationDefault = Vector3.zero;
+	[NonSerialized, ShowNonSerializedField] private float _zoomFOVDefault = 60.0f;
+	[NonSerialized, ShowNonSerializedField] private float _zoomDistanceDefault = 2.0f;
+
+	private bool _bHasInitialised = false;
 
 	private Vector3 _currentEulerRotation;
 	private float _currentFOV;
 	private float _currentDistance;
 
-	void Awake()
+	void Start()
 	{
-		_currentEulerRotation = transform.rotation.eulerAngles;
-		_eulerRotationDefault = _currentEulerRotation;
+		Initialise();
+	}
 
-		if( !_orbitCamera )
+	private void Initialise()
+	{
+		if( !_bHasInitialised )
 		{
-			_orbitCamera = GetComponent<Camera>();
-		}
+			_bHasInitialised = true;
+			_eulerRotationDefault = transform.rotation.eulerAngles;
 
-		if( !_orbitCamera )
-		{
-			_orbitCamera = Camera.main;
-		}
+			if( !_orbitCamera )
+			{
+				_orbitCamera = GetComponent<Camera>();
+			}
 
-		_zoomFOVDefault = _orbitCamera.fieldOfView;
-		_zoomDistanceDefault = _orbitCamera.transform.localPosition.z;
+			if( !_orbitCamera )
+			{
+				_orbitCamera = Camera.main;
+			}
+
+			_zoomFOVDefault = _orbitCamera.fieldOfView;
+			_zoomDistanceDefault = _orbitCamera.transform.localPosition.z;
+
+			ResetToDefault();
+		}
 	}
 
 	public void ResetToDefault()
 	{
-		_zoomFOVDefault = _orbitCamera.fieldOfView = _zoomFOVDefault;
+		_currentDistance = _zoomDistanceDefault;
+		_currentEulerRotation = _eulerRotationDefault;
+		
+		_currentEulerRotation.x = Mathf.Clamp( _currentEulerRotation.x,
+			_orbitXRange.x, _orbitXRange.y );
+		
+		// _zoomFOVDefault = _orbitCamera.fieldOfView = _zoomFOVDefault;
 		_orbitCamera.transform.localPosition = new Vector3(
 			_orbitCamera.transform.localPosition.x,
 			_orbitCamera.transform.localPosition.y,
-			_zoomDistanceDefault );
-		transform.rotation = Quaternion.Euler( _eulerRotationDefault );
+			_currentDistance );
+		transform.rotation = Quaternion.Euler( _currentEulerRotation );
+
 	}
 
 	void Update()
 	{
+		Initialise();
 		OrbitCamera();
 		switch( _zoomType )
 		{
