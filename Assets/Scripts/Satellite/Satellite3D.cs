@@ -20,6 +20,7 @@ public class Satellite3D : MonoBehaviour
 	private Quaternion _originalMeshRootRotation;
 	private Vector3 _originalMeshRootScale;
 	public ParticleSystem _damageParticles;
+	public ParticleSystem _deathParticles;
 
 	public GameObject _highlightObject;
 
@@ -215,7 +216,8 @@ public class Satellite3D : MonoBehaviour
 			strength: _damageShakeStrength_Rotation,
 			vibrato: _damageShakeVibrato,
 			randomness: _damageShakeRandomness,
-			fadeOut: false // Continuous shaking
+			fadeOut: false, // Continuous shaking
+			randomnessMode: ShakeRandomnessMode.Harmonic
 		).SetLoops( -1, LoopType.Restart );
 
 		if( _damageParticles )
@@ -294,6 +296,11 @@ public class Satellite3D : MonoBehaviour
 			.SetEase( Ease.OutQuad ) );
 
 		_meshMaterial.SetColor( _propertyIDBaseColour, _deadMeshColour );
+
+		if( _deathParticles )
+		{
+			_deathParticles.Play();
+		}
 	}
 
 	void OnDestroy()
