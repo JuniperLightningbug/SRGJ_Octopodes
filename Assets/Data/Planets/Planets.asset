@@ -19,4 +19,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fc5fa21b5496a444abda4d9d5d8ed9eb, type: 2}
   - {fileID: 11400000, guid: 2140005a489dd54469ef964ce54f8070, type: 2}
   _tutorialPlanetConfig: {fileID: 11400000, guid: 5f9c7e4d91a20e4488e5d60df5eab7b9, type: 2}
-  _bActivateTutorial: 1
+  _bActivateTutorial: 0

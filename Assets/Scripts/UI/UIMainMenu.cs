@@ -6,7 +6,13 @@ using UnityEngine.SceneManagement;
 public class UIMainMenu : MonoBehaviour
 {
 
+	public string _gameSceneName = "PlanetManager";
+
 	// UI Event
+	public void UI_StartGame()
+	{
+		UI_StartGame( _gameSceneName );
+	}
 	public void UI_StartGame(string inSceneName)
 	{
 		Scene activeScene = SceneManager.GetActiveScene();
