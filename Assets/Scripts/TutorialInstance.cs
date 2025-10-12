@@ -123,6 +123,7 @@ public class TutorialInstance : MonoBehaviour
 	public IEnumerator TutorialSequence()
 	{
 		// One big coroutine to rule them all
+		yield return new WaitForEndOfFrame();
 		
 		// Hide Layers
 		EventBus.Invoke( this, EventBus.EEventType.TUT_HideAllLayers );
