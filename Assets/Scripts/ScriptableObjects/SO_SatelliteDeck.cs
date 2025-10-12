@@ -62,7 +62,6 @@ public class SO_SatelliteDeck : ScriptableObject
 
 	public bool DrawSatellites()
 	{
-
 		if( _cardDrawNumbers != null && _cardDrawNumbers.Count > 0 )
 		{
 			int numCardsToDraw = _cardDrawNumbers[Mathf.Min( _numCardDrawActionsSoFar, _cardDrawNumbers.Count - 1 )];

@@ -27,7 +27,7 @@ public class UIValues_PlanetProgress : UIValuesBase
 		if( context._eventType == EventBus.EEventType.OnChanged_PlanetProgress &&
 		    obj is float newProgressValue )
 		{
-			_discoveryProgress = newProgressValue;
+			_discoveryProgress = newProgressValue / GameManager.kProgressWinThreshold;
 		}
 		else if( context._eventType == EventBus.EEventType.PostClearActivePlanet ||
 		         context._eventType == EventBus.EEventType.PostSpawnNewPlanet )

@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using Shapes;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 public class GameManager : StandaloneSingletonBase<GameManager>
@@ -25,7 +26,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	[SerializeField] private Object _tutorialPrefab;
 
 	[SerializeField] private bool _bActivateOnStart = true;
-	[SerializeField] private float _progressWinThreshold = 0.8f;
+	public const float kProgressWinThreshold = 0.8f;
 	[SerializeField] private bool _bPlanetIsCompleted = false;
 	private Coroutine _drawCardsCoroutine = null;
 	private const float kCardDrawDelay = 3.0f;
@@ -45,6 +46,9 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	[SerializeField] private bool _bDrawStormGizmos = false;
 	[SerializeField] private bool _bPauseStormTimer = false;
 	
+	// Last-day game jam things
+	[SerializeField] private float _timeSinceLastCardDraw = 0.0f;
+	[SerializeField] private float _timeBetweenCardDraws = 10.0f;
 
 	protected override void Initialise()
 	{
@@ -67,6 +71,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	public void DrawNextCards()
 	{
 		_satelliteDeck?.DrawSatellites();
+		_timeSinceLastCardDraw = 0.0f;
 	}
 
 	public void DrawNextCardsDelayed( float delay = kCardDrawDelay )
@@ -253,7 +258,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	{
 		if( !BTutorialIsActive )
 		{
-			DrawNextCardsDelayed();
+			_timeSinceLastCardDraw += 10.0f; // Accelerate a bit after storm
 		}
 	}
 	
@@ -261,13 +266,13 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 	{
 		if( !_bPlanetIsCompleted && obj is float newProgress )
 		{
-			if( _planetManager?.ActivePlanet?.PlanetConfig != null && newProgress > _progressWinThreshold )
+			if( _planetManager?.ActivePlanet?.PlanetConfig != null && newProgress > kProgressWinThreshold )
 			{
 				_bPlanetIsCompleted = true;
 				EventBus.Invoke( this, EventBus.EEventType.PlanetCompleted,
 					_planetManager.ActivePlanet.PlanetConfig );
 			}
-			_satelliteDeck?.TryDrawCardsFromProgress( newProgress );
+			//_satelliteDeck?.TryDrawCardsFromProgress( newProgress );
 		}
 	}
 
@@ -318,6 +323,16 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		if( Keyboard.current.backslashKey.wasPressedThisFrame )
 		{
 			DrawNextCards();
+		}
+		
+		if( !BTutorialIsActive )
+		{
+			_timeSinceLastCardDraw += Time.deltaTime;
+			if( _timeSinceLastCardDraw > _timeBetweenCardDraws && !(_stormTimer != null && _stormTimer.BStormIsActive) )
+			{
+				_timeSinceLastCardDraw = 0.0f;
+				DrawNextCardsDelayed();
+			}
 		}
 	}
 

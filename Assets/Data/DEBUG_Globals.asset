@@ -20,5 +20,5 @@ MonoBehaviour:
   _satelliteSafeModeTime: 3
   _satelliteRadius: 0.2
   _bInfiniteHealth: 0
-  _discoveryFadeOutStartTime: 28
-  _discoveryFadeOutEndTime: 32
+  _discoveryFadeOutStartTime: 29
+  _discoveryFadeOutEndTime: 30

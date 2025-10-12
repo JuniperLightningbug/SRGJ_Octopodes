@@ -243,6 +243,8 @@ public class TutorialInstance : MonoBehaviour
 		EventBus.Invoke( this, EventBus.EEventType.TUT_Popup_HideAll );
 		EventBus.Invoke( this, EventBus.EEventType.TUT_Popup_WinCondition, false );
 
+		_bIsActive = false;
+
 		// End of tutorial - carry on as normal from here
 		yield return null;
 
