@@ -601,6 +601,45 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 155746775313476568, guid: 1553a9353c7a9d14b983032cca166cfc, type: 3}
   m_PrefabInstance: {fileID: 741690887}
   m_PrefabAsset: {fileID: 0}
+--- !u!21 &748040105
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Disc Transparent (INNER_RADIUS) (instance)
+  m_Shader: {fileID: 4800000, guid: 0736a017ee88a8741b09e7382339ab99, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - INNER_RADIUS
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _StencilComp: 8
+    - _StencilID: 0
+    - _StencilOp: 0
+    - _StencilOpPass: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _ZOffsetFactor: 0
+    - _ZOffsetUnits: 0
+    - _ZTest: 8
+    m_Colors: []
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!4 &785122574 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8886015278592442234, guid: 886251e46a6c64d4693389a9e5cde7ed, type: 3}
@@ -627,6 +666,45 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7589106306137768062, guid: 8c68b02928b028f40881d11c6b89dfdc, type: 3}
   m_PrefabInstance: {fileID: 2532674498254189770}
   m_PrefabAsset: {fileID: 0}
+--- !u!21 &958514787
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Disc Transparent (INNER_RADIUS) (instance)
+  m_Shader: {fileID: 4800000, guid: 0736a017ee88a8741b09e7382339ab99, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - INNER_RADIUS
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _StencilComp: 8
+    - _StencilID: 0
+    - _StencilOp: 0
+    - _StencilOpPass: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _ZOffsetFactor: 0
+    - _ZOffsetUnits: 0
+    - _ZTest: 8
+    m_Colors: []
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!224 &1119610046 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3543864907429503752, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
@@ -857,6 +935,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5130394476392386161}
     m_Modifications:
+    - target: {fileID: 881507910380391427, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
+      propertyPath: _displayEvent
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3274178794068846771, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
+      propertyPath: _displayEvent
+      value: 24
+      objectReference: {fileID: 0}
     - target: {fileID: 3295937747637844522, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
       propertyPath: m_Name
       value: Panel_TutorialPopups
@@ -940,6 +1026,22 @@ PrefabInstance:
     - target: {fileID: 3543864907429503752, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3958974100915223144, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
+      propertyPath: _displayEvent
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 6269822613723905768, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
+      propertyPath: _displayEvent
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 6379304473328993888, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
+      propertyPath: _displayEvent
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7584766754073312495, guid: c1793142cf600f1438055b5e4da5da5d, type: 3}
+      propertyPath: _displayEvent
+      value: 23
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

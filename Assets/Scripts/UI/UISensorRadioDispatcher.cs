@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Similar to UIEventDispatcher - TODO could generalise this
 public class UISensorRadioDispatcher : MonoBehaviour
 {
 	[System.Serializable]
