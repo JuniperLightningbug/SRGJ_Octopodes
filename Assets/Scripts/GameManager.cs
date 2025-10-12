@@ -4,6 +4,7 @@ using MM;
 using NaughtyAttributes;
 using Shapes;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
 
 public class GameManager : StandaloneSingletonBase<GameManager>
@@ -250,7 +251,7 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 
 	private void OnGlobalEvent_StormEnded( EventBus.EventContext context, object obj = null )
 	{
-		if( _tutorialInstance == null )
+		if( !BTutorialIsActive )
 		{
 			DrawNextCardsDelayed();
 		}
@@ -312,6 +313,11 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		if( !_bPauseStormTimer )
 		{
 			_stormTimer?.Update( Time.deltaTime );
+		}
+
+		if( Keyboard.current.backslashKey.wasPressedThisFrame )
+		{
+			DrawNextCards();
 		}
 	}
 
