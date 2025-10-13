@@ -61,6 +61,8 @@ public class SatelliteOrbit : MonoBehaviour
 	public bool BIsInSafeMode => _bIsInSafeMode;
 	[SerializeField] private bool _bLayerIsSelected = false;
 	[SerializeField] private bool _bLayerIsHovered = false;
+	[SerializeField] private bool _bSatelliteIsHighlightedByCursor = false;
+	
 	
 	[SerializeField, ReadOnly, Range( 0.0f, 1.0f )]
 	private float _safeModeProgress = 0.0f;
@@ -253,6 +255,7 @@ public class SatelliteOrbit : MonoBehaviour
 			_bIsAlive = false;
 			_satelliteComponent?.Kill();
 			UpdateSatelliteComponentOutline();
+			UpdateOrbitVisualsActiveState();
 			StopTrackingSatellite();
 		}
 	}
@@ -278,6 +281,9 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_satelliteComponent.Highlight( bActive );
 		}
+
+		_bSatelliteIsHighlightedByCursor = bActive;
+		UpdateOrbitVisualsActiveState();
 	}
 
 	public void ToggleSafeMode( bool bActive )
@@ -299,6 +305,8 @@ public class SatelliteOrbit : MonoBehaviour
 			UpdateSatelliteComponentOutline();
 		}
 
+		UpdateOrbitVisualsActiveState();
+
 		if( bActive )
 		{
 			StopTrackingSatellite();
@@ -316,7 +324,18 @@ public class SatelliteOrbit : MonoBehaviour
 			_bIsAlive,
 			_bLayerIsSelected,
 			_bLayerIsHovered,
-			_bIsInSafeMode );
+			_bIsInSafeMode,
+			_bSatelliteIsHighlightedByCursor );
+	}
+
+	public void UpdateOrbitVisualsActiveState()
+	{
+		if( _orbitalOuterCircleVisuals )
+		{
+			_orbitalOuterCircleVisuals.gameObject.SetActive( _bIsAlive && 
+			                                                 (_bLayerIsHovered || _bLayerIsSelected ||
+			                                                  _bSatelliteIsHighlightedByCursor ) );
+		}
 	}
 	
 #endregion
@@ -329,6 +348,7 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_bLayerIsSelected = _satelliteData._sensorType == inType;
 			UpdateSatelliteComponentOutline();
+			UpdateOrbitVisualsActiveState();
 		}
 	}
 	
@@ -338,6 +358,7 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_bLayerIsSelected = false;
 			UpdateSatelliteComponentOutline();
+			UpdateOrbitVisualsActiveState();
 		}
 	}
 	
@@ -347,6 +368,7 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_bLayerIsHovered = _satelliteData._sensorType == inType;
 			UpdateSatelliteComponentOutline();
+			UpdateOrbitVisualsActiveState();
 		}
 	}
 	
@@ -356,6 +378,7 @@ public class SatelliteOrbit : MonoBehaviour
 		{
 			_bLayerIsHovered = false;
 			UpdateSatelliteComponentOutline();
+			UpdateOrbitVisualsActiveState();
 		}
 	}
 

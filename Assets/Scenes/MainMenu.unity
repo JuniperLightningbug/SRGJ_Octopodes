@@ -1082,8 +1082,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145.28, y: -119.45124}
-  m_SizeDelta: {x: 270.56, y: 24.128925}
+  m_AnchoredPosition: {x: 129.1, y: -119.45124}
+  m_SizeDelta: {x: 238.2, y: 24.128925}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &423598046
 MonoBehaviour:
@@ -1105,7 +1105,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Lindsay, Science Consultant
+  m_text: Lindsay Goodwin, Science Consultant
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2034,8 +2034,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 181.6739, y: -61.19339}
-  m_SizeDelta: {x: 343.3478, y: 24.128925}
+  m_AnchoredPosition: {x: 161, y: -61.19339}
+  m_SizeDelta: {x: 302, y: 24.128925}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &734504660
 MonoBehaviour:
@@ -3359,8 +3359,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 193.825, y: -32.06446}
-  m_SizeDelta: {x: 367.65, y: 24.128925}
+  m_AnchoredPosition: {x: 154.35, y: -32.06446}
+  m_SizeDelta: {x: 288.7, y: 24.128925}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1133835375
 MonoBehaviour:
@@ -3382,7 +3382,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Martin Micklewaithe, Engineer
+  m_text: Martin Micklethwaite, Engineer
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6303,7 +6303,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -37.33}
-  m_SizeDelta: {x: 285.2967, y: 151.5157}
+  m_SizeDelta: {x: 334.43, y: 151.5157}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1816141382
 MonoBehaviour:
@@ -7119,8 +7119,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 188.00325, y: -90.32231}
-  m_SizeDelta: {x: 356.0065, y: 24.128925}
+  m_AnchoredPosition: {x: 154.15, y: -90.32231}
+  m_SizeDelta: {x: 288.3, y: 24.128925}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2050080838
 MonoBehaviour:

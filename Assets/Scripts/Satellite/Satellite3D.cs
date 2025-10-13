@@ -78,18 +78,19 @@ public class Satellite3D : MonoBehaviour
 		bool bIsAlive,
 		bool bIsSensorTypeSelected,
 		bool bIsSensorTypeHovered,
-		bool bIsSafeModeOn )
+		bool bIsSafeModeOn,
+		bool bIsHighlightedByCursor )
 	{
 		EOutlineState newOutlineState = EOutlineState.None;
 		if( !bIsAlive || !bOrbitIsActive )
 		{
 			newOutlineState = EOutlineState.None;
 		}
-		else if( bIsSafeModeOn )
+		else if( bIsSafeModeOn && !bIsHighlightedByCursor )
 		{
 			newOutlineState = EOutlineState.Dark;
 		}
-		else if( bIsSensorTypeSelected || bIsSensorTypeHovered )
+		else if( bIsSensorTypeSelected || bIsSensorTypeHovered || bIsHighlightedByCursor )
 		{
 			newOutlineState = EOutlineState.Colour;
 		}

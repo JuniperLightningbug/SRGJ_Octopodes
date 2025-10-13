@@ -7,6 +7,18 @@ using UnityEngine.UI;
 public class UIValues_LayerProgress : UIValuesBase, IPointerEnterHandler, IPointerExitHandler
 {
 
+	protected override EventBus.EEventType[] UpdateOnEvents
+	{
+		get
+		{
+			return new EventBus.EEventType[]
+			{
+				EventBus.EEventType.OnChanged_LayerDiscovery,
+				EventBus.EEventType.UI_CreatePlanet,
+			};
+		}
+	}
+	
 	protected override bool BUpdateWhenDisabled => true;
 
 	public Slider _slider;
@@ -88,7 +100,11 @@ public class UIValues_LayerProgress : UIValuesBase, IPointerEnterHandler, IPoint
 	{
 		if( _outline )
 		{
-			_outline.enabled = true;
+			if( !_outline.enabled )
+			{
+				EventBus.Invoke(this, EventBus.EEventType.UI_HoverSensorView, _type );
+				_outline.enabled = true;
+			}
 		}
 	}
 
@@ -96,7 +112,11 @@ public class UIValues_LayerProgress : UIValuesBase, IPointerEnterHandler, IPoint
 	{
 		if( _outline )
 		{
-			_outline.enabled = false;
+			if( _outline.enabled )
+			{
+				EventBus.Invoke(this, EventBus.EEventType.UI_StopHoverSensorView, _type );
+				_outline.enabled = false;
+			}
 		}
 	}
 	

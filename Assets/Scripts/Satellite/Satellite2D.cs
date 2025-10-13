@@ -45,7 +45,7 @@ public class Satellite2D : MonoBehaviour
 
 		if( _nameTMP )
 		{
-			_nameTMP.SetText( _satelliteData._name );
+			_nameTMP.SetText( _satelliteData.ReadableString() );
 		}
 		if( _descriptionTMP )
 		{
@@ -53,7 +53,7 @@ public class Satellite2D : MonoBehaviour
 		}
 		if( _typeTMP )
 		{
-			_typeTMP.SetText( _satelliteData._sensorType.ToString() ); // TODO index the actual strings
+			_typeTMP.SetText( _satelliteData.ReadableString() );
 		}
 		if( _activeHighlightObj )
 		{
