@@ -42,9 +42,10 @@ public class UIValues_LayerProgress : UIValuesBase, IPointerEnterHandler, IPoint
 	
 	private void OnGlobalEvent_TUTActivateLayer( EventBus.EventContext context, object obj = null )
 	{
-		if( obj is SO_PlanetConfig.ESensorType type && _toggle != null )
+		if( obj is SO_PlanetConfig.ESensorType type && type == _type && _toggle != null )
 		{
 			_toggle.isOn = true;
+			
 		}
 	}
 	

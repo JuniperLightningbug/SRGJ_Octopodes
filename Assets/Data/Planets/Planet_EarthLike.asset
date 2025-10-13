@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf56075a9d471c042a50862307ae671a, type: 3}
   m_Name: Planet_EarthLike
   m_EditorClassIdentifier: 
-  _name: 
+  _name: Aurea-16
   _planetLayers:
   - _sensorType: 0
     _mesh: {fileID: 1908012735059086017, guid: 47eb4852e3cd2c24da4b349421919c19, type: 3}
@@ -48,3 +48,4 @@ MonoBehaviour:
   _stormDamagePerSecond: 0.3
   _bActivateTutorial: 0
   _rotationTime: 80
+  _bHasClouds: 1

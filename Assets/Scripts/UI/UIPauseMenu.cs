@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.SceneManagement;
 
 public class UIPauseMenu : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class UIPauseMenu : MonoBehaviour
 
 	public void GoToMainMenu()
     {
-		//Change scene code goes here
+	    SceneManager.LoadScene( "MainMenu" );
     }
 
     public void QuitGame()

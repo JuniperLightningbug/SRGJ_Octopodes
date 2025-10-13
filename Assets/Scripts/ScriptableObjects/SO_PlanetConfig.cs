@@ -50,6 +50,8 @@ public class SO_PlanetConfig : ScriptableObject
 	[Tooltip( "RotationTime" )]
 	public float _rotationTime = 0.0f;
 
+	public bool _bHasClouds = false;
+
 	[Button]
 	public void Validate()
 	{

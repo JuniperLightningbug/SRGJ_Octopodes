@@ -41,6 +41,13 @@ public class PlanetManager : StandaloneSingletonBase<PlanetManager>
 		GoToPlanetIdx( 0 );
 	}
 
+	public bool GetIsLastPlanet()
+	{
+		return _activePlanetIdx >= ((_planetsData._bActivateTutorial && _planetsData._tutorialPlanetConfig != null) ?
+			_planetsData._planetConfigs.Count:
+			_planetsData._planetConfigs.Count-1);
+	}
+
 	public void GoToPlanetIdx( int planetIdx )
 	{
 		if( _planetsData )

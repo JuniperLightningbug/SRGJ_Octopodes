@@ -24,6 +24,8 @@ MonoBehaviour:
     m_path: Assets/Scenes/MainMenu.unity
   - m_enabled: 1
     m_path: Assets/Scenes/PlanetManager.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/OutroScene.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
     m_Settings: []

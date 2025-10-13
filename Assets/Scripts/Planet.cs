@@ -20,6 +20,7 @@ public class Planet : MonoBehaviour
 	[SerializeField] private MeshFilter _planetMeshFilter;
 	[SerializeField] private MeshRenderer _planetMeshRenderer;
 	[SerializeField] public List<Transform> _planetStormZones = new List<Transform>();
+	[SerializeField] public GameObject _cloudsObject;
 
 	[SerializeField]
 	private Transform _rotationTransform;
@@ -243,6 +244,11 @@ public class Planet : MonoBehaviour
 					}
 				}
 			}
+		}
+
+		if( _cloudsObject )
+		{
+			_cloudsObject.SetActive( _planetConfig._bHasClouds );
 		}
 		
 		OnUpdateSensorType();

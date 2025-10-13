@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using Shapes;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -154,11 +155,23 @@ public class GameManager : StandaloneSingletonBase<GameManager>
 		EventBus.Invoke( EventBus.EEventType.PostClearActivePlanet );
 	}
 
+	private void EndGame()
+	{
+		SceneManager.LoadScene( "OutroScene" );
+	}
+
 	private void GoToNextPlanet()
 	{
 		ClearActivePlanet();
-		_planetManager?.GoToNextPlanet();
-		TryCreatePlanet(); // Try to create immediately
+		if( _planetManager && _planetManager.GetIsLastPlanet() )
+		{
+			EndGame();
+		}
+		else
+		{
+			_planetManager?.GoToNextPlanet();
+			TryCreatePlanet(); // Try to create immediately
+		}
 	}
 
 	private void GoToFirstPlanet()

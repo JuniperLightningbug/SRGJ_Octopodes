@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf56075a9d471c042a50862307ae671a, type: 3}
   m_Name: Planet_Tutorial
   m_EditorClassIdentifier: 
-  _name: 
+  _name: SRGJ-25
   _planetLayers:
   - _sensorType: 0
     _mesh: {fileID: 1908012735059086017, guid: 47eb4852e3cd2c24da4b349421919c19, type: 3}
@@ -41,10 +41,11 @@ MonoBehaviour:
     _bHasTexture: 1
   _planetMesh: {fileID: -575865206004738883, guid: dff4304222d90ce4aa09797e796c1343, type: 3}
   _planetMaterial: {fileID: 2100000, guid: 688ee1e962bf9f44b9431eb88fb56969, type: 2}
-  _summaryUIPrefab: {fileID: 5023069573216675151, guid: a675526f294c734458852a26ea085453, type: 3}
+  _summaryUIPrefab: {fileID: 5023069573216675151, guid: 28fe1afa5ee1a2f41923ffd1fe986f4a, type: 3}
   _satelliteDeck: {fileID: 11400000, guid: f666624f847fb594eaa47f60385e86a6, type: 2}
   _stormTimings: {fileID: 11400000, guid: 7ca7419bb8da20f4ea83d16a28385a45, type: 2}
   _stormZoneRadius: 0.7
   _stormDamagePerSecond: 0.15
   _bActivateTutorial: 1
   _rotationTime: 80
+  _bHasClouds: 1

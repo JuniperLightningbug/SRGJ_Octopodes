@@ -23,7 +23,6 @@ public class UIMainMenu : MonoBehaviour
 	}
 	
 	// UI Event
-	[Button( "Quit Game" )]
 	public void UI_QuitGame()
 	{
 		Application.Quit();
